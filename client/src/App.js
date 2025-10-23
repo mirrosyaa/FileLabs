@@ -1,7 +1,11 @@
+import React from "react";
+import LoginPage from "./pages/login";
 
 function App() {
   return (
-    <h1>Hello</h1>
+    <div id="App Content">
+      <LoginPage />
+    </div>
   );
 }
 
