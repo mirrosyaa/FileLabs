@@ -1,7 +1,9 @@
 import { React, useState } from "react";
+import { useNavigate } from "react-router-dom";
 
 function LoginForm() {
   // Store the user's input in state variables
+  const navigate = useNavigate();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
@@ -10,6 +12,7 @@ function LoginForm() {
     e.preventDefault(); // stop the page from reloading
     console.log("Email:", email);
     console.log("Password:", password);
+    navigate("/home");
 
     // You can add your login logic here (e.g., send to API)
   };
