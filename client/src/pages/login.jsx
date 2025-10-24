@@ -1,11 +1,14 @@
 import React from "react";
+import LoginForm from "../components/loginForm.jsx";
 import "../CSS/login.css";
 
-function loginPage(){
-    //login page logiic here
+function loginPage() {
+  //login page logiic here
 
-    return(
-        <h1>Login Page</h1>
-    )
+  return (
+    <div>
+      <LoginForm />
+    </div>
+  );
 }
 export default loginPage;
