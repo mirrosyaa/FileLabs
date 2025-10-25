@@ -1,5 +1,6 @@
 # Node modules (all locations)
 node_modules/
+db.js
 client/node_modules/
 server/node_modules/
 

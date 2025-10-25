@@ -1,19 +1,24 @@
-// Import Express
 const express = require('express');
 const cors = require('cors');
+const axios = require('axios');
+const usersRoutes = require('./routes/users');
 
-// Create an Express app
 const app = express();
+const PORT = 3000;
 
 // Middleware
-app.use(cors()); // allows frontend requests
-app.use(express.json()); // allows JSON body parsing
+app.use(cors());               // enable CORS
+app.use(express.json());       // parse JSON request bodies
 
-// Define a simple route
+// Routes
+app.use('/users', usersRoutes);
+
+// Test route
 app.get('/', (req, res) => {
   res.send('Server is running!');
 });
 
-// Start the server
-const PORT = 5000;
-app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
+// Start server
+app.listen(PORT, () => {
+  console.log(`Server running at http://localhost:${PORT}`);
+});
