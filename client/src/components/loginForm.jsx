@@ -13,7 +13,6 @@ function LoginForm() {
     e.preventDefault(); // stop the page from reloading
     console.log("Email:", email);
     console.log("Password:", password);
-    //navigate("/home");
 
     try {
       const response = await axios.post("http://localhost:3001/users/login", {
