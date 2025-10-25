@@ -2,25 +2,40 @@ const express = require('express');
 const router = express.Router();
 const db = require('../database/db');
 
-// GET all users
-router.get('/', (req, res) => {
-  db.query('SELECT * FROM users', (err, results) => {
-    if (err) return res.status(500).json({ error: err });
-    res.json(results);
-  });
-});
+router.post('/login', (req, res) => {
+  const { user_email, user_password } = req.body;
 
-// POST a new user
-router.post('/', (req, res) => {
-  const { name, email } = req.body;
-  db.query(
-    'INSERT INTO users (name, email) VALUES (?, ?)',
-    [name, email],
-    (err, result) => {
-      if (err) return res.status(500).json({ error: err });
-      res.json({ message: 'User added', userId: result.insertId });
+  // Check if both fields are provided
+  if (!user_email || !user_password) {
+    return res.status(400).json({ message: 'Email and password are required.' });
+  }
+
+  // Query to check if the email and password match
+  const sql = 'SELECT * FROM users WHERE user_email = ? AND user_password = ?';
+
+  db.query(sql, [user_email, user_password], (err, results) => {
+    if (err) {
+      console.error('Database error:', err);
+      return res.status(500).json({ message: 'Internal server error' });
     }
-  );
+
+    // If no matching user found
+    if (results.length === 0) {
+      return res.status(401).json({ message: 'Invalid email or password' });
+    }
+
+    // If user found
+    const user = results[0];
+    res.json({
+      message: 'Login successful!',
+      user: {
+        id: user.userID,
+        email: user.user_email,
+        username: user.username,
+        created_at: user.created_at
+      }
+    });
+  });
 });
 
 module.exports = router;

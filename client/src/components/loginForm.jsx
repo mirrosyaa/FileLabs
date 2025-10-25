@@ -1,5 +1,6 @@
 import { React, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import axios from "axios";
 
 function LoginForm() {
   // Store the user's input in state variables
@@ -8,13 +9,22 @@ function LoginForm() {
   const [password, setPassword] = useState("");
 
   // Handle form submission
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault(); // stop the page from reloading
     console.log("Email:", email);
     console.log("Password:", password);
-    navigate("/home");
+    //navigate("/home");
 
-    // You can add your login logic here (e.g., send to API)
+    try {
+      const response = await axios.post("http://localhost:3001/users/login", {
+        user_email: email,
+        user_password: password,
+      });
+      console.log(response.data);
+      navigate("/home");
+    }catch (err){
+      console.error("Login error:", err);
+    }
   };
 
   return (
