@@ -3,8 +3,7 @@ import LoginForm from "../components/loginForm.jsx";
 import "../CSS/login.css";
 
 function loginPage() {
-  //login page logiic here
-
+  // page to display all login components
   return (
     <div>
       <LoginForm />

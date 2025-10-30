@@ -4,24 +4,26 @@ import axios from "axios";
 
 function LoginForm() {
   // Store the user's input in state variables
-  const navigate = useNavigate();
+  const navigate = useNavigate(); // used to help navigate between login and home page
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
-  // Handle form submission
+  // Handle login form submission
   const handleSubmit = async (e) => {
     e.preventDefault(); // stop the page from reloading
     console.log("Email:", email);
     console.log("Password:", password);
 
     try {
+      // send login data to backend
       const response = await axios.post("http://localhost:3001/users/login", {
         user_email: email,
         user_password: password,
       });
       console.log(response.data);
-      navigate("/home");
-    }catch (err){
+      navigate("/home"); // if login is successful, navigate to home page
+    } catch (err) {
+      // if login fails, log the error from the backend
       console.error("Login error:", err);
     }
   };
