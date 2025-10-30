@@ -1,21 +1,21 @@
-const express = require('express');
-const cors = require('cors');
-const axios = require('axios');
-const usersRoutes = require('./routes/users');
+const express = require("express");
+const cors = require("cors");
+const axios = require("axios");
+const usersRoutes = require("./routes/users");
 
 const app = express();
 const PORT = 3001;
 
 // Middleware
-app.use(cors());               // enable CORS
-app.use(express.json());       // parse JSON request bodies
+app.use(cors());
+app.use(express.json());
 
 // Routes
-app.use('/users', usersRoutes);
+app.use("/users", usersRoutes);
 
 // Test route
-app.get('/', (req, res) => {
-  res.send('Server is running!');
+app.get("/", (req, res) => {
+  res.send("Server is running!");
 });
 
 // Start server
