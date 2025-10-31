@@ -7,6 +7,8 @@ function LoginForm() {
   const navigate = useNavigate(); // used to help navigate between login and home page
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [loginError, setLoginError] = useState(false);
+  const errorMessage = <h3 className="err">Incorrect username and password</h3>;
 
   // Handle login form submission
   const handleSubmit = async (e) => {
@@ -25,6 +27,7 @@ function LoginForm() {
     } catch (err) {
       // if login fails, log the error from the backend
       console.error("Login error:", err);
+      setLoginError(true);
     }
   };
 
@@ -61,6 +64,7 @@ function LoginForm() {
             required
           />
         </div>
+        <div>{loginError ? errorMessage : null}</div>
 
         <button type="submit" className="btn btn-primary w-100">
           Login
