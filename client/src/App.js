@@ -1,6 +1,7 @@
 import React from "react";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import AuthProvider from "./Authentication/authProvider";
+import RouteProtector from "./Authentication/RouteProtector";
 import LoginPage from "./pages/login";
 import HomePage from "./pages/homePage";
 
@@ -10,8 +11,18 @@ function App() {
       <Router>
         <div id="App Content">
           <Routes>
+            {/* Public routes*/}
             <Route path="/" element={<LoginPage />} />
-            <Route path="/home" element={<HomePage />} />
+
+            {/* Protected routes*/}
+            <Route
+              path="/home"
+              element={
+                <RouteProtector>
+                  <HomePage />
+                </RouteProtector>
+              }
+            />
           </Routes>
         </div>
       </Router>
