@@ -27,7 +27,7 @@ const authenticateToken = (req, res, next) => {
 
     // Token is valid, attach user data to request
     req.user = user;
-    next(); // Continue to the route handler
+    next(); // Continue to the route handlerrrtrrrrrrrrrrrr
   });
 };
 
