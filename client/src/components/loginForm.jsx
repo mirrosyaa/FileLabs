@@ -1,10 +1,12 @@
 import { React, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { useAuth } from "../Authentication/authProvider";
 import axios from "axios";
 
 function LoginForm() {
   // Store the user's input in state variables
   const navigate = useNavigate(); // used to help navigate between login and home page
+  const { setToken } = useAuth(); // Get setToken from AuthProvider
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loginError, setLoginError] = useState(false);
@@ -23,6 +25,10 @@ function LoginForm() {
         user_password: password,
       });
       console.log(response.data);
+
+      // Save JWT token to AuthProvider
+      setToken(response.data.token);
+
       navigate("/home"); // if login is successful, navigate to home page
     } catch (err) {
       // if login fails, log the error from the backend
