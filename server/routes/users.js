@@ -3,6 +3,7 @@ const router = express.Router();
 const db = require("../database/db");
 const jwt = require("jsonwebtoken");
 
+//=======================================MIDDLEWARE CODE=======================================
 // Secret key for JWT (In production, use environment variable!)
 const JWT_SECRET = "hello123456789";
 
@@ -30,6 +31,7 @@ const authenticateToken = (req, res, next) => {
     next(); // Continue to the route handlerrrtrrrrrrrrrrrr
   });
 };
+//============================================================================================
 
 // Route to check if user exists and validate login
 router.post("/login", (req, res) => {
@@ -83,15 +85,6 @@ router.post("/login", (req, res) => {
         userType: user.user_type,
       },
     });
-  });
-});
-
-// Protected route example - requires valid JWT token
-router.get("/profile", authenticateToken, (req, res) => {
-  // req.user contains the decoded JWT data (userId, email, username)
-  res.json({
-    message: "Access granted to protected route!",
-    user: req.user, // User data from JWT token
   });
 });
 
