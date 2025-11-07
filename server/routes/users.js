@@ -8,7 +8,7 @@ const JWT_SECRET = "hello123456789";
 
 // Middleware to verify JWT token
 const authenticateToken = (req, res, next) => {
-  // Get token from Authorization header
+  // Get token from Authorisation header
   const authHeader = req.headers["authorization"];
   const token = authHeader && authHeader.split(" ")[1]; // Format: "Bearer TOKEN"
 
@@ -67,7 +67,7 @@ router.post("/login", (req, res) => {
         username: user.username,
       },
       JWT_SECRET,
-      { expiresIn: "6h" } // Token expires in 6 hours
+      { expiresIn: "4h" } // Token expires in 6 hours
     );
 
     // Send token to frontend
