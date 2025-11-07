@@ -65,6 +65,7 @@ router.post("/login", (req, res) => {
         userId: user.userID,
         email: user.user_email,
         username: user.username,
+        userType: user.user_type,
       },
       JWT_SECRET,
       { expiresIn: "4h" } // Token expires in 6 hours
@@ -79,6 +80,7 @@ router.post("/login", (req, res) => {
         email: user.user_email,
         username: user.username,
         created_at: user.created_at,
+        userType: user.user_type,
       },
     });
   });
