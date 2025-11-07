@@ -1,8 +1,8 @@
 import React from "react";
-import LoginForm from "../components/loginForm.jsx";
+import LoginForm from "../components/loginForm";
 import "../CSS/login.css";
 
-function loginPage() {
+function LoginPage() {
   // page to display all login components
   return (
     <div>
@@ -10,4 +10,4 @@ function loginPage() {
     </div>
   );
 }
-export default loginPage;
+export default LoginPage;
