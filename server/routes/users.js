@@ -1,6 +1,35 @@
 const express = require("express");
 const router = express.Router();
 const db = require("../database/db");
+const jwt = require("jsonwebtoken");
+
+// Secret key for JWT (In production, use environment variable!)
+const JWT_SECRET = "hello123456789";
+
+// Middleware to verify JWT token
+const authenticateToken = (req, res, next) => {
+  // Get token from Authorization header
+  const authHeader = req.headers["authorization"];
+  const token = authHeader && authHeader.split(" ")[1]; // Format: "Bearer TOKEN"
+
+  // If no token provided
+  if (!token) {
+    return res
+      .status(401)
+      .json({ message: "Access denied. No token provided." });
+  }
+
+  // Verify token
+  jwt.verify(token, JWT_SECRET, (err, user) => {
+    if (err) {
+      return res.status(403).json({ message: "Invalid or expired token." });
+    }
+
+    // Token is valid, attach user data to request
+    req.user = user;
+    next(); // Continue to the route handler
+  });
+};
 
 // Route to check if user exists and validate login
 router.post("/login", (req, res) => {
@@ -27,10 +56,24 @@ router.post("/login", (req, res) => {
       return res.status(401).json({ message: "Invalid email or password" });
     }
 
-    // If user found
+    // If user found, generate JWT token
     const user = results[0];
+
+    // Create JWT token with user data
+    const token = jwt.sign(
+      {
+        userId: user.userID,
+        email: user.user_email,
+        username: user.username,
+      },
+      JWT_SECRET,
+      { expiresIn: "6h" } // Token expires in 6 hours
+    );
+
+    // Send token to frontend
     res.json({
       message: "Login successful!",
+      token: token, // JWT token for authentication
       user: {
         id: user.userID,
         email: user.user_email,
@@ -38,6 +81,15 @@ router.post("/login", (req, res) => {
         created_at: user.created_at,
       },
     });
+  });
+});
+
+// Protected route example - requires valid JWT token
+router.get("/profile", authenticateToken, (req, res) => {
+  // req.user contains the decoded JWT data (userId, email, username)
+  res.json({
+    message: "Access granted to protected route!",
+    user: req.user, // User data from JWT token
   });
 });
 
