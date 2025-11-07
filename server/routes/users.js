@@ -33,6 +33,32 @@ const authenticateToken = (req, res, next) => {
 };
 //============================================================================================
 
+//============================== GET USER PROFILE ==============================
+// Get current user's profile (protected)
+router.get("/profile", authenticateToken, (req, res) => {
+  const userId = req.user.userId;
+
+  const sql = `
+    SELECT userID, username, user_email, user_type, created_at 
+    FROM users 
+    WHERE userID = ?
+  `;
+
+  db.query(sql, [userId], (err, results) => {
+    if (err) {
+      console.error("Database error:", err);
+      return res.status(500).json({ message: "Server error" });
+    }
+
+    if (results.length === 0) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    res.json({ user: results[0] });
+  });
+});
+
+//============================== LOGIN ROUTE =================================
 // Route to check if user exists and validate login
 router.post("/login", (req, res) => {
   const { user_email, user_password } = req.body;
@@ -88,4 +114,241 @@ router.post("/login", (req, res) => {
   });
 });
 
+//============================== REGISTER ROUTE ==============================
+router.post("/register", authenticateToken, (req, res) => {
+  const { username, user_email, user_password, user_type } = req.body;
+  const adminUserType = req.user.userType; // From JWT token
+
+  if (adminUserType !== "admin") {
+    return res
+      .status(403)
+      .json({ message: "Access denied. Admin privileges required." });
+  }
+
+  // Validate required fields
+  if (!username || !user_email || !user_password) {
+    return res.status(400).json({
+      message: "Username, email, and password are required.",
+    });
+  }
+
+  const checkSql = "SELECT * FROM users WHERE user_email = ? OR username = ?";
+  const insertSql =
+    "INSERT INTO users (username, user_email, user_password, user_type) VALUES (?, ?, ?, ?)";
+
+  db.query(checkSql, [user_email, username], (err, result) => {
+    if (err) {
+      console.error("Database error:", err);
+      return res
+        .status(500)
+        .json({ message: "Server error - is the database connected?" });
+    }
+    if (results.length > 0) {
+      const existingUser = results[0];
+      if (existingUser.user_email === user_email) {
+        return res.status(409).json({ message: "Email already registered" });
+      }
+      if (existingUser.username === username) {
+        return res.status(409).json({ message: "Username already taken" });
+      }
+    }
+  });
+
+  db.query(
+    insertSql,
+    [username, user_email, user_password, userType],
+    (err, result) => {
+      if (err) {
+        console.error("Error inserting user:", err);
+        return res
+          .status(500)
+          .json({ message: "Error creating user - likley SQL error" });
+      }
+
+      // User created successfully
+      res.status(201).json({
+        message: "User created successfully!",
+        userId: result.insertId,
+      });
+    }
+  );
+});
+
+//============================== CHANGE PASSWORD ROUTE ==============================
+router.post("/change-password", authenticateToken, (req, res) => {
+  const userId = req.user.userId;
+  const { oldPassword, newPassword } = req.body;
+
+  // Validate input
+  if (!currentPassword || !newPassword) {
+    return res.status(400).json({
+      message: "Current password and new password are required",
+    });
+  }
+
+  const verifySql = "SELECT user_password FROM users WHERE userID = ?";
+  const updateSql = "UPDATE users SET user_password = ? WHERE userID = ?";
+  db.query(verifySql, [userId], (err, results) => {
+    if (err) {
+      console.error("Database error:", err);
+      return res.status(500).json({
+        message: "Server error - no database connection or SQL error",
+      });
+    }
+
+    if (results.length === 0) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    if (results[0].user_password !== oldPassword) {
+      return res.status(401).json({ message: "Current password is incorrect" });
+    }
+  });
+  db.query(updateSql, [newPassword, userId], (err, result) => {
+    if (err) {
+      console.error("Database error:", err);
+      return res
+        .status(500)
+        .json({ message: "Server error - likley SQL error" });
+    }
+    res.json({ message: "Password updated successfully!" });
+  });
+});
+
+//============================== EDIT USER ROUTE ==============================
+// Update user profile
+router.put("/profile", authenticateToken, (req, res) => {
+  const userId = req.user.userId;
+  const { username, user_email } = req.body;
+
+  // Validate at least one field is provided
+  if (!username && !user_email) {
+    return res.status(400).json({
+      message: "Provide at least one field to update (username or email)",
+    });
+  }
+
+  // Build dynamic SQL query based on provided fields
+  let updateFields = [];
+  let values = [];
+
+  if (username) {
+    updateFields.push("username = ?");
+    values.push(username);
+  }
+
+  if (user_email) {
+    updateFields.push("user_email = ?");
+    values.push(user_email);
+  }
+
+  values.push(userId); // For WHERE clause
+
+  const sql = `UPDATE users SET ${updateFields.join(", ")} WHERE userID = ?`;
+
+  db.query(sql, values, (err, result) => {
+    if (err) {
+      console.error("Error updating user:", err);
+
+      // Check if it's a duplicate entry error
+      if (err.code === "ER_DUP_ENTRY") {
+        return res.status(409).json({
+          message: "Username or email already taken",
+        });
+      }
+
+      return res.status(500).json({ message: "Error updating profile" });
+    }
+
+    if (result.affectedRows === 0) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    res.json({
+      message: "Profile updated successfully",
+      updated: { username, user_email },
+    });
+  });
+});
+
+//============================== DELETE USER ROUTE ==============================
+// Delete user account (protected)
+router.delete("/account", authenticateToken, (req, res) => {
+  const userId = req.user.userId; // From JWT token
+  const { password } = req.body; // Require password confirmation
+
+  // Validate password provided
+  if (!password) {
+    return res.status(400).json({
+      message: "Password confirmation required to delete account",
+    });
+  }
+
+  // Verify password before deleting
+  const verifySql = "SELECT user_password FROM users WHERE userID = ?";
+
+  db.query(verifySql, [userId], (err, results) => {
+    if (err) {
+      console.error("Database error:", err);
+      return res.status(500).json({ message: "Server error" });
+    }
+
+    if (results.length === 0) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    // Check if password matches
+    if (results[0].user_password !== password) {
+      return res.status(401).json({ message: "Incorrect password" });
+    }
+
+    // Delete the user
+    const deleteSql = "DELETE FROM users WHERE userID = ?";
+
+    db.query(deleteSql, [userId], (err, result) => {
+      if (err) {
+        console.error("Error deleting user:", err);
+        return res.status(500).json({ message: "Error deleting account" });
+      }
+
+      res.json({
+        message: "Account deleted successfully",
+        deletedUserId: userId,
+      });
+    });
+  });
+});
+
+//============================== ADMIN: DELETE ANY USER ==============================
+// Admin route to delete any user
+router.delete("/admin/user/:userId", authenticateToken, (req, res) => {
+  const adminUserType = req.user.userType; // From JWT token
+  const targetUserId = req.params.userId;
+
+  // Check if user is admin
+  if (adminUserType !== "admin") {
+    return res.status(403).json({
+      message: "Access denied. Admin privileges required.",
+    });
+  }
+
+  // Delete the specified user
+  const sql = "DELETE FROM users WHERE userID = ?";
+
+  db.query(sql, [targetUserId], (err, result) => {
+    if (err) {
+      console.error("Error deleting user:", err);
+      return res.status(500).json({ message: "Error deleting user" });
+    }
+
+    if (result.affectedRows === 0) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    res.json({
+      message: "User deleted successfully",
+      deletedUserId: targetUserId,
+    });
+  });
+});
 module.exports = router;
