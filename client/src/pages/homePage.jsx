@@ -2,6 +2,9 @@ import { React } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../Authentication/authProvider";
 import Navbar from "../components/navbar";
+import Boxes from "../components/boxes";
+import Footer from "../components/footer";
+
 
 function HomePage() {
   const { setToken } = useAuth();
@@ -13,7 +16,7 @@ function HomePage() {
   };
 
   return (
-    <div>
+    <div className="page-container">
       <Navbar />
       <div className="container mt-5">
         <h1>Welcome to the Home Page</h1>
@@ -22,6 +25,8 @@ function HomePage() {
           Logout
         </button>
       </div>
+      <Boxes />
+      <Footer />
     </div>
   );
 }
