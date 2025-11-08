@@ -1,0 +1,72 @@
+.boxes-container {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 2rem;
+  padding: 2rem;
+  margin: 0 auto;
+  width: 96%;
+  max-width: 100%;
+}
+
+.box {
+  background-color: #f5f5f5;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  padding: 1.5rem;
+  /* 2:1 aspect ratio - width is 2 times the height */
+  aspect-ratio: 2 / 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  transition: transform 0.2s, box-shadow 0.2s;
+  overflow: hidden;
+  width: 100%;
+}
+
+.box:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+}
+
+/* Responsive Design */
+
+/* Tablets and smaller desktops (2 columns) */
+@media (max-width: 1400px) {
+  .boxes-container {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1.5rem;
+    padding: 1.5rem;
+    width: 94%;
+  }
+}
+
+/* Mobile landscape and small tablets (1 column, maintain 3:1 ratio) */
+@media (max-width: 768px) {
+  .boxes-container {
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
+    padding: 1rem;
+    width: 92%;
+  }
+
+  .box {
+    padding: 1rem;
+  }
+}
+
+/* Small mobile devices (adjust aspect ratio to 2:1 for better mobile UX) */
+@media (max-width: 480px) {
+  .boxes-container {
+    gap: 1rem;
+    padding: 0.75rem;
+    width: 90%;
+  }
+
+  .box {
+    /* Adjusted to 2:1 aspect ratio for small screens */
+    aspect-ratio: 2 / 1;
+    padding: 0.75rem;
+    font-size: 0.9rem;
+  }
+}
