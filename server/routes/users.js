@@ -2,6 +2,7 @@ const express = require("express");
 const router = express.Router();
 const db = require("../database/db");
 const jwt = require("jsonwebtoken");
+const multer = require("multer");
 
 //=======================================MIDDLEWARE CODE=======================================
 // Secret key for JWT (In production, use environment variable!)
@@ -31,6 +32,37 @@ const authenticateToken = (req, res, next) => {
     next(); // Continue to the route handlerrrtrrrrrrrrrrrr
   });
 };
+
+//=======================================MULTER MIDDLEWARE CODE=======================================
+// Configure multer to store files in memory as Buffer
+const storage = multer.memoryStorage();
+const upload = multer({
+  storage: storage,
+  limits: {
+    fileSize: 5 * 1024 * 1024, // 5MB max file size
+  },
+  fileFilter: (req, file, cb) => {
+    // Only allow image files
+    const allowedTypes = [
+      "image/jpeg",
+      "image/jpg",
+      "image/png",
+      "image/gif",
+      "image/webp",
+    ];
+
+    if (allowedTypes.includes(file.mimetype)) {
+      cb(null, true);
+    } else {
+      cb(
+        new Error(
+          "Invalid file type. Only JPEG, PNG, GIF, and WebP images are allowed."
+        ),
+        false
+      );
+    }
+  },
+});
 //============================================================================================
 
 //============================== GET USER PROFILE ==============================
@@ -55,6 +87,68 @@ router.get("/profile", authenticateToken, (req, res) => {
     }
 
     res.json({ user: results[0] });
+  });
+});
+
+//============================== GET OWN PROFILE PHOTO ==============================
+router.get("/profile-photo/:userId", authenticateToken, (req, res) => {
+  const userId = req.params.userId;
+
+  const sql = `SELECT user_photo FROM users WHERE userID = ?`;
+
+  db.query(sql, [userId], (err, results) => {
+    if (err) {
+      console.error("Error fetching photo:", err);
+      return res.status(500).json({
+        message: "Error fetching profile photo - is database connected?",
+      });
+    }
+
+    if (results.length === 0) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    const user = results[0];
+
+    // Check if user has a profile photo
+    if (!user.user_photo) {
+      return res
+        .status(404)
+        .json({ message: "No profile photo found for this user" });
+    }
+
+    // Send image - browser will detect type from image data
+    res.set("Content-Type", "image/jpeg"); // Default, works for most images
+    res.send(user.user_photo);
+  });
+});
+
+//============================== GET OWN PROFILE PHOTO ==============================
+router.get("/my-profile-photo", authenticateToken, (req, res) => {
+  const userId = req.user.userId;
+
+  const sql = `SELECT user_photo FROM users WHERE userID = ?`;
+
+  db.query(sql, [userId], (err, results) => {
+    if (err) {
+      console.error("Error fetching photo:", err);
+      return res.status(500).json({ message: "Error fetching profile photo" });
+    }
+
+    if (results.length === 0) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    const user = results[0];
+
+    if (!user.user_photo) {
+      return res
+        .status(404)
+        .json({ message: "You haven't uploaded a profile photo yet" });
+    }
+
+    res.set("Content-Type", "image/jpeg");
+    res.send(user.user_photo);
   });
 });
 
@@ -156,7 +250,7 @@ router.post("/register", authenticateToken, (req, res) => {
 
   db.query(
     insertSql,
-    [username, user_email, user_password, userType],
+    [username, user_email, user_password, user_type],
     (err, result) => {
       if (err) {
         console.error("Error inserting user:", err);
@@ -173,6 +267,44 @@ router.post("/register", authenticateToken, (req, res) => {
     }
   );
 });
+
+//============================== UPLOAD PROFILE PHOTO ==============================
+router.post(
+  "/profile-photo",
+  authenticateToken,
+  upload.single("photo"),
+  (req, res) => {
+    // Check if file was uploaded
+    if (!req.file) {
+      return res.status(400).json({ message: "No file uploaded" });
+    }
+
+    const userId = req.user.userId; // From JWT token
+    const photoBuffer = req.file.buffer; // Image as binary data
+
+    const sql = `
+    UPDATE users 
+    SET user_photo = ? 
+    WHERE userID = ?
+  `;
+
+    db.query(sql, [photoBuffer, userId], (err, result) => {
+      if (err) {
+        console.error("Error saving photo:", err);
+        return res.status(500).json({ message: "Error saving profile photo" });
+      }
+
+      if (result.affectedRows === 0) {
+        return res.status(404).json({ message: "User not found" });
+      }
+
+      res.json({
+        message: "Profile photo uploaded successfully",
+        photoSize: req.file.size,
+      });
+    });
+  }
+);
 
 //============================== CHANGE PASSWORD ROUTE ==============================
 router.post("/change-password", authenticateToken, (req, res) => {
@@ -204,6 +336,7 @@ router.post("/change-password", authenticateToken, (req, res) => {
       return res.status(401).json({ message: "Current password is incorrect" });
     }
   });
+
   db.query(updateSql, [newPassword, userId], (err, result) => {
     if (err) {
       console.error("Database error:", err);
@@ -338,7 +471,9 @@ router.delete("/admin/user/:userId", authenticateToken, (req, res) => {
   db.query(sql, [targetUserId], (err, result) => {
     if (err) {
       console.error("Error deleting user:", err);
-      return res.status(500).json({ message: "Error deleting user" });
+      return res
+        .status(500)
+        .json({ message: "Error deleting user - is database connected?" });
     }
 
     if (result.affectedRows === 0) {
@@ -348,6 +483,61 @@ router.delete("/admin/user/:userId", authenticateToken, (req, res) => {
     res.json({
       message: "User deleted successfully",
       deletedUserId: targetUserId,
+    });
+  });
+});
+
+//============================== DELETE PROFILE PHOTO ==============================
+router.delete("/profile-photo", authenticateToken, (req, res) => {
+  const userId = req.user.userId;
+
+  const sql = `UPDATE users SET user_photo = NULL WHERE userID = ?`;
+
+  db.query(sql, [userId], (err, result) => {
+    if (err) {
+      console.error("Error deleting photo:", err);
+      return res.status(500).json({
+        message: "Error deleting profile photo - is database connected?",
+      });
+    }
+
+    if (result.affectedRows === 0) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    res.json({ message: "Profile photo deleted successfully" });
+  });
+});
+
+//============================== ADMIN: DELETE ANY USER'S PHOTO ==============================
+router.delete("/admin/profile-photo/:userId", authenticateToken, (req, res) => {
+  const adminUserType = req.user.userType;
+  const targetUserId = req.params.userId;
+
+  // Check if user is admin
+  if (adminUserType !== "admin") {
+    return res.status(403).json({
+      message: "Access denied. Admin privileges required.",
+    });
+  }
+
+  const sql = `UPDATE users SET user_photo = NULL WHERE userID = ?`;
+
+  db.query(sql, [targetUserId], (err, result) => {
+    if (err) {
+      console.error("Error deleting photo:", err);
+      return res.status(500).json({
+        message: "Error deleting profile photo - is database connected?",
+      });
+    }
+
+    if (result.affectedRows === 0) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    res.json({
+      message: "User's profile photo deleted successfully",
+      deletedForUserId: targetUserId,
     });
   });
 });
