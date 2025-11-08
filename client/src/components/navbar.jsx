@@ -13,31 +13,39 @@ function Navbar() {
   const { setToken } = useAuth();
   const navigate = useNavigate();
 
-  // Fetch and set user's profile photo
+  // Function to load user photo
+  const loadUserPhoto = async () => {
+    try {
+      const response = await axios.get(
+        "http://localhost:3001/users/my-profile-photo",
+        { responseType: "blob" }
+      );
+      const photoUrl = URL.createObjectURL(response.data);
+      setProfilePhoto(photoUrl);
+    } catch (err) {
+      console.error("Error fetching profile photo:", err);
+      setProfilePhoto(defaultPhoto);
+    }
+  };
+
+  // Fetch and set user's profile photo on mount
   useEffect(() => {
-    // Fetch user's profile photo from database
-    const getUserPhoto = async () => {
-      try {
-        const response = await axios.get(
-          "http://localhost:3001/users/profilePhoto",
-          { responseType: "blob" }
-        );
-        const photoUrl = URL.createObjectURL(response.data);
-        setProfilePhoto(photoUrl); // Updates to user's photo
-      } catch (err) {
-        console.error("Error fetching profile photo:", err);
-      }
+    loadUserPhoto();
+  }, []);
+
+  // Listen for profile photo updates from settings modal
+  useEffect(() => {
+    const handlePhotoUpdate = () => {
+      console.log("Profile photo updated, reloading...");
+      loadUserPhoto();
     };
 
-    getUserPhoto();
+    window.addEventListener("profilePhotoUpdated", handlePhotoUpdate);
 
-    // Cleanup: revoke object URL when component unmounts
     return () => {
-      if (profilePhoto !== defaultPhoto) {
-        URL.revokeObjectURL(profilePhoto);
-      }
+      window.removeEventListener("profilePhotoUpdated", handlePhotoUpdate);
     };
-  });
+  }, []);
 
   const toggleDropdown = () => {
     setDropdownOpen(!dropdownOpen);
