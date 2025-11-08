@@ -5,11 +5,13 @@ import axios from "axios";
 import defaultPhoto from "../media/defaultProfile.jpg";
 import { useAuth } from "../Authentication/authProvider";
 import SettingsModal from "../modals/settingsModal";
+import LogoutModal from "../modals/logoutModal";
 
 function Navbar() {
   const [profilePhoto, setProfilePhoto] = useState(defaultPhoto);
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const [settingsModalOpen, setSettingsModalOpen] = useState(false);
+  const [logoutModalOpen, setLogoutModalOpen] = useState(false);
   const { setToken } = useAuth();
   const navigate = useNavigate();
 
@@ -51,7 +53,12 @@ function Navbar() {
     setDropdownOpen(!dropdownOpen);
   };
 
-  const handleLogout = () => {
+  const handleLogoutClick = () => {
+    setLogoutModalOpen(true);
+    setDropdownOpen(false);
+  };
+
+  const confirmLogout = () => {
     setToken(null); // Clear the token
     navigate("/"); // Redirect to login page
   };
@@ -104,7 +111,7 @@ function Navbar() {
               >
                 Settings
               </button>
-              <button className="dropdown-item" onClick={handleLogout}>
+              <button className="dropdown-item" onClick={handleLogoutClick}>
                 Logout
               </button>
             </div>
@@ -116,6 +123,13 @@ function Navbar() {
       <SettingsModal
         isOpen={settingsModalOpen}
         onClose={() => setSettingsModalOpen(false)}
+      />
+
+      {/* Logout Confirmation Modal */}
+      <LogoutModal
+        isOpen={logoutModalOpen}
+        onClose={() => setLogoutModalOpen(false)}
+        onConfirm={confirmLogout}
       />
     </nav>
   );
