@@ -1,12 +1,19 @@
 import React, { useState, useEffect } from "react";
 import "../CSS/navbar.css";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import axios from "axios";
 import defaultPhoto from "../media/defaultProfile.jpg";
+import { useAuth } from "../Authentication/authProvider";
+import SettingsModal from "../modals/settingsModal";
 
 function Navbar() {
   const [profilePhoto, setProfilePhoto] = useState(defaultPhoto);
+  const [dropdownOpen, setDropdownOpen] = useState(false);
+  const [settingsModalOpen, setSettingsModalOpen] = useState(false);
+  const { setToken } = useAuth();
+  const navigate = useNavigate();
 
+  // Fetch and set user's profile photo
   useEffect(() => {
     // Fetch user's profile photo from database
     const getUserPhoto = async () => {
@@ -32,6 +39,31 @@ function Navbar() {
     };
   });
 
+  const toggleDropdown = () => {
+    setDropdownOpen(!dropdownOpen);
+  };
+
+  const handleLogout = () => {
+    setToken(null); // Clear the token
+    navigate("/"); // Redirect to login page
+  };
+
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (
+        dropdownOpen &&
+        !event.target.closest(".profile-dropdown-container")
+      ) {
+        setDropdownOpen(false);
+      }
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, [dropdownOpen]);
+
   return (
     <nav className="navbar">
       <div className="nav-brand">
@@ -45,10 +77,38 @@ function Navbar() {
       </div>
 
       <div className="nav-right">
-        <Link to="/profile" className="profile-link">
-          <img src={profilePhoto} alt="profile" className="profile-photo" />
-        </Link>
+        <div className="profile-dropdown-container">
+          <img
+            src={profilePhoto}
+            alt="profile"
+            className="profile-photo"
+            onClick={toggleDropdown}
+          />
+
+          {dropdownOpen && (
+            <div className="profile-dropdown">
+              <button
+                className="dropdown-item"
+                onClick={() => {
+                  setSettingsModalOpen(true);
+                  setDropdownOpen(false);
+                }}
+              >
+                Settings
+              </button>
+              <button className="dropdown-item" onClick={handleLogout}>
+                Logout
+              </button>
+            </div>
+          )}
+        </div>
       </div>
+
+      {/* Settings Modal */}
+      <SettingsModal
+        isOpen={settingsModalOpen}
+        onClose={() => setSettingsModalOpen(false)}
+      />
     </nav>
   );
 }
