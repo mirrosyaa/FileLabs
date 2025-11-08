@@ -46,13 +46,22 @@
 }
 
 .profile-link {
-  color: white;
+  display: flex;
+  align-items: center;
   text-decoration: none;
-  padding: 0.5rem 1rem;
-  border: 1px solid white;
-  border-radius: 4px;
 }
 
-.profile-link:hover {
-  background-color: rgba(255, 255, 255, 0.1);
+.profile-photo {
+  width: 55px;
+  height: 55px;
+  border-radius: 50%; /* Makes it circular */
+  object-fit: cover; /* Ensures image fills the circle without distortion */
+  border: 2px solid #fff; /* Optional: white border around photo */
+  cursor: pointer;
+  transition: transform 0.2s ease;
+}
+
+.profile-photo:hover {
+  transform: scale(1.1); /* Slight zoom on hover */
+  box-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
 }
