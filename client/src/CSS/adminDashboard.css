@@ -5,7 +5,7 @@
   background-color: #f4f6f8;
   display: flex;
   flex-direction: column;
-  align-items: center;
+  align-items: left;
   font-family: "Arial", sans-serif;
 }
 
@@ -43,7 +43,7 @@
 .search-box {
   display: flex;
   flex: 1;
-  max-width: 700px;
+  max-width: 3000px;
 }
 
 .search-box input {
@@ -84,7 +84,7 @@
 /* Table */
 .table-container {
   width: 100%;
-  max-width: 1000px;
+  max-width: 1750px;
   overflow-x: auto;
   background: white;
   border-radius: 10px;
