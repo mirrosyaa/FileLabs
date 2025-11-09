@@ -1,58 +1,23 @@
-import React, { useState } from "react";
+import React, { useState, useRef } from "react";
 import "../CSS/adminDashboard.css";
 import AdminHeader from "../components/AdminHeader";
 import SearchBar from "../components/SearchBar";
 import UsersTable from "../components/UsersTable";
 import Navbar from "../components/navbar";
+import AddUserModal from "../modals/addUserModal";
 
 function AdminDashboard() {
   const [searchTerm, setSearchTerm] = useState("");
   const [userTypeFilter, setUserTypeFilter] = useState("all");
-  const [users, setUsers] = useState([
-    {
-      id: 1,
-      name: "John Doe",
-      email: "john@example.com",
-      joined: "2024-09-12",
-      userType: "user",
-    },
-    {
-      id: 2,
-      name: "Jane Smith",
-      email: "jane@example.com",
-      joined: "2024-10-02",
-      userType: "admin",
-    },
-  ]);
+  const [isAddUserModalOpen, setIsAddUserModalOpen] = useState(false);
+  const usersTableRef = useRef();
 
-  // Add new user
-  const handleAddUser = () => {
-    const newUser = {
-      id: Date.now(),
-      name: "New User",
-      email: "newuser@example.com",
-      joined: new Date().toISOString().split("T")[0],
-      userType: "user",
-    };
-    setUsers([...users, newUser]);
+  const handleUserAdded = () => {
+    // Refresh the users table when a new user is added
+    if (usersTableRef.current) {
+      usersTableRef.current.refreshUsers();
+    }
   };
-
-  // Delete user by ID
-  const handleDelete = (id) => {
-    setUsers(users.filter((user) => user.id !== id));
-  };
-
-  // Filter by search term and user type
-  const filteredUsers = users.filter((user) => {
-    const matchesSearch =
-      user.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      user.email.toLowerCase().includes(searchTerm.toLowerCase());
-
-    const matchesType =
-      userTypeFilter === "all" || user.userType === userTypeFilter;
-
-    return matchesSearch && matchesType;
-  });
 
   return (
     <div>
@@ -89,12 +54,24 @@ function AdminDashboard() {
               </button>
             </div>
           </div>
-          <button className="add-btn" onClick={handleAddUser}>
+          <button
+            className="add-btn"
+            onClick={() => setIsAddUserModalOpen(true)}
+          >
             ➕ Add User
           </button>
         </div>
-        <UsersTable users={filteredUsers} onDelete={handleDelete} />
+        <UsersTable
+          ref={usersTableRef}
+          searchTerm={searchTerm}
+          userTypeFilter={userTypeFilter}
+        />
       </div>
+      <AddUserModal
+        isOpen={isAddUserModalOpen}
+        onClose={() => setIsAddUserModalOpen(false)}
+        onUserAdded={handleUserAdded}
+      />
     </div>
   );
 }

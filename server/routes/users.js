@@ -354,7 +354,7 @@ router.post("/register", authenticateToken, async (req, res) => {
       }
 
       const insertSql =
-        "INSERT INTO users (username, user_email, user_password, user_type) VALUES (?, ?, ?, ?)";
+        "INSERT INTO users (username, user_email, user_password, user_type, created_at) VALUES (?, ?, ?, ?, NOW())";
 
       db.query(
         insertSql,
