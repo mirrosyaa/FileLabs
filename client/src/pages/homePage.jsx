@@ -15,16 +15,9 @@ function HomePage() {
     navigate("/"); // Redirect to login page
   };
 
-  return (
+   return (
     <div className="page-container">
       <Navbar />
-      <div className="container mt-5">
-        <h1>Welcome to the Home Page</h1>
-        <p>You are successfully logged in!</p>
-        <button className="btn btn-danger" onClick={handleLogout}>
-          Logout
-        </button>
-      </div>
       <Boxes />
       <Footer />
     </div>
