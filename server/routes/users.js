@@ -473,9 +473,22 @@ router.put("/profile", authenticateToken, async (req, res) => {
 
         // Check if it's a duplicate entry error
         if (err.code === "ER_DUP_ENTRY") {
-          return res.status(409).json({
-            message: "Username or email already taken",
-          });
+          // Check which field caused the duplicate
+          const errorMessage = err.message || "";
+
+          if (errorMessage.includes("username")) {
+            return res.status(409).json({
+              message: "Username already taken",
+            });
+          } else if (errorMessage.includes("user_email")) {
+            return res.status(409).json({
+              message: "Email already registered",
+            });
+          } else {
+            return res.status(409).json({
+              message: "Username or email already taken",
+            });
+          }
         }
 
         return res.status(500).json({ message: "Error updating profile" });

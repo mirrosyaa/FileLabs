@@ -141,6 +141,11 @@ function SettingsModal({ isOpen, onClose }) {
       setUsername(newUsername);
       setEmail(newEmail);
 
+      // Dispatch event to notify other components if username changed
+      if (newUsername !== username) {
+        window.dispatchEvent(new CustomEvent("usernameUpdated"));
+      }
+
       // Show success state
       setAccountSuccess(true);
 
