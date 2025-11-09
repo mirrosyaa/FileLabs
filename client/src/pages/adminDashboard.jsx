@@ -1,14 +1,24 @@
 import React, { useState } from "react";
-import "../../CSS/AdminDashboard.css";
-import AdminHeader from "../../components/AdminHeader";
-import SearchBar from "../../components/SearchBar";
-import UsersTable from "../../components/UsersTable";
+import "../CSS/AdminDashboard.css";
+import AdminHeader from "../components/AdminHeader";
+import SearchBar from "../components/SearchBar";
+import UsersTable from "../components/UsersTable";
 
 function AdminDashboard() {
   const [searchTerm, setSearchTerm] = useState("");
   const [users, setUsers] = useState([
-    { id: 1, name: "John Doe", email: "john@example.com", joined: "2024-09-12" },
-    { id: 2, name: "Jane Smith", email: "jane@example.com", joined: "2024-10-02" },
+    {
+      id: 1,
+      name: "John Doe",
+      email: "john@example.com",
+      joined: "2024-09-12",
+    },
+    {
+      id: 2,
+      name: "Jane Smith",
+      email: "jane@example.com",
+      joined: "2024-10-02",
+    },
   ]);
 
   // Add new user
