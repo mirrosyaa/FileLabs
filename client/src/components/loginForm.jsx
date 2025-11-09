@@ -40,7 +40,7 @@ function LoginForm() {
   };
 
   return (
-    <div className="container mt-5" style={{ maxWidth: "400px" }}>
+    <div className="container" style={{ maxWidth: "400px" }}>
       <h2 className="text-center mb-4">Login</h2>
       <form onSubmit={handleSubmit}>
         <div className="mb-3">
