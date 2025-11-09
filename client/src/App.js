@@ -23,7 +23,6 @@ function App() {
                 </RouteProtector>
               }
             />
-            />
             {/* Admin route */}
             <Route
               path="/admin"
