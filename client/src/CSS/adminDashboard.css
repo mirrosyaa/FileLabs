@@ -150,6 +150,24 @@
   background-color: #f9f9f9;
 }
 
+.user-type-badge {
+  padding: 4px 10px;
+  border-radius: 12px;
+  font-size: 0.9rem;
+  font-weight: 500;
+  display: inline-block;
+}
+
+.user-type-badge.admin {
+  background-color: #e3f2fd;
+  color: #1976d2;
+}
+
+.user-type-badge.user {
+  background-color: #f3e5f5;
+  color: #7b1fa2;
+}
+
 .delete-btn {
   background-color: #ff4d4d;
   color: white;

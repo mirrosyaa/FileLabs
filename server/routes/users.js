@@ -102,6 +102,49 @@ router.get("/profile", authenticateToken, (req, res) => {
   });
 });
 
+//============================== ADMIN: GET ALL USERS ==============================
+router.get("/admin/users", authenticateToken, (req, res) => {
+  const adminUserType = req.user.userType;
+
+  // Check if user is admin
+  if (adminUserType !== "admin") {
+    return res.status(403).json({
+      message: "Access denied. Admin privileges required.",
+    });
+  }
+
+  const sql = `
+    SELECT userID, username, user_email, user_type, created_at 
+    FROM users 
+    ORDER BY created_at DESC
+  `;
+
+  db.query(sql, (err, results) => {
+    if (err) {
+      console.error("Database error:", err);
+      return res.status(500).json({ message: "Server error" });
+    }
+
+    // Decrypt all emails before sending to frontend
+    const usersWithDecryptedEmails = results.map((user) => {
+      try {
+        return {
+          ...user,
+          user_email: decryptEmail(user.user_email),
+        };
+      } catch (error) {
+        console.error(`Error decrypting email for user ${user.userID}:`, error);
+        return {
+          ...user,
+          user_email: "Error decrypting email",
+        };
+      }
+    });
+
+    res.json({ users: usersWithDecryptedEmails });
+  });
+});
+
 //============================== GET A USERS PROFILE PHOTO ==============================
 router.get("/profile-photo/:userId", authenticateToken, (req, res) => {
   const userId = req.params.userId;

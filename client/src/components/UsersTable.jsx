@@ -7,10 +7,10 @@ function UsersTable({ users, onDelete }) {
       <table className="user-table">
         <thead>
           <tr>
-            <th>User’s Name</th>
+            <th>Username</th>
             <th>Email Address</th>
-            <th>Date of Join</th>
-            <th>Actions</th>
+            <th>Date Joined</th>
+            <th>User Type</th>
           </tr>
         </thead>
         <tbody>
@@ -21,8 +21,9 @@ function UsersTable({ users, onDelete }) {
                 <td>{user.email}</td>
                 <td>{user.joined}</td>
                 <td>
-                  <button className="delete-btn" onClick={() => onDelete(user.id)}>
-                  </button>
+                  <span className={`user-type-badge ${user.userType}`}>
+                    {user.userType === "admin" ? "👤 Admin" : "👥 User"}
+                  </span>
                 </td>
               </tr>
             ))
