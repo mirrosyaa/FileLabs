@@ -2,6 +2,7 @@ import React from "react";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import AuthProvider from "./Authentication/authProvider";
 import RouteProtector from "./Authentication/RouteProtector";
+import AdminRouteProtector from "./Authentication/AdminRouteProtector";
 import LoginPage from "./pages/login";
 import HomePage from "./pages/homePage";
 import AdminDashboard from "./pages/adminDashboard";
@@ -27,9 +28,9 @@ function App() {
             <Route
               path="/admin"
               element={
-                <RouteProtector>
+                <AdminRouteProtector>
                   <AdminDashboard />
-                </RouteProtector>
+                </AdminRouteProtector>
               }
             />
           </Routes>
