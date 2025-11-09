@@ -3,6 +3,7 @@ import "../CSS/adminDashboard.css";
 import AdminHeader from "../components/AdminHeader";
 import SearchBar from "../components/SearchBar";
 import UsersTable from "../components/UsersTable";
+import Navbar from "../components/navbar";
 
 function AdminDashboard() {
   const [searchTerm, setSearchTerm] = useState("");
@@ -45,15 +46,18 @@ function AdminDashboard() {
   );
 
   return (
-    <div className="dashboard-container">
-      <AdminHeader />
-      <div className="dashboard-controls">
-        <SearchBar searchTerm={searchTerm} setSearchTerm={setSearchTerm} />
-        <button className="add-btn" onClick={handleAddUser}>
-          ➕ Add User
-        </button>
+    <div>
+      <Navbar />
+      <div className="dashboard-container">
+        <AdminHeader />
+        <div className="dashboard-controls">
+          <SearchBar searchTerm={searchTerm} setSearchTerm={setSearchTerm} />
+          <button className="add-btn" onClick={handleAddUser}>
+            ➕ Add User
+          </button>
+        </div>
+        <UsersTable users={filteredUsers} onDelete={handleDelete} />
       </div>
-      <UsersTable users={filteredUsers} onDelete={handleDelete} />
     </div>
   );
 }
