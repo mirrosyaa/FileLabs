@@ -90,7 +90,7 @@ router.get("/profile", authenticateToken, (req, res) => {
   });
 });
 
-//============================== GET OWN PROFILE PHOTO ==============================
+//============================== GET A USERS PROFILE PHOTO ==============================
 router.get("/profile-photo/:userId", authenticateToken, (req, res) => {
   const userId = req.params.userId;
 
@@ -312,19 +312,20 @@ router.post("/change-password", authenticateToken, (req, res) => {
   const { oldPassword, newPassword } = req.body;
 
   // Validate input
-  if (!currentPassword || !newPassword) {
+  if (!oldPassword || !newPassword) {
     return res.status(400).json({
-      message: "Current password and new password are required",
+      message: "Both current password and new password are required",
     });
   }
 
   const verifySql = "SELECT user_password FROM users WHERE userID = ?";
   const updateSql = "UPDATE users SET user_password = ? WHERE userID = ?";
+
   db.query(verifySql, [userId], (err, results) => {
     if (err) {
       console.error("Database error:", err);
       return res.status(500).json({
-        message: "Server error - no database connection or SQL error",
+        message: "Database error occurred",
       });
     }
 
@@ -335,16 +336,15 @@ router.post("/change-password", authenticateToken, (req, res) => {
     if (results[0].user_password !== oldPassword) {
       return res.status(401).json({ message: "Current password is incorrect" });
     }
-  });
 
-  db.query(updateSql, [newPassword, userId], (err, result) => {
-    if (err) {
-      console.error("Database error:", err);
-      return res
-        .status(500)
-        .json({ message: "Server error - likley SQL error" });
-    }
-    res.json({ message: "Password updated successfully!" });
+    // Password verified, now update it
+    db.query(updateSql, [newPassword, userId], (err, result) => {
+      if (err) {
+        console.error("Database error:", err);
+        return res.status(500).json({ message: "Error updating password" });
+      }
+      res.json({ message: "Password changed successfully" });
+    });
   });
 });
 
