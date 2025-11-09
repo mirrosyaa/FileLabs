@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import "../CSS/AdminDashboard.css";
+import "../CSS/adminDashboard.css";
 import AdminHeader from "../components/AdminHeader";
 import SearchBar from "../components/SearchBar";
 import UsersTable from "../components/UsersTable";

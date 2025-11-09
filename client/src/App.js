@@ -4,6 +4,7 @@ import AuthProvider from "./Authentication/authProvider";
 import RouteProtector from "./Authentication/RouteProtector";
 import LoginPage from "./pages/login";
 import HomePage from "./pages/homePage";
+import AdminDashboard from "./pages/adminDashboard";
 
 function App() {
   return (
@@ -13,13 +14,22 @@ function App() {
           <Routes>
             {/* Public routes*/}
             <Route path="/" element={<LoginPage />} />
-
             {/* Protected routes*/}
             <Route
               path="/home"
               element={
                 <RouteProtector>
                   <HomePage />
+                </RouteProtector>
+              }
+            />
+            />
+            {/* Admin route */}
+            <Route
+              path="/admin"
+              element={
+                <RouteProtector>
+                  <AdminDashboard />
                 </RouteProtector>
               }
             />
