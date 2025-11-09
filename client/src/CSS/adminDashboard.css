@@ -1,18 +1,17 @@
 /* Basic container */
 .dashboard-container {
   min-height: 100vh;
-  padding: 20px;
+  padding: 2rem;
   background-color: #f4f6f8;
   display: flex;
   flex-direction: column;
-  align-items: left;
+  align-items: center;
   font-family: "Arial", sans-serif;
 }
 
 /* Header section */
 .dashboard-header {
-  width: 100%;
-  max-width: 1000px;
+  width: 95%;
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -31,19 +30,28 @@
 
 /* Search and add section */
 .dashboard-controls {
-  width: 100%;
-  max-width: 1000px;
+  width: 95%;
   display: flex;
   flex-wrap: wrap;
   justify-content: space-between;
-  gap: 10px;
+  align-items: center;
+  gap: 15px;
   margin-bottom: 20px;
+}
+
+.search-filter-group {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  flex: 1;
+  min-width: 0;
 }
 
 .search-box {
   display: flex;
   flex: 1;
-  max-width: 3000px;
+  min-width: 300px;
+  max-width: 800px;
 }
 
 .search-box input {
@@ -54,7 +62,7 @@
   font-size: 1rem;
 }
 
-.filter-btn {
+.search-btn {
   background-color: #e0e0e0;
   border: none;
   border-radius: 0 8px 8px 0;
@@ -63,18 +71,49 @@
   font-size: 1.2rem;
 }
 
-.filter-btn:hover {
+.search-btn:hover {
   background-color: #ccc;
+}
+
+.filter-controls {
+  display: flex;
+  gap: 10px;
+  flex-shrink: 0;
+}
+
+.filter-btn {
+  background-color: #f1f1f1;
+  color: #333;
+  padding: 10px 16px;
+  border: 2px solid transparent;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 0.95rem;
+  transition: all 0.3s ease;
+  white-space: nowrap;
+}
+
+.filter-btn:hover {
+  background-color: #e0e0e0;
+  border-color: #007bff;
+}
+
+.filter-btn.active {
+  background-color: #007bff;
+  color: white;
+  border-color: #0056b3;
 }
 
 .add-btn {
   background-color: #007bff;
   color: white;
-  padding: 10px 15px;
+  padding: 10px 20px;
   border: none;
   border-radius: 8px;
   cursor: pointer;
   font-size: 1rem;
+  white-space: nowrap;
+  flex-shrink: 0;
 }
 
 .add-btn:hover {
@@ -83,8 +122,7 @@
 
 /* Table */
 .table-container {
-  width: 100%;
-  max-width: 1750px;
+  width: 95%;
   overflow-x: auto;
   background: white;
   border-radius: 10px;
@@ -133,16 +171,42 @@
 }
 
 /* Responsive Design */
-@media (max-width: 600px) {
+@media (max-width: 768px) {
+  .dashboard-container {
+    padding: 1rem;
+  }
+
   .dashboard-header h1 {
     font-size: 1.4rem;
   }
 
-  .add-btn {
+  .dashboard-controls {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .search-filter-group {
+    flex-direction: column;
     width: 100%;
+    gap: 10px;
   }
 
   .search-box {
+    width: 100%;
+    max-width: 100%;
+    min-width: 0;
+  }
+
+  .filter-controls {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .filter-btn {
+    flex: 1;
+  }
+
+  .add-btn {
     width: 100%;
   }
 
