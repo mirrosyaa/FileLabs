@@ -15,6 +15,7 @@ function App() {
           <Routes>
             {/* Public routes*/}
             <Route path="/" element={<LoginPage />} />
+
             {/* Protected routes*/}
             <Route
               path="/home"
@@ -24,7 +25,7 @@ function App() {
                 </RouteProtector>
               }
             />
-            {/* Admin route */}
+            {/* Admin routes */}
             <Route
               path="/admin"
               element={
