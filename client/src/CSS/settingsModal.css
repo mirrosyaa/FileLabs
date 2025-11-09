@@ -261,6 +261,28 @@
   font-weight: 500;
 }
 
+.error-message-modal {
+  background-color: #fee;
+  color: #c33;
+  padding: 10px 12px;
+  border-radius: 6px;
+  border-left: 4px solid #c33;
+  margin: 15px 0;
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.success-message-modal {
+  background-color: #efe;
+  color: #2a7;
+  padding: 10px 12px;
+  border-radius: 6px;
+  border-left: 4px solid #2a7;
+  margin: 15px 0;
+  font-size: 14px;
+  font-weight: 500;
+}
+
 /* Section Save Button */
 .section-save-button {
   width: 100%;

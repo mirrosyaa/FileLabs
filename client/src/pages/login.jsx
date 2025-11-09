@@ -5,7 +5,7 @@ import "../CSS/login.css";
 function LoginPage() {
   // page to display all login components
   return (
-    <div>
+    <div className="login-page-container">
       <LoginForm />
     </div>
   );

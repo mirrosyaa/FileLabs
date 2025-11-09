@@ -9,17 +9,17 @@ function HomePage() {
   const [username, setUsername] = useState("");
   const [greeting, setGreeting] = useState("");
 
-  useEffect(() => {
-    // Fetch username
-    const fetchUsername = async () => {
-      try {
-        const response = await axios.get("http://localhost:3001/users/profile");
-        setUsername(response.data.user.username);
-      } catch (error) {
-        console.error("Error fetching username:", error);
-      }
-    };
+  // Function to fetch username
+  const fetchUsername = async () => {
+    try {
+      const response = await axios.get("http://localhost:3001/users/profile");
+      setUsername(response.data.user.username);
+    } catch (error) {
+      console.error("Error fetching username:", error);
+    }
+  };
 
+  useEffect(() => {
     // Determine greeting based on time
     const determineGreeting = () => {
       const hour = new Date().getHours();
@@ -34,6 +34,20 @@ function HomePage() {
 
     fetchUsername();
     determineGreeting();
+  }, []);
+
+  // Listen for username updates from settings modal
+  useEffect(() => {
+    const handleUsernameUpdate = () => {
+      console.log("Username updated, reloading...");
+      fetchUsername();
+    };
+
+    window.addEventListener("usernameUpdated", handleUsernameUpdate);
+
+    return () => {
+      window.removeEventListener("usernameUpdated", handleUsernameUpdate);
+    };
   }, []);
 
   return (

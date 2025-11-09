@@ -7,21 +7,23 @@ function LoginForm() {
   // Store the user's input in state variables
   const navigate = useNavigate(); // used to help navigate between login and home page
   const { setToken } = useAuth(); // Get setToken from AuthProvider
-  const [email, setEmail] = useState("");
+  const [emailOrUsername, setEmailOrUsername] = useState("");
   const [password, setPassword] = useState("");
   const [loginError, setLoginError] = useState(false);
-  const errorMessage = <h3 className="err">Incorrect username and password</h3>;
+  const errorMessage = (
+    <h3 className="err">Incorrect username/email and password</h3>
+  );
 
   // Handle login form submission
   const handleSubmit = async (e) => {
     e.preventDefault(); // stop the page from reloading
-    console.log("Email:", email);
+    console.log("Email/Username:", emailOrUsername);
     console.log("Password:", password);
 
     try {
       // send login data to backend
       const response = await axios.post("http://localhost:3001/users/login", {
-        user_email: email,
+        user_email: emailOrUsername, // Backend accepts either email or username
         user_password: password,
       });
       console.log(response.data);
@@ -38,20 +40,20 @@ function LoginForm() {
   };
 
   return (
-    <div className="container mt-5" style={{ maxWidth: "400px" }}>
+    <div className="container" style={{ maxWidth: "400px" }}>
       <h2 className="text-center mb-4">Login</h2>
       <form onSubmit={handleSubmit}>
         <div className="mb-3">
-          <label htmlFor="email" className="form-label">
-            Email address
+          <label htmlFor="emailOrUsername" className="form-label">
+            Email or Username
           </label>
           <input
-            type="email"
+            type="text"
             className="form-control"
-            id="email"
-            placeholder="Enter your email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
+            id="emailOrUsername"
+            placeholder="Enter your email or username"
+            value={emailOrUsername}
+            onChange={(e) => setEmailOrUsername(e.target.value)}
             required
           />
         </div>

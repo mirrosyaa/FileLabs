@@ -3,6 +3,8 @@ const router = express.Router();
 const db = require("../database/db");
 const jwt = require("jsonwebtoken");
 const multer = require("multer");
+const bcrypt = require("bcrypt");
+const { encryptEmail, decryptEmail } = require("../utils/encryption");
 
 //=======================================MIDDLEWARE CODE=======================================
 // Secret key for JWT (In production, use environment variable!)
@@ -86,7 +88,60 @@ router.get("/profile", authenticateToken, (req, res) => {
       return res.status(404).json({ message: "User not found" });
     }
 
-    res.json({ user: results[0] });
+    const user = results[0];
+
+    // Decrypt email before sending to frontend
+    try {
+      user.user_email = decryptEmail(user.user_email);
+    } catch (error) {
+      console.error("Error decrypting email:", error);
+      return res.status(500).json({ message: "Error retrieving user data" });
+    }
+
+    res.json({ user: user });
+  });
+});
+
+//============================== ADMIN: GET ALL USERS ==============================
+router.get("/admin/users", authenticateToken, (req, res) => {
+  const adminUserType = req.user.userType;
+
+  // Check if user is admin
+  if (adminUserType !== "admin") {
+    return res.status(403).json({
+      message: "Access denied. Admin privileges required.",
+    });
+  }
+
+  const sql = `
+    SELECT userID, username, user_email, user_type, created_at 
+    FROM users 
+    ORDER BY created_at DESC
+  `;
+
+  db.query(sql, (err, results) => {
+    if (err) {
+      console.error("Database error:", err);
+      return res.status(500).json({ message: "Server error" });
+    }
+
+    // Decrypt all emails before sending to frontend
+    const usersWithDecryptedEmails = results.map((user) => {
+      try {
+        return {
+          ...user,
+          user_email: decryptEmail(user.user_email),
+        };
+      } catch (error) {
+        console.error(`Error decrypting email for user ${user.userID}:`, error);
+        return {
+          ...user,
+          user_email: "Error decrypting email",
+        };
+      }
+    });
+
+    res.json({ users: usersWithDecryptedEmails });
   });
 });
 
@@ -154,7 +209,7 @@ router.get("/my-profile-photo", authenticateToken, (req, res) => {
 
 //============================== LOGIN ROUTE =================================
 // Route to check if user exists and validate login
-router.post("/login", (req, res) => {
+router.post("/login", async (req, res) => {
   const { user_email, user_password } = req.body;
 
   // Check if both fields are provided
@@ -164,52 +219,99 @@ router.post("/login", (req, res) => {
       .json({ message: "Email and password are required." });
   }
 
-  // Query to check if the email and password match
-  const sql = "SELECT * FROM users WHERE user_email = ? AND user_password = ?";
+  try {
+    // Try to find user by username first (since username is not encrypted)
+    // If not found, we'll need to check all users and decrypt their emails
+    const usernameSql = "SELECT * FROM users WHERE username = ?";
+    const allUsersSql = "SELECT * FROM users";
 
-  db.query(sql, [user_email, user_password], (err, results) => {
-    if (err) {
-      console.error("Database error:", err);
-      return res.status(500).json({ message: "Internal server error" });
-    }
+    // First, try to find by username (in case user entered username instead of email)
+    db.query(usernameSql, [user_email], async (err, results) => {
+      if (err) {
+        console.error("Database error:", err);
+        return res.status(500).json({ message: "Internal server error" });
+      }
 
-    // If no matching user found
-    if (results.length === 0) {
-      return res.status(401).json({ message: "Invalid email or password" });
-    }
+      let user = null;
 
-    // If user found, generate JWT token
-    const user = results[0];
+      // If found by username
+      if (results.length > 0) {
+        user = results[0];
+      } else {
+        // Not found by username, search by decrypting all emails
+        const allUsersResults = await new Promise((resolve, reject) => {
+          db.query(allUsersSql, (err, results) => {
+            if (err) reject(err);
+            else resolve(results);
+          });
+        });
 
-    // Create JWT token with user data
-    const token = jwt.sign(
-      {
-        userId: user.userID,
-        email: user.user_email,
-        username: user.username,
-        userType: user.user_type,
-      },
-      JWT_SECRET,
-      { expiresIn: "4h" } // Token expires in 6 hours
-    );
+        // Decrypt and compare emails
+        for (const dbUser of allUsersResults) {
+          try {
+            const decryptedEmail = decryptEmail(dbUser.user_email);
+            if (decryptedEmail.toLowerCase() === user_email.toLowerCase()) {
+              user = dbUser;
+              break;
+            }
+          } catch (decryptError) {
+            // Skip users with invalid encrypted emails
+            continue;
+          }
+        }
+      }
 
-    // Send token to frontend
-    res.json({
-      message: "Login successful!",
-      token: token, // JWT token for authentication
-      user: {
-        id: user.userID,
-        email: user.user_email,
-        username: user.username,
-        created_at: user.created_at,
-        userType: user.user_type,
-      },
+      // If no matching user found
+      if (!user) {
+        return res.status(401).json({ message: "Invalid email or password" });
+      }
+
+      // Compare password with hashed password
+      const passwordMatch = await bcrypt.compare(
+        user_password,
+        user.user_password
+      );
+
+      if (!passwordMatch) {
+        return res.status(401).json({ message: "Invalid email or password" });
+      }
+
+      // Decrypt email for JWT token
+      const decryptedEmail = decryptEmail(user.user_email);
+
+      // Create JWT token with user data
+      const token = jwt.sign(
+        {
+          userId: user.userID,
+          email: decryptedEmail,
+          username: user.username,
+          userType: user.user_type,
+        },
+        JWT_SECRET,
+        { expiresIn: "4h" }
+      );
+
+      // Send token to frontend
+      res.json({
+        message: "Login successful!",
+        token: token,
+        user: {
+          id: user.userID,
+          email: decryptedEmail,
+          username: user.username,
+          created_at: user.created_at,
+          userType: user.user_type,
+        },
+      });
     });
-  });
+  } catch (error) {
+    console.error("Encryption error:", error);
+    return res.status(500).json({ message: "Server error" });
+  }
 });
 
 //============================== REGISTER ROUTE ==============================
-router.post("/register", authenticateToken, (req, res) => {
+router.post("/register", authenticateToken, async (req, res) => {
   const { username, user_email, user_password, user_type } = req.body;
   const adminUserType = req.user.userType; // From JWT token
 
@@ -226,46 +328,57 @@ router.post("/register", authenticateToken, (req, res) => {
     });
   }
 
-  const checkSql = "SELECT * FROM users WHERE user_email = ? OR username = ?";
-  const insertSql =
-    "INSERT INTO users (username, user_email, user_password, user_type) VALUES (?, ?, ?, ?)";
+  try {
+    // Encrypt email and hash password
+    const encryptedEmail = encryptEmail(user_email);
+    const hashedPassword = await bcrypt.hash(user_password, 10);
 
-  db.query(checkSql, [user_email, username], (err, result) => {
-    if (err) {
-      console.error("Database error:", err);
-      return res
-        .status(500)
-        .json({ message: "Server error - is the database connected?" });
-    }
-    if (results.length > 0) {
-      const existingUser = results[0];
-      if (existingUser.user_email === user_email) {
-        return res.status(409).json({ message: "Email already registered" });
-      }
-      if (existingUser.username === username) {
-        return res.status(409).json({ message: "Username already taken" });
-      }
-    }
-  });
+    const checkSql = "SELECT * FROM users WHERE user_email = ? OR username = ?";
 
-  db.query(
-    insertSql,
-    [username, user_email, user_password, user_type],
-    (err, result) => {
+    db.query(checkSql, [encryptedEmail, username], (err, results) => {
       if (err) {
-        console.error("Error inserting user:", err);
+        console.error("Database error:", err);
         return res
           .status(500)
-          .json({ message: "Error creating user - likley SQL error" });
+          .json({ message: "Server error - is the database connected?" });
       }
 
-      // User created successfully
-      res.status(201).json({
-        message: "User created successfully!",
-        userId: result.insertId,
-      });
-    }
-  );
+      if (results.length > 0) {
+        const existingUser = results[0];
+        if (existingUser.user_email === encryptedEmail) {
+          return res.status(409).json({ message: "Email already registered" });
+        }
+        if (existingUser.username === username) {
+          return res.status(409).json({ message: "Username already taken" });
+        }
+      }
+
+      const insertSql =
+        "INSERT INTO users (username, user_email, user_password, user_type, created_at) VALUES (?, ?, ?, ?, NOW())";
+
+      db.query(
+        insertSql,
+        [username, encryptedEmail, hashedPassword, user_type || "user"],
+        (err, result) => {
+          if (err) {
+            console.error("Error inserting user:", err);
+            return res
+              .status(500)
+              .json({ message: "Error creating user - likely SQL error" });
+          }
+
+          // User created successfully
+          res.status(201).json({
+            message: "User created successfully!",
+            userId: result.insertId,
+          });
+        }
+      );
+    });
+  } catch (error) {
+    console.error("Encryption/Hashing error:", error);
+    return res.status(500).json({ message: "Server error" });
+  }
 });
 
 //============================== UPLOAD PROFILE PHOTO ==============================
@@ -307,7 +420,7 @@ router.post(
 );
 
 //============================== CHANGE PASSWORD ROUTE ==============================
-router.post("/change-password", authenticateToken, (req, res) => {
+router.post("/change-password", authenticateToken, async (req, res) => {
   const userId = req.user.userId;
   const { oldPassword, newPassword } = req.body;
 
@@ -321,7 +434,7 @@ router.post("/change-password", authenticateToken, (req, res) => {
   const verifySql = "SELECT user_password FROM users WHERE userID = ?";
   const updateSql = "UPDATE users SET user_password = ? WHERE userID = ?";
 
-  db.query(verifySql, [userId], (err, results) => {
+  db.query(verifySql, [userId], async (err, results) => {
     if (err) {
       console.error("Database error:", err);
       return res.status(500).json({
@@ -333,24 +446,40 @@ router.post("/change-password", authenticateToken, (req, res) => {
       return res.status(404).json({ message: "User not found" });
     }
 
-    if (results[0].user_password !== oldPassword) {
-      return res.status(401).json({ message: "Current password is incorrect" });
-    }
+    try {
+      // Compare old password with hashed password
+      const passwordMatch = await bcrypt.compare(
+        oldPassword,
+        results[0].user_password
+      );
 
-    // Password verified, now update it
-    db.query(updateSql, [newPassword, userId], (err, result) => {
-      if (err) {
-        console.error("Database error:", err);
-        return res.status(500).json({ message: "Error updating password" });
+      if (!passwordMatch) {
+        return res
+          .status(401)
+          .json({ message: "Current password is incorrect" });
       }
-      res.json({ message: "Password changed successfully" });
-    });
+
+      // Hash new password
+      const hashedNewPassword = await bcrypt.hash(newPassword, 10);
+
+      // Password verified, now update it
+      db.query(updateSql, [hashedNewPassword, userId], (err, result) => {
+        if (err) {
+          console.error("Database error:", err);
+          return res.status(500).json({ message: "Error updating password" });
+        }
+        res.json({ message: "Password changed successfully" });
+      });
+    } catch (error) {
+      console.error("Hashing error:", error);
+      return res.status(500).json({ message: "Server error" });
+    }
   });
 });
 
 //============================== EDIT USER ROUTE ==============================
 // Update user profile
-router.put("/profile", authenticateToken, (req, res) => {
+router.put("/profile", authenticateToken, async (req, res) => {
   const userId = req.user.userId;
   const { username, user_email } = req.body;
 
@@ -361,52 +490,71 @@ router.put("/profile", authenticateToken, (req, res) => {
     });
   }
 
-  // Build dynamic SQL query based on provided fields
-  let updateFields = [];
-  let values = [];
+  try {
+    // Build dynamic SQL query based on provided fields
+    let updateFields = [];
+    let values = [];
 
-  if (username) {
-    updateFields.push("username = ?");
-    values.push(username);
-  }
+    if (username) {
+      updateFields.push("username = ?");
+      values.push(username);
+    }
 
-  if (user_email) {
-    updateFields.push("user_email = ?");
-    values.push(user_email);
-  }
+    if (user_email) {
+      const encryptedEmail = encryptEmail(user_email);
+      updateFields.push("user_email = ?");
+      values.push(encryptedEmail);
+    }
 
-  values.push(userId); // For WHERE clause
+    values.push(userId); // For WHERE clause
 
-  const sql = `UPDATE users SET ${updateFields.join(", ")} WHERE userID = ?`;
+    const sql = `UPDATE users SET ${updateFields.join(", ")} WHERE userID = ?`;
 
-  db.query(sql, values, (err, result) => {
-    if (err) {
-      console.error("Error updating user:", err);
+    db.query(sql, values, (err, result) => {
+      if (err) {
+        console.error("Error updating user:", err);
 
-      // Check if it's a duplicate entry error
-      if (err.code === "ER_DUP_ENTRY") {
-        return res.status(409).json({
-          message: "Username or email already taken",
-        });
+        // Check if it's a duplicate entry error
+        if (err.code === "ER_DUP_ENTRY") {
+          // Check which field caused the duplicate
+          const errorMessage = err.message || "";
+
+          if (errorMessage.includes("username")) {
+            return res.status(409).json({
+              message: "Username already taken",
+            });
+          } else if (errorMessage.includes("user_email")) {
+            return res.status(409).json({
+              message: "Email already registered",
+            });
+          } else {
+            return res.status(409).json({
+              message: "Username or email already taken",
+            });
+          }
+        }
+
+        return res.status(500).json({ message: "Error updating profile" });
       }
 
-      return res.status(500).json({ message: "Error updating profile" });
-    }
+      if (result.affectedRows === 0) {
+        return res.status(404).json({ message: "User not found" });
+      }
 
-    if (result.affectedRows === 0) {
-      return res.status(404).json({ message: "User not found" });
-    }
-
-    res.json({
-      message: "Profile updated successfully",
-      updated: { username, user_email },
+      res.json({
+        message: "Profile updated successfully",
+        updated: { username, user_email },
+      });
     });
-  });
+  } catch (error) {
+    console.error("Encryption error:", error);
+    return res.status(500).json({ message: "Server error" });
+  }
 });
 
 //============================== DELETE USER ROUTE ==============================
 // Delete user account (protected)
-router.delete("/account", authenticateToken, (req, res) => {
+router.delete("/account", authenticateToken, async (req, res) => {
   const userId = req.user.userId; // From JWT token
   const { password } = req.body; // Require password confirmation
 
@@ -420,7 +568,7 @@ router.delete("/account", authenticateToken, (req, res) => {
   // Verify password before deleting
   const verifySql = "SELECT user_password FROM users WHERE userID = ?";
 
-  db.query(verifySql, [userId], (err, results) => {
+  db.query(verifySql, [userId], async (err, results) => {
     if (err) {
       console.error("Database error:", err);
       return res.status(500).json({ message: "Server error" });
@@ -430,25 +578,35 @@ router.delete("/account", authenticateToken, (req, res) => {
       return res.status(404).json({ message: "User not found" });
     }
 
-    // Check if password matches
-    if (results[0].user_password !== password) {
-      return res.status(401).json({ message: "Incorrect password" });
-    }
+    try {
+      // Compare password with hashed password
+      const passwordMatch = await bcrypt.compare(
+        password,
+        results[0].user_password
+      );
 
-    // Delete the user
-    const deleteSql = "DELETE FROM users WHERE userID = ?";
-
-    db.query(deleteSql, [userId], (err, result) => {
-      if (err) {
-        console.error("Error deleting user:", err);
-        return res.status(500).json({ message: "Error deleting account" });
+      if (!passwordMatch) {
+        return res.status(401).json({ message: "Incorrect password" });
       }
 
-      res.json({
-        message: "Account deleted successfully",
-        deletedUserId: userId,
+      // Delete the user
+      const deleteSql = "DELETE FROM users WHERE userID = ?";
+
+      db.query(deleteSql, [userId], (err, result) => {
+        if (err) {
+          console.error("Error deleting user:", err);
+          return res.status(500).json({ message: "Error deleting account" });
+        }
+
+        res.json({
+          message: "Account deleted successfully",
+          deletedUserId: userId,
+        });
       });
-    });
+    } catch (error) {
+      console.error("Hashing error:", error);
+      return res.status(500).json({ message: "Server error" });
+    }
   });
 });
 

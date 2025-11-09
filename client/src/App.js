@@ -2,8 +2,10 @@ import React from "react";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import AuthProvider from "./Authentication/authProvider";
 import RouteProtector from "./Authentication/RouteProtector";
+import AdminRouteProtector from "./Authentication/AdminRouteProtector";
 import LoginPage from "./pages/login";
 import HomePage from "./pages/homePage";
+import AdminDashboard from "./pages/adminDashboard";
 
 function App() {
   return (
@@ -21,6 +23,15 @@ function App() {
                 <RouteProtector>
                   <HomePage />
                 </RouteProtector>
+              }
+            />
+            {/* Admin routes */}
+            <Route
+              path="/admin"
+              element={
+                <AdminRouteProtector>
+                  <AdminDashboard />
+                </AdminRouteProtector>
               }
             />
           </Routes>
