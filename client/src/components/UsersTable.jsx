@@ -6,12 +6,15 @@ import React, {
 } from "react";
 import "../CSS/adminDashboard.css";
 import axios from "axios";
+import UserDetailsModal from "../modals/userDetailsModal";
 
 const UsersTable = forwardRef(
-  ({ searchTerm = "", userTypeFilter = "all" }, ref) => {
+  ({ searchTerm = "", userTypeFilter = "all", currentAdminId = null }, ref) => {
     const [users, setUsers] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
+    const [selectedUserId, setSelectedUserId] = useState(null);
+    const [isModalOpen, setIsModalOpen] = useState(false);
 
     // Fetch all users when component mounts
     useEffect(() => {
@@ -66,6 +69,22 @@ const UsersTable = forwardRef(
       return matchesSearch && matchesFilter;
     });
 
+    const handleRowClick = (userId) => {
+      setSelectedUserId(userId);
+      setIsModalOpen(true);
+    };
+
+    const handleCloseModal = () => {
+      setIsModalOpen(false);
+      setSelectedUserId(null);
+    };
+
+    const handleUserDeleted = () => {
+      // Refresh the users list after deletion
+      fetchUsers();
+      handleCloseModal();
+    };
+
     if (loading) {
       return (
         <div className="table-container">
@@ -96,7 +115,11 @@ const UsersTable = forwardRef(
           <tbody>
             {filteredUsers.length > 0 ? (
               filteredUsers.map((user) => (
-                <tr key={user.id}>
+                <tr
+                  key={user.id}
+                  onClick={() => handleRowClick(user.id)}
+                  style={{ cursor: "pointer" }}
+                >
                   <td>{user.name}</td>
                   <td>{user.email}</td>
                   <td>{user.joined}</td>
@@ -116,6 +139,14 @@ const UsersTable = forwardRef(
             )}
           </tbody>
         </table>
+
+        <UserDetailsModal
+          isOpen={isModalOpen}
+          onClose={handleCloseModal}
+          userId={selectedUserId}
+          onUserDeleted={handleUserDeleted}
+          currentAdminId={currentAdminId}
+        />
       </div>
     );
   }

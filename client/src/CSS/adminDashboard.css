@@ -146,8 +146,13 @@
   color: #333;
 }
 
-.user-table tr:hover {
-  background-color: #f9f9f9;
+.user-table tbody tr {
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.user-table tbody tr:hover {
+  background-color: #e3f2fd;
 }
 
 .user-type-badge {

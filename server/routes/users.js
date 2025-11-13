@@ -613,13 +613,21 @@ router.delete("/account", authenticateToken, async (req, res) => {
 //============================== ADMIN: DELETE ANY USER ==============================
 // Admin route to delete any user
 router.delete("/admin/user/:userId", authenticateToken, (req, res) => {
-  const adminUserType = req.user.userType; // From JWT token
+  const adminUserType = req.user.userType;
+  const adminUserId = req.user.userId;
   const targetUserId = req.params.userId;
 
   // Check if user is admin
   if (adminUserType !== "admin") {
     return res.status(403).json({
       message: "Access denied. Admin privileges required.",
+    });
+  }
+
+  // Prevent admin from deleting themselves
+  if (parseInt(targetUserId) === adminUserId) {
+    return res.status(403).json({
+      message: "You cannot delete your own account.",
     });
   }
 
@@ -641,6 +649,57 @@ router.delete("/admin/user/:userId", authenticateToken, (req, res) => {
     res.json({
       message: "User deleted successfully",
       deletedUserId: targetUserId,
+    });
+  });
+});
+
+//============================== ADMIN: UPDATE USER TYPE ==============================
+router.put("/admin/user/:userId/type", authenticateToken, (req, res) => {
+  const adminUserType = req.user.userType;
+  const adminUserId = req.user.userId;
+  const targetUserId = req.params.userId;
+  const { user_type } = req.body;
+
+  // Check if user is admin
+  if (adminUserType !== "admin") {
+    return res.status(403).json({
+      message: "Access denied. Admin privileges required.",
+    });
+  }
+
+  // Prevent admin from changing their own user type
+  if (parseInt(targetUserId) === adminUserId) {
+    return res.status(403).json({
+      message: "You cannot change your own user type.",
+    });
+  }
+
+  // Validate user_type
+  if (!user_type || (user_type !== "admin" && user_type !== "user")) {
+    return res.status(400).json({
+      message: "Invalid user type. Must be 'admin' or 'user'.",
+    });
+  }
+
+  // Update user type
+  const sql = "UPDATE users SET user_type = ? WHERE userID = ?";
+
+  db.query(sql, [user_type, targetUserId], (err, result) => {
+    if (err) {
+      console.error("Error updating user type:", err);
+      return res.status(500).json({
+        message: "Error updating user type - is database connected?",
+      });
+    }
+
+    if (result.affectedRows === 0) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    res.json({
+      message: "User type updated successfully",
+      userId: targetUserId,
+      newUserType: user_type,
     });
   });
 });
