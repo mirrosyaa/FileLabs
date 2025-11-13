@@ -19,6 +19,9 @@ function SettingsModal({ isOpen, onClose }) {
   const [newPassword, setNewPassword] = useState("");
   const [passwordError, setPasswordError] = useState("");
   const [passwordSuccess, setPasswordSuccess] = useState(false);
+
+  // Closing animation state
+  const [isClosing, setIsClosing] = useState(false);
   useEffect(() => {
     if (isOpen) {
       // Fetch user profile data when modal opens
@@ -267,21 +270,36 @@ function SettingsModal({ isOpen, onClose }) {
     }
   };
 
-  if (!isOpen) return null;
+  if (!isOpen && !isClosing) return null;
 
   // Close modal when clicking on overlay (background)
   const handleOverlayClick = (e) => {
-    if (e.target.className === "modal-overlay") {
-      onClose();
+    if (e.target.className.includes("modal-overlay")) {
+      setIsClosing(true);
+      setTimeout(() => {
+        setIsClosing(false);
+        onClose();
+      }, 300); // Match animation duration
     }
   };
 
+  const handleCloseButton = () => {
+    setIsClosing(true);
+    setTimeout(() => {
+      setIsClosing(false);
+      onClose();
+    }, 300); // Match animation duration
+  };
+
   return (
-    <div className="modal-overlay" onClick={handleOverlayClick}>
+    <div
+      className={`modal-overlay ${isClosing ? "closing" : ""}`}
+      onClick={handleOverlayClick}
+    >
       <div className="modal-content">
         <div className="modal-header">
           <h2>Settings</h2>
-          <button className="close-button" onClick={onClose}>
+          <button className="close-button" onClick={handleCloseButton}>
             ×
           </button>
         </div>

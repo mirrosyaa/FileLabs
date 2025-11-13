@@ -1,4 +1,5 @@
-import React, { useState, useRef } from "react";
+import React, { useState, useRef, useEffect } from "react";
+import axios from "axios";
 import "../CSS/adminDashboard.css";
 import AdminHeader from "../components/AdminHeader";
 import SearchBar from "../components/SearchBar";
@@ -10,7 +11,21 @@ function AdminDashboard() {
   const [searchTerm, setSearchTerm] = useState("");
   const [userTypeFilter, setUserTypeFilter] = useState("all");
   const [isAddUserModalOpen, setIsAddUserModalOpen] = useState(false);
+  const [currentAdminId, setCurrentAdminId] = useState(null);
   const usersTableRef = useRef();
+
+  // Fetch current admin's user ID
+  useEffect(() => {
+    const fetchCurrentUser = async () => {
+      try {
+        const response = await axios.get("http://localhost:3001/users/profile");
+        setCurrentAdminId(response.data.user.userID);
+      } catch (err) {
+        console.error("Error fetching current user:", err);
+      }
+    };
+    fetchCurrentUser();
+  }, []);
 
   const handleUserAdded = () => {
     // Refresh the users table when a new user is added
@@ -65,6 +80,7 @@ function AdminDashboard() {
           ref={usersTableRef}
           searchTerm={searchTerm}
           userTypeFilter={userTypeFilter}
+          currentAdminId={currentAdminId}
         />
       </div>
       <AddUserModal

@@ -10,6 +10,7 @@ function AddUserModal({ isOpen, onClose, onUserAdded }) {
   const [error, setError] = useState("");
   const [success, setSuccess] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isClosing, setIsClosing] = useState(false);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -81,19 +82,26 @@ function AddUserModal({ isOpen, onClose, onUserAdded }) {
   };
 
   const handleClose = () => {
-    setUsername("");
-    setEmail("");
-    setPassword("");
-    setUserType("user");
-    setError("");
-    setSuccess(false);
-    onClose();
+    setIsClosing(true);
+    setTimeout(() => {
+      setUsername("");
+      setEmail("");
+      setPassword("");
+      setUserType("user");
+      setError("");
+      setSuccess(false);
+      setIsClosing(false);
+      onClose();
+    }, 300); // Match animation duration
   };
 
-  if (!isOpen) return null;
+  if (!isOpen && !isClosing) return null;
 
   return (
-    <div className="modal-overlay" onClick={handleClose}>
+    <div
+      className={`modal-overlay ${isClosing ? "closing" : ""}`}
+      onClick={handleClose}
+    >
       <div className="modal-content" onClick={(e) => e.stopPropagation()}>
         <button className="close-btn" onClick={handleClose}>
           ✕
