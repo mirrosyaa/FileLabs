@@ -1,7 +1,3 @@
-<<<<<<< Updated upstream
-// ...existing code...
-=======
->>>>>>> Stashed changes
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../Authentication/authProvider";
@@ -10,16 +6,15 @@ import "../CSS/login.css"; // added: starfield + login-box styles
 // ...existing code...
 
 function LoginForm() {
-  const navigate = useNavigate();
-  const { setToken } = useAuth();
+  // Store the user's input in state variables
+  const navigate = useNavigate(); // used to help navigate between login and home page
+  const { setToken } = useAuth(); // Get setToken from AuthProvider
   const [emailOrUsername, setEmailOrUsername] = useState("");
   const [password, setPassword] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
 
-<<<<<<< Updated upstream
-=======
   // --- added: generate randomized stars for the animated background ---
-  const STAR_COUNT = 240;
+  const STAR_COUNT = 140;
   const rand = (min, max) => Math.random() * (max - min) + min;
   const stars = Array.from({ length: STAR_COUNT }).map((_, i) => {
     const left = `${rand(0, 100)}%`;
@@ -45,22 +40,29 @@ function LoginForm() {
   // --- end star generation ---
 
   // Handle login form submission
->>>>>>> Stashed changes
   const handleSubmit = async (e) => {
-    e.preventDefault();
-    setErrorMessage("");
+    e.preventDefault(); // stop the page from reloading
+    setErrorMessage(""); // Clear previous errors
     console.log("Email/Username:", emailOrUsername);
-    // password console.log intentionally removed for security
+    console.log("Password:", password);
 
     try {
+      // send login data to backend
       const response = await axios.post("http://localhost:3001/users/login", {
-        user_email: emailOrUsername,
+        user_email: emailOrUsername, // Backend accepts either email or username
         user_password: password,
       });
+      console.log(response.data);
+
+      // Save JWT token to AuthProvider
       setToken(response.data.token);
-      navigate("/home");
+
+      navigate("/home"); // if login is successful, navigate to home page
     } catch (err) {
+      // if login fails, log the error from the backend
       console.error("Login error:", err);
+
+      // Check if it's a server error (500) or authentication error (401)
       if (err.response) {
         if (err.response.status === 500) {
           setErrorMessage("Server error. Please try again later.");
@@ -70,7 +72,10 @@ function LoginForm() {
           setErrorMessage(err.response.data.message || "Login failed");
         }
       } else if (err.request) {
-        setErrorMessage("Unable to connect to server. Please check your connection.");
+        // Network error - no response received
+        setErrorMessage(
+          "Unable to connect to server. Please check your connection."
+        );
       } else {
         setErrorMessage("An error occurred. Please try again.");
       }
@@ -81,25 +86,6 @@ function LoginForm() {
     <div className="login-page-container">
       <div className="starfield">{stars}</div>
 
-<<<<<<< Updated upstream
-        {/* simple password field (restored) */}
-        <div className="mb-3">
-          <label htmlFor="password" className="form-label">
-            Password
-          </label>
-          <input
-            id="password"
-            type="password"
-            className="form-control"
-            placeholder="Enter your password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            required
-          />
-        </div>
-
-        {errorMessage && <div className="alert alert-danger">{errorMessage}</div>}
-=======
       <div className="login-box">
         <div className="container" style={{ maxWidth: "400px" }}>
           <h2 className="text-center mb-4">Login</h2>
@@ -118,7 +104,6 @@ function LoginForm() {
                 required
               />
             </div>
->>>>>>> Stashed changes
 
             <div className="mb-3">
               <label htmlFor="password" className="form-label">
@@ -147,5 +132,4 @@ function LoginForm() {
     </div>
   );
 }
-
 export default LoginForm;
