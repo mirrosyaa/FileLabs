@@ -3,7 +3,6 @@ import { useNavigate } from "react-router-dom";
 import { useAuth } from "../Authentication/authProvider";
 import axios from "axios";
 import "../CSS/login.css"; // added: starfield + login-box styles
-// ...existing code...
 
 function LoginForm() {
   // Store the user's input in state variables
@@ -14,7 +13,7 @@ function LoginForm() {
   const [errorMessage, setErrorMessage] = useState("");
 
   // --- added: generate randomized stars for the animated background ---
-  const STAR_COUNT = 140;
+  const STAR_COUNT = 300;
   const rand = (min, max) => Math.random() * (max - min) + min;
   const stars = Array.from({ length: STAR_COUNT }).map((_, i) => {
     const left = `${rand(0, 100)}%`;
@@ -37,7 +36,7 @@ function LoginForm() {
       />
     );
   });
-  // --- end star generation ---
+  
 
   // Handle login form submission
   const handleSubmit = async (e) => {
@@ -86,6 +85,7 @@ function LoginForm() {
     <div className="login-page-container">
       <div className="starfield">{stars}</div>
 
+      
       <div className="login-box">
         <div className="container" style={{ maxWidth: "400px" }}>
           <h2 className="text-center mb-4">Login</h2>
