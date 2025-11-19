@@ -120,3 +120,56 @@ html {
 @media (max-width:420px) {
   .login-box { padding: 20px; width: 92%; }
 }
+/* ...existing code... */
+
+.password-wrap {
+  position: relative;
+}
+
+/* leave room on the right inside the input for the toggle button */
+.password-wrap .form-control {
+  padding-right: 44px;
+}
+
+/* toggle button placed inside the input on the right */
+.password-toggle {
+  position: absolute;
+  right: 8px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 36px;
+  height: 36px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  border: none;
+  background: transparent;
+  color: #000;
+  cursor: pointer;
+  border-radius: 6px;
+}
+
+
+
+/* visible focus ring for keyboard users */
+.password-toggle:focus {
+  outline: 2px solid #000;
+  outline-offset: 2px;
+}
+
+/* svg inside the button follows currentColor and stays crisp */
+.password-toggle svg {
+  width: 18px;
+  height: 18px;
+  display: block;
+  stroke: currentColor;
+  fill: none;
+}
+
+/* subtle hover state */
+.password-toggle:hover {
+  color: #000;
+}
+
+/* ...existing code... */
