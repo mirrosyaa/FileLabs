@@ -1,4 +1,4 @@
-/* ...existing code... */
+
 h1 {
   color: blue;
 }
@@ -172,4 +172,25 @@ html {
   color: #000;
 }
 
-/* ...existing code... */
+
+/* remember-me layout + small icon */
+.remember-row { gap: 8px; }
+.form-check { display: inline-flex; align-items: center; gap: 8px; cursor: pointer; color: rgba(255,255,255,0.88); }
+.form-check-input { width: 16px; height: 16px; margin: 0; accent-color: #5ec8ff; }
+
+/* small icon button on the right */
+.remember-icon {
+  background: transparent;
+  border: none;
+  color: rgba(255,255,255,0.75);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 6px;
+  border-radius: 6px;
+  cursor: pointer;
+}
+.remember-icon.checked { color: #5ec8ff; }
+.remember-icon:focus { outline: 2px solid rgba(94,200,255,0.18); outline-offset: 2px; }
+.remember-icon svg { display: block; stroke: currentColor; fill: none; width: 18px; height: 18px; }
+

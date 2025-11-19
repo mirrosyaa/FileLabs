@@ -1,5 +1,5 @@
 // ...existing code...
-import React, { useState } from "react";
+import React, { useState, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../Authentication/authProvider";
 import axios from "axios";
@@ -14,13 +14,23 @@ function LoginForm() {
   const [errorMessage, setErrorMessage] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const toggleShowPassword = () => setShowPassword((v) => !v);
-
+  const [rememberMe, setRememberMe] = useState(() => {
+    try { return JSON.parse(localStorage.getItem("rememberMe")) || false; } catch { return false; }
+  });
+  const toggleRemember = () => {
+    setRememberMe((prev) => {
+      const next = !prev;
+      try { localStorage.setItem("rememberMe", JSON.stringify(next)); } catch {}
+      return next;
+    });
+  };
   // helpers for randomized animated layers
   const rand = (min, max) => Math.random() * (max - min) + min;
 
   // starfield (unchanged)
   const STAR_COUNT = 300;
-  const stars = Array.from({ length: STAR_COUNT }).map((_, i) => {
+const stars = useMemo(() => {
+  return Array.from({ length: STAR_COUNT }).map((_, i) => {
     const left = `${rand(0, 100)}%`;
     const top = `${rand(0, 100)}%`;
     const size = `${Math.floor(rand(1, 4))}px`;
@@ -41,6 +51,7 @@ function LoginForm() {
       />
     );
   });
+}, []); 
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -125,6 +136,19 @@ function LoginForm() {
                 </button>
               </div>
             </div>
+
+ <div className="mb-3 remember-row">
+  <label className="form-check" htmlFor="rememberMe">
+    <input
+      id="rememberMe"
+      type="checkbox"
+      className="form-check-input"
+      checked={rememberMe}
+      onChange={toggleRemember}
+    />
+    <span className="form-check-label">Remember me</span>
+  </label>
+</div>
 
             {errorMessage && <div className="alert alert-danger">{errorMessage}</div>}
 
