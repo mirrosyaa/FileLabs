@@ -1,40 +1,31 @@
-import { React, useState } from "react";
+// ...existing code...
+import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../Authentication/authProvider";
 import axios from "axios";
 
 function LoginForm() {
-  // Store the user's input in state variables
-  const navigate = useNavigate(); // used to help navigate between login and home page
-  const { setToken } = useAuth(); // Get setToken from AuthProvider
+  const navigate = useNavigate();
+  const { setToken } = useAuth();
   const [emailOrUsername, setEmailOrUsername] = useState("");
   const [password, setPassword] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
 
-  // Handle login form submission
   const handleSubmit = async (e) => {
-    e.preventDefault(); // stop the page from reloading
-    setErrorMessage(""); // Clear previous errors
+    e.preventDefault();
+    setErrorMessage("");
     console.log("Email/Username:", emailOrUsername);
-    console.log("Password:", password);
+    // password console.log intentionally removed for security
 
     try {
-      // send login data to backend
       const response = await axios.post("http://localhost:3001/users/login", {
-        user_email: emailOrUsername, // Backend accepts either email or username
+        user_email: emailOrUsername,
         user_password: password,
       });
-      console.log(response.data);
-
-      // Save JWT token to AuthProvider
       setToken(response.data.token);
-
-      navigate("/home"); // if login is successful, navigate to home page
+      navigate("/home");
     } catch (err) {
-      // if login fails, log the error from the backend
       console.error("Login error:", err);
-
-      // Check if it's a server error (500) or authentication error (401)
       if (err.response) {
         if (err.response.status === 500) {
           setErrorMessage("Server error. Please try again later.");
@@ -44,10 +35,7 @@ function LoginForm() {
           setErrorMessage(err.response.data.message || "Login failed");
         }
       } else if (err.request) {
-        // Network error - no response received
-        setErrorMessage(
-          "Unable to connect to server. Please check your connection."
-        );
+        setErrorMessage("Unable to connect to server. Please check your connection.");
       } else {
         setErrorMessage("An error occurred. Please try again.");
       }
@@ -73,23 +61,23 @@ function LoginForm() {
           />
         </div>
 
+        {/* simple password field (restored) */}
         <div className="mb-3">
           <label htmlFor="password" className="form-label">
             Password
           </label>
           <input
+            id="password"
             type="password"
             className="form-control"
-            id="password"
             placeholder="Enter your password"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             required
           />
         </div>
-        {errorMessage && (
-          <div className="alert alert-danger">{errorMessage}</div>
-        )}
+
+        {errorMessage && <div className="alert alert-danger">{errorMessage}</div>}
 
         <button type="submit" className="btn btn-primary w-100">
           Login
@@ -98,4 +86,5 @@ function LoginForm() {
     </div>
   );
 }
+
 export default LoginForm;
