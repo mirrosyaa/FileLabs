@@ -251,33 +251,155 @@
   border-radius: 0 0 12px 12px;
 }
 
-/* Smooth media query for smaller screens */
-@media (max-width: 768px) {
+/* Mobile Navigation */
+@media (max-width: 1024px) {
   .navbar {
-    padding: 0.75rem 1.5rem;
-  }
-
-  .nav-center {
-    gap: 0.5rem;
-  }
-
-  .nav-button {
-    padding: 0.5rem 1rem;
-    font-size: 0.9rem;
+    height: 80px;
+    padding: 0 1.5rem;
+    border-radius: 0 0 30px 30px;
   }
 
   .nav-brand a {
     font-size: 1.4rem;
   }
 
+  .nav-center {
+    gap: 1rem;
+  }
+
+  .icon-circle {
+    width: 48px;
+    height: 48px;
+  }
+
+  .button-label {
+    font-size: 0.7rem;
+  }
+
   .profile-photo {
-    width: 42px;
-    height: 42px;
+    width: 52px;
+    height: 52px;
+  }
+}
+
+@media (max-width: 768px) {
+  .navbar {
+    height: 70px;
+    padding: 0 1rem;
+    border-radius: 0 0 20px 20px;
+  }
+
+  .nav-brand {
+    display: none;
+  }
+
+  .nav-center {
+    position: static;
+    transform: none;
+    gap: 0.5rem;
+    flex: 1;
+    justify-content: center;
+    margin: 0;
+    padding-left: 0;
+  }
+
+  .nav-button {
+    padding: 0.3rem 0.5rem;
+  }
+
+  .icon-circle {
+    width: 48px;
+    height: 48px;
+  }
+
+  .icon-circle svg {
+    width: 22px;
+    height: 22px;
+  }
+
+  .button-label {
+    display: none;
+  }
+
+  .profile-photo {
+    width: 46px;
+    height: 46px;
+  }
+
+  .nav-button:hover {
+    transform: translateY(-1px);
+  }
+
+  .nav-button:hover .icon-circle {
+    transform: scale(1.05);
+  }
+
+  .nav-right {
+    width: auto;
+  }
+
+  .nav-button.active::after {
+    display: none;
   }
 }
 
 @media (max-width: 480px) {
-  .nav-center {
+  .navbar {
+    height: 60px;
+    padding: 0 0.75rem;
+    border-radius: 0 0 15px 15px;
+  }
+
+  .nav-brand {
     display: none;
+  }
+
+  .nav-center {
+    position: static;
+    transform: none;
+    gap: 0.4rem;
+    flex: 1;
+    justify-content: center;
+    margin: 0;
+    padding-left: 0;
+  }
+
+  .nav-button {
+    padding: 0.2rem 0.3rem;
+  }
+
+  .icon-circle {
+    width: 44px;
+    height: 44px;
+  }
+
+  .icon-circle svg {
+    width: 20px;
+    height: 20px;
+  }
+
+  .button-label {
+    display: none;
+  }
+
+  .profile-photo {
+    width: 40px;
+    height: 40px;
+  }
+
+  .nav-right {
+    width: auto;
+  }
+
+  .nav-button.active::after {
+    display: none;
+  }
+
+  .nav-button:hover {
+    transform: none;
+  }
+
+  .nav-button:hover .icon-circle {
+    transform: scale(1.02);
   }
 }
