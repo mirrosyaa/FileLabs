@@ -13,6 +13,7 @@ function Navbar() {
   const [settingsModalOpen, setSettingsModalOpen] = useState(false);
   const [logoutModalOpen, setLogoutModalOpen] = useState(false);
   const { setToken } = useAuth();
+  const [userType, setUserType] = useState(null);
   const navigate = useNavigate();
   const location = useLocation();
 
@@ -31,9 +32,20 @@ function Navbar() {
     }
   };
 
+  // Fetch user profile to get user type
+  const fetchUserProfile = async () => {
+    try {
+      const response = await axios.get("http://localhost:3001/users/profile");
+      setUserType(response.data.user.user_type);
+    } catch (err) {
+      console.error("Error fetching user profile:", err);
+    }
+  };
+
   // Fetch and set user's profile photo on mount
   useEffect(() => {
     loadUserPhoto();
+    fetchUserProfile();
   }, []);
 
   // Listen for profile photo updates from settings modal
@@ -203,6 +215,15 @@ function Navbar() {
 
           {dropdownOpen && (
             <div className={styles["profile-dropdown"]}>
+              {userType === "admin" && (
+                <Link
+                  to="/admin"
+                  className={styles["dropdown-item"]}
+                  onClick={() => setDropdownOpen(false)}
+                >
+                  Admin Dashboard
+                </Link>
+              )}
               <button
                 className={styles["dropdown-item"]}
                 onClick={() => {
