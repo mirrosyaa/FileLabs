@@ -68,7 +68,19 @@ function LoginForm() {
         user_password: password,
       });
       setToken(response.data.token);
-      navigate("/home");
+
+      // Trigger fade out on parent login page
+      const loginContainer = document.querySelector(
+        `.${styles["login-page-container"]}`
+      );
+      if (loginContainer) {
+        loginContainer.classList.add(styles["fade-out"]);
+      }
+
+      // Navigate after fade out animation
+      setTimeout(() => {
+        navigate("/home");
+      }, 300);
     } catch (err) {
       console.error("Login error:", err);
       if (err.response) {

@@ -1,41 +1,86 @@
-import React from "react";
-import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import React, { useState, useEffect } from "react";
+import {
+  BrowserRouter as Router,
+  Routes,
+  Route,
+  useLocation,
+} from "react-router-dom";
 import AuthProvider from "./Authentication/authProvider";
 import RouteProtector from "./Authentication/RouteProtector";
 import AdminRouteProtector from "./Authentication/AdminRouteProtector";
 import LoginPage from "./pages/login";
 import HomePage from "./pages/homePage";
 import AdminDashboard from "./pages/adminDashboard";
+import LoadingScreen from "./pages/loadingScreen";
+
+function AppContent() {
+  const [loading, setLoading] = useState(false);
+  const location = useLocation();
+  const previousLocation = React.useRef(location.pathname);
+
+  useEffect(() => {
+    const fromLogin = previousLocation.current === "/";
+    const toHome = location.pathname === "/home";
+
+    // Only show loading screen when going from login to home
+    if (fromLogin && toHome) {
+      setLoading(true);
+
+      // Hide loading screen after 2 seconds
+      const hideTimer = setTimeout(() => {
+        setLoading(false);
+      }, 2000);
+
+      // Update previous location
+      previousLocation.current = location.pathname;
+
+      return () => {
+        clearTimeout(hideTimer);
+      };
+    }
+
+    // Update previous location for other transitions
+    previousLocation.current = location.pathname;
+  }, [location.pathname]);
+
+  if (loading) {
+    return <LoadingScreen />;
+  }
+
+  return (
+    <div id="App Content">
+      <Routes>
+        {/* Public routes*/}
+        <Route path="/" element={<LoginPage />} />
+
+        {/* Protected routes*/}
+        <Route
+          path="/home"
+          element={
+            <RouteProtector>
+              <HomePage />
+            </RouteProtector>
+          }
+        />
+        {/* Admin Protected routes */}
+        <Route
+          path="/admin"
+          element={
+            <AdminRouteProtector>
+              <AdminDashboard />
+            </AdminRouteProtector>
+          }
+        />
+      </Routes>
+    </div>
+  );
+}
 
 function App() {
   return (
     <AuthProvider>
       <Router>
-        <div id="App Content">
-          <Routes>
-            {/* Public routes*/}
-            <Route path="/" element={<LoginPage />} />
-
-            {/* Protected routes*/}
-            <Route
-              path="/home"
-              element={
-                <RouteProtector>
-                  <HomePage />
-                </RouteProtector>
-              }
-            />
-            {/* Admin Protected routes */}
-            <Route
-              path="/admin"
-              element={
-                <AdminRouteProtector>
-                  <AdminDashboard />
-                </AdminRouteProtector>
-              }
-            />
-          </Routes>
-        </div>
+        <AppContent />
       </Router>
     </AuthProvider>
   );

@@ -1,10 +1,28 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import LoginForm from "../components/loginForm";
 import styles from "../CSS/login.module.css";
 
 function LoginPage() {
+  const [fadeOut, setFadeOut] = useState(false);
+
+  useEffect(() => {
+    // Listen for navigation events
+    const handleBeforeUnload = () => {
+      setFadeOut(true);
+    };
+
+    window.addEventListener("beforeunload", handleBeforeUnload);
+    return () => {
+      window.removeEventListener("beforeunload", handleBeforeUnload);
+    };
+  }, []);
+
   return (
-    <div className={styles["login-page-container"]}>
+    <div
+      className={`${styles["login-page-container"]} ${
+        fadeOut ? styles["fade-out"] : ""
+      }`}
+    >
       {/* animated star layers */}
       <div className={styles.stars} aria-hidden="true" />
       <div className={styles.twinkling} aria-hidden="true" />
