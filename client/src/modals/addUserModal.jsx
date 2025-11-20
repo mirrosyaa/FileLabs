@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import axios from "axios";
-import "../CSS/addUserModal.css";
+import styles from "../CSS/addUserModal.module.css";
 
 function AddUserModal({ isOpen, onClose, onUserAdded }) {
   const [username, setUsername] = useState("");
@@ -99,21 +99,26 @@ function AddUserModal({ isOpen, onClose, onUserAdded }) {
 
   return (
     <div
-      className={`modal-overlay ${isClosing ? "closing" : ""}`}
+      className={`${styles["modal-overlay"]} ${
+        isClosing ? styles.closing : ""
+      }`}
       onClick={handleClose}
     >
-      <div className="modal-content" onClick={(e) => e.stopPropagation()}>
-        <button className="close-btn" onClick={handleClose}>
+      <div
+        className={styles["modal-content"]}
+        onClick={(e) => e.stopPropagation()}
+      >
+        <button className={styles["close-btn"]} onClick={handleClose}>
           ✕
         </button>
 
-        <h2 className="modal-title">Add New User</h2>
+        <h2 className={styles["modal-title"]}>Add New User</h2>
 
-        <form onSubmit={handleSubmit} className="settings-form">
-          <div className="form-section">
+        <form onSubmit={handleSubmit} className={styles["settings-form"]}>
+          <div className={styles["form-section"]}>
             <h3>User Details</h3>
 
-            <div className="form-group">
+            <div className={styles["form-group"]}>
               <label htmlFor="username">Username</label>
               <input
                 type="text"
@@ -126,7 +131,7 @@ function AddUserModal({ isOpen, onClose, onUserAdded }) {
               />
             </div>
 
-            <div className="form-group">
+            <div className={styles["form-group"]}>
               <label htmlFor="email">Email Address</label>
               <input
                 type="email"
@@ -139,7 +144,7 @@ function AddUserModal({ isOpen, onClose, onUserAdded }) {
               />
             </div>
 
-            <div className="form-group">
+            <div className={styles["form-group"]}>
               <label htmlFor="password">Password</label>
               <input
                 type="password"
@@ -152,7 +157,7 @@ function AddUserModal({ isOpen, onClose, onUserAdded }) {
               />
             </div>
 
-            <div className="form-group">
+            <div className={styles["form-group"]}>
               <label htmlFor="userType">User Type</label>
               <select
                 id="userType"
@@ -165,16 +170,20 @@ function AddUserModal({ isOpen, onClose, onUserAdded }) {
               </select>
             </div>
 
-            {error && <div className="error-message-modal">{error}</div>}
+            {error && (
+              <div className={styles["error-message-modal"]}>{error}</div>
+            )}
             {success && (
-              <div className="success-message-modal">
+              <div className={styles["success-message-modal"]}>
                 User added successfully!
               </div>
             )}
 
             <button
               type="submit"
-              className={`save-btn ${success ? "success" : ""}`}
+              className={`${styles["save-btn"]} ${
+                success ? styles.success : ""
+              }`}
               disabled={isSubmitting}
             >
               {isSubmitting ? "Adding..." : success ? "✓ Added!" : "Add User"}

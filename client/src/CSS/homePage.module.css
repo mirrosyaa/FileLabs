@@ -1,3 +1,8 @@
+.home-page-wrapper {
+  min-height: 100vh;
+  background-color: azure;
+}
+
 .greeting-header {
   text-align: left;
   margin: 2rem auto 1rem auto;

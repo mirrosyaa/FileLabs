@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import "../CSS/logoutModal.css";
+import styles from "../CSS/logoutModal.module.css";
 
 function LogoutModal({ isOpen, onClose, onConfirm }) {
   const [isClosing, setIsClosing] = useState(false);
@@ -24,17 +24,22 @@ function LogoutModal({ isOpen, onClose, onConfirm }) {
 
   return (
     <div
-      className={`logout-modal-overlay ${isClosing ? "closing" : ""}`}
+      className={`${styles["logout-modal-overlay"]} ${
+        isClosing ? styles.closing : ""
+      }`}
       onClick={handleClose}
     >
-      <div className="logout-modal" onClick={(e) => e.stopPropagation()}>
+      <div
+        className={styles["logout-modal"]}
+        onClick={(e) => e.stopPropagation()}
+      >
         <h2>Confirm Logout</h2>
         <p>Are you sure you want to logout?</p>
-        <div className="logout-modal-buttons">
-          <button className="cancel-button" onClick={handleClose}>
+        <div className={styles["logout-modal-buttons"]}>
+          <button className={styles["cancel-button"]} onClick={handleClose}>
             Cancel
           </button>
-          <button className="confirm-button" onClick={handleConfirm}>
+          <button className={styles["confirm-button"]} onClick={handleConfirm}>
             Logout
           </button>
         </div>

@@ -4,7 +4,7 @@ import React, {
   forwardRef,
   useImperativeHandle,
 } from "react";
-import "../CSS/adminDashboard.css";
+import styles from "../CSS/adminDashboard.module.css";
 import axios from "axios";
 import UserDetailsModal from "../modals/userDetailsModal";
 
@@ -87,23 +87,23 @@ const UsersTable = forwardRef(
 
     if (loading) {
       return (
-        <div className="table-container">
-          <div className="loading-message">Loading users...</div>
+        <div className={styles["table-container"]}>
+          <div className={styles["loading-message"]}>Loading users...</div>
         </div>
       );
     }
 
     if (error) {
       return (
-        <div className="table-container">
-          <div className="error-message">{error}</div>
+        <div className={styles["table-container"]}>
+          <div className={styles["error-message"]}>{error}</div>
         </div>
       );
     }
 
     return (
-      <div className="table-container">
-        <table className="user-table">
+      <div className={styles["table-container"]}>
+        <table className={styles["user-table"]}>
           <thead>
             <tr>
               <th>Username</th>
@@ -124,7 +124,11 @@ const UsersTable = forwardRef(
                   <td>{user.email}</td>
                   <td>{user.joined}</td>
                   <td>
-                    <span className={`user-type-badge ${user.userType}`}>
+                    <span
+                      className={`${styles["user-type-badge"]} ${
+                        styles[user.userType]
+                      }`}
+                    >
                       {user.userType === "admin" ? "👤 Admin" : "👥 User"}
                     </span>
                   </td>
@@ -132,7 +136,7 @@ const UsersTable = forwardRef(
               ))
             ) : (
               <tr>
-                <td colSpan="4" className="no-users">
+                <td colSpan="4" className={styles["no-users"]}>
                   No users found
                 </td>
               </tr>

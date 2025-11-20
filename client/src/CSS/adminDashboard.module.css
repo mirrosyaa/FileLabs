@@ -146,6 +146,10 @@
   color: #333;
 }
 
+.user-table td {
+  color: #333;
+}
+
 .user-table tbody tr {
   cursor: pointer;
   transition: background-color 0.2s ease;

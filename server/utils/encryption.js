@@ -3,7 +3,7 @@ const crypto = require("crypto");
 // Encryption key - MUST be stored in environment variable in production!
 // Must be exactly 32 bytes for AES-256
 const ENCRYPTION_KEY =
-  process.env.ENCRYPTION_KEY || "12345678901234567890123456789012"; // Exactly 32 characters
+  process.env.ENCRYPTION_KEY || "12345678901234567890123456789012";
 const IV_LENGTH = 16; // For AES, this is always 16
 
 // Encrypt email

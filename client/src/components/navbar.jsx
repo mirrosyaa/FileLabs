@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import "../CSS/navbar.css";
+import styles from "../CSS/navbar.module.css";
 import { Link, useNavigate } from "react-router-dom";
 import axios from "axios";
 import defaultPhoto from "../media/defaultProfile.jpg";
@@ -77,9 +77,13 @@ function Navbar() {
 
   useEffect(() => {
     const handleClickOutside = (event) => {
+      const dropdownContainer = document.querySelector(
+        `.${styles["profile-dropdown-container"]}`
+      );
       if (
         dropdownOpen &&
-        !event.target.closest(".profile-dropdown-container")
+        dropdownContainer &&
+        !dropdownContainer.contains(event.target)
       ) {
         setDropdownOpen(false);
       }
@@ -92,40 +96,40 @@ function Navbar() {
   }, [dropdownOpen]);
 
   return (
-    <nav className="navbar">
-      <div className="nav-brand">
+    <nav className={styles.navbar}>
+      <div className={styles["nav-brand"]}>
         <Link to="/home">FileLabs</Link>
       </div>
 
-      <div className="nav-center">
-        <button className="nav-button">Button 1</button>
-        <button className="nav-button">Button 2</button>
-        <button className="nav-button">Button 3</button>
+      <div className={styles["nav-center"]}>
+        <button className={styles["nav-button"]}>Button 1</button>
+        <button className={styles["nav-button"]}>Button 2</button>
+        <button className={styles["nav-button"]}>Button 3</button>
       </div>
 
-      <div className="nav-right">
-        <div className="profile-dropdown-container">
+      <div className={styles["nav-right"]}>
+        <div className={styles["profile-dropdown-container"]}>
           <img
             src={profilePhoto}
             alt="profile"
-            className="profile-photo"
+            className={styles["profile-photo"]}
             onClick={toggleDropdown}
           />
 
           {dropdownOpen && (
-            <div className="profile-dropdown">
+            <div className={styles["profile-dropdown"]}>
               {/* Show Admin Dashboard link only for admin users */}
               {userType === "admin" && (
                 <Link
                   to="/admin"
-                  className="dropdown-item"
+                  className={styles["dropdown-item"]}
                   onClick={() => setDropdownOpen(false)}
                 >
                   Admin Dashboard
                 </Link>
               )}
               <button
-                className="dropdown-item"
+                className={styles["dropdown-item"]}
                 onClick={() => {
                   setSettingsModalOpen(true);
                   setDropdownOpen(false);
@@ -133,7 +137,10 @@ function Navbar() {
               >
                 Settings
               </button>
-              <button className="dropdown-item" onClick={handleLogoutClick}>
+              <button
+                className={styles["dropdown-item"]}
+                onClick={handleLogoutClick}
+              >
                 Logout
               </button>
             </div>

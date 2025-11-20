@@ -3,7 +3,7 @@ import React, { useState, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../Authentication/authProvider";
 import axios from "axios";
-import "../CSS/login.css";
+import styles from "../CSS/login.module.css";
 
 function LoginForm() {
   const navigate = useNavigate();
@@ -15,12 +15,18 @@ function LoginForm() {
   const [showPassword, setShowPassword] = useState(false);
   const toggleShowPassword = () => setShowPassword((v) => !v);
   const [rememberMe, setRememberMe] = useState(() => {
-    try { return JSON.parse(localStorage.getItem("rememberMe")) || false; } catch { return false; }
+    try {
+      return JSON.parse(localStorage.getItem("rememberMe")) || false;
+    } catch {
+      return false;
+    }
   });
   const toggleRemember = () => {
     setRememberMe((prev) => {
       const next = !prev;
-      try { localStorage.setItem("rememberMe", JSON.stringify(next)); } catch {}
+      try {
+        localStorage.setItem("rememberMe", JSON.stringify(next));
+      } catch {}
       return next;
     });
   };
@@ -29,29 +35,29 @@ function LoginForm() {
 
   // starfield (unchanged)
   const STAR_COUNT = 300;
-const stars = useMemo(() => {
-  return Array.from({ length: STAR_COUNT }).map((_, i) => {
-    const left = `${rand(0, 100)}%`;
-    const top = `${rand(0, 100)}%`;
-    const size = `${Math.floor(rand(1, 4))}px`;
-    const duration = `${rand(6, 20)}s`;
-    const delay = `${-rand(0, 20)}s`;
-    return (
-      <div
-        key={`star-${i}`}
-        className="star"
-        style={{
-          left,
-          top,
-          width: size,
-          height: size,
-          animationDuration: duration,
-          animationDelay: delay,
-        }}
-      />
-    );
-  });
-}, []); 
+  const stars = useMemo(() => {
+    return Array.from({ length: STAR_COUNT }).map((_, i) => {
+      const left = `${rand(0, 100)}%`;
+      const top = `${rand(0, 100)}%`;
+      const size = `${Math.floor(rand(1, 4))}px`;
+      const duration = `${rand(6, 20)}s`;
+      const delay = `${-rand(0, 20)}s`;
+      return (
+        <div
+          key={`star-${i}`}
+          className={styles.star}
+          style={{
+            left,
+            top,
+            width: size,
+            height: size,
+            animationDuration: duration,
+            animationDelay: delay,
+          }}
+        />
+      );
+    });
+  }, []);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -74,7 +80,9 @@ const stars = useMemo(() => {
           setErrorMessage(err.response.data?.message || "Login failed");
         }
       } else if (err.request) {
-        setErrorMessage("Unable to connect to server. Please check your connection.");
+        setErrorMessage(
+          "Unable to connect to server. Please check your connection."
+        );
       } else {
         setErrorMessage("An error occurred. Please try again.");
       }
@@ -82,16 +90,18 @@ const stars = useMemo(() => {
   };
 
   return (
-    <div className="login-page-container">
-      <div className="starfield">{stars}</div>
+    <div className={styles["login-page-container"]}>
+      <div className={styles.starfield}>{stars}</div>
 
-      <div className="login-box">
+      <div className={styles["login-box"]}>
         <div className="container" style={{ maxWidth: "420px" }}>
           <h2 className="text-center mb-4">FileLabs</h2>
 
           <form onSubmit={handleSubmit}>
             <div className="mb-3">
-              <label htmlFor="emailOrUsername" className="form-label">Email or Username</label>
+              <label htmlFor="emailOrUsername" className="form-label">
+                Email or Username
+              </label>
               <input
                 type="text"
                 className="form-control"
@@ -104,8 +114,10 @@ const stars = useMemo(() => {
             </div>
 
             <div className="mb-3">
-              <label htmlFor="password" className="form-label">Password</label>
-              <div className="password-wrap">
+              <label htmlFor="password" className="form-label">
+                Password
+              </label>
+              <div className={styles["password-wrap"]}>
                 <input
                   type={showPassword ? "text" : "password"}
                   className="form-control"
@@ -117,42 +129,88 @@ const stars = useMemo(() => {
                 />
                 <button
                   type="button"
-                  className="password-toggle"
+                  className={styles["password-toggle"]}
                   onClick={toggleShowPassword}
                   aria-label={showPassword ? "Hide password" : "Show password"}
                   aria-pressed={showPassword}
                 >
                   {showPassword ? (
-                    <svg viewBox="0 0 24 24" width="18" height="18" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false">
-                      <path d="M3 3l18 18" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"/>
-                      <path d="M10.47 10.47a3 3 0 004.06 4.06" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"/>
+                    <svg
+                      viewBox="0 0 24 24"
+                      width="18"
+                      height="18"
+                      xmlns="http://www.w3.org/2000/svg"
+                      aria-hidden="true"
+                      focusable="false"
+                    >
+                      <path
+                        d="M3 3l18 18"
+                        stroke="currentColor"
+                        strokeWidth="1.6"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                      />
+                      <path
+                        d="M10.47 10.47a3 3 0 004.06 4.06"
+                        stroke="currentColor"
+                        strokeWidth="1.6"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                      />
                     </svg>
                   ) : (
-                    <svg viewBox="0 0 24 24" width="18" height="18" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false">
-                      <path d="M2 12s4-7 10-7 10 7 10 7-4 7-10 7S2 12 2 12z" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round" fill="none"/>
-                      <circle cx="12" cy="12" r="3" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round" fill="none"/>
+                    <svg
+                      viewBox="0 0 24 24"
+                      width="18"
+                      height="18"
+                      xmlns="http://www.w3.org/2000/svg"
+                      aria-hidden="true"
+                      focusable="false"
+                    >
+                      <path
+                        d="M2 12s4-7 10-7 10 7 10 7-4 7-10 7S2 12 2 12z"
+                        stroke="currentColor"
+                        strokeWidth="1.2"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        fill="none"
+                      />
+                      <circle
+                        cx="12"
+                        cy="12"
+                        r="3"
+                        stroke="currentColor"
+                        strokeWidth="1.2"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        fill="none"
+                      />
                     </svg>
                   )}
                 </button>
               </div>
             </div>
 
- <div className="mb-3 remember-row">
-  <label className="form-check" htmlFor="rememberMe">
-    <input
-      id="rememberMe"
-      type="checkbox"
-      className="form-check-input"
-      checked={rememberMe}
-      onChange={toggleRemember}
-    />
-    <span className="form-check-label">Remember me</span>
-  </label>
-</div>
+            <div className={`mb-3 ${styles["remember-row"]}`}>
+              <label className="form-check" htmlFor="rememberMe">
+                <input
+                  id="rememberMe"
+                  type="checkbox"
+                  className="form-check-input"
+                  checked={rememberMe}
+                  onChange={toggleRemember}
+                />
+                <span className="form-check-label">Remember me</span>
+              </label>
+            </div>
 
-            {errorMessage && <div className="alert alert-danger">{errorMessage}</div>}
+            {errorMessage && (
+              <div className="alert alert-danger">{errorMessage}</div>
+            )}
 
-            <button type="submit" className="btn btn-primary w-100">Login</button>
+            <button type="submit" className="btn btn-primary w-100">
+              Login
+            </button>
           </form>
         </div>
       </div>
