@@ -146,59 +146,51 @@ function LoginForm() {
                   aria-label={showPassword ? "Hide password" : "Show password"}
                   aria-pressed={showPassword}
                 >
-                  {showPassword ? (
-                    <svg
-                      viewBox="0 0 24 24"
-                      width="18"
-                      height="18"
-                      xmlns="http://www.w3.org/2000/svg"
-                      aria-hidden="true"
-                      focusable="false"
-                    >
-                      <path
-                        d="M3 3l18 18"
-                        stroke="currentColor"
-                        strokeWidth="1.6"
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                      />
-                      <path
-                        d="M10.47 10.47a3 3 0 004.06 4.06"
-                        stroke="currentColor"
-                        strokeWidth="1.6"
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                      />
-                    </svg>
-                  ) : (
-                    <svg
-                      viewBox="0 0 24 24"
-                      width="18"
-                      height="18"
-                      xmlns="http://www.w3.org/2000/svg"
-                      aria-hidden="true"
-                      focusable="false"
-                    >
-                      <path
-                        d="M2 12s4-7 10-7 10 7 10 7-4 7-10 7S2 12 2 12z"
-                        stroke="currentColor"
-                        strokeWidth="1.2"
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        fill="none"
-                      />
-                      <circle
-                        cx="12"
-                        cy="12"
-                        r="3"
-                        stroke="currentColor"
-                        strokeWidth="1.2"
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        fill="none"
-                      />
-                    </svg>
-                  )}
+                  <svg
+                    viewBox="0 0 24 24"
+                    width="18"
+                    height="18"
+                    xmlns="http://www.w3.org/2000/svg"
+                    aria-hidden="true"
+                    focusable="false"
+                    className={styles["eye-icon"]}
+                  >
+                    {/* Eye shape - always visible */}
+                    <path
+                      d="M2 12s4-7 10-7 10 7 10 7-4 7-10 7S2 12 2 12z"
+                      stroke="currentColor"
+                      strokeWidth="1.2"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      fill="none"
+                    />
+                    <circle
+                      cx="12"
+                      cy="12"
+                      r="3"
+                      stroke="currentColor"
+                      strokeWidth="1.2"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      fill="none"
+                    />
+
+                    {/* Animated slash line */}
+                    <line
+                      x1="3"
+                      y1="3"
+                      x2="21"
+                      y2="21"
+                      stroke="currentColor"
+                      strokeWidth="1.6"
+                      strokeLinecap="round"
+                      className={`${styles["eye-slash"]} ${
+                        showPassword
+                          ? styles["slash-hide"]
+                          : styles["slash-show"]
+                      }`}
+                    />
+                  </svg>
                 </button>
               </div>
             </div>

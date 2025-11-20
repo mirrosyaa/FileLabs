@@ -192,6 +192,43 @@ html {
   fill: none;
 }
 
+/* Eye icon container */
+.eye-icon {
+  overflow: visible;
+}
+
+/* Animated slash line */
+.eye-slash {
+  transform-origin: center;
+  transition: stroke-dashoffset 0.3s ease-in-out, opacity 0.3s ease-in-out;
+}
+
+/* Show state - slash is hidden (password visible) */
+.slash-hide {
+  stroke-dasharray: 25;
+  stroke-dashoffset: 25;
+  opacity: 0;
+}
+
+/* Hide state - slash is visible (password hidden) */
+.slash-show {
+  stroke-dasharray: 25;
+  stroke-dashoffset: 0;
+  opacity: 1;
+  animation: slashDraw 0.3s ease-in-out;
+}
+
+@keyframes slashDraw {
+  from {
+    stroke-dashoffset: 25;
+    opacity: 0;
+  }
+  to {
+    stroke-dashoffset: 0;
+    opacity: 1;
+  }
+}
+
 /* subtle hover state */
 .password-toggle:hover {
   color: #000;
