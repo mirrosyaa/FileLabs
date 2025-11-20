@@ -12,11 +12,17 @@ import LoginPage from "./pages/login";
 import HomePage from "./pages/homePage";
 import AdminDashboard from "./pages/adminDashboard";
 import LoadingScreen from "./pages/loadingScreen";
+import Navbar from "./components/navbar";
+import { useAuth } from "./Authentication/authProvider";
 
 function AppContent() {
   const [loading, setLoading] = useState(false);
   const location = useLocation();
   const previousLocation = React.useRef(location.pathname);
+  const { token } = useAuth();
+
+  // Check if user is logged in (not on login page)
+  const isLoggedIn = token && location.pathname !== "/";
 
   useEffect(() => {
     const fromLogin = previousLocation.current === "/";
@@ -48,30 +54,40 @@ function AppContent() {
   }
 
   return (
-    <div id="App Content">
-      <Routes>
-        {/* Public routes*/}
-        <Route path="/" element={<LoginPage />} />
+    <div id="App">
+      {/* Persistent Navbar - only shown when logged in */}
+      {isLoggedIn ? (
+        <div id="Navbar">
+          <Navbar />
+        </div>
+      ) : null}
 
-        {/* Protected routes*/}
-        <Route
-          path="/home"
-          element={
-            <RouteProtector>
-              <HomePage />
-            </RouteProtector>
-          }
-        />
-        {/* Admin Protected routes */}
-        <Route
-          path="/admin"
-          element={
-            <AdminRouteProtector>
-              <AdminDashboard />
-            </AdminRouteProtector>
-          }
-        />
-      </Routes>
+      {/* Page Content */}
+      <div id="App-Content">
+        <Routes>
+          {/* Public routes*/}
+          <Route path="/" element={<LoginPage />} />
+
+          {/* Protected routes*/}
+          <Route
+            path="/home"
+            element={
+              <RouteProtector>
+                <HomePage />
+              </RouteProtector>
+            }
+          />
+          {/* Admin Protected routes */}
+          <Route
+            path="/admin"
+            element={
+              <AdminRouteProtector>
+                <AdminDashboard />
+              </AdminRouteProtector>
+            }
+          />
+        </Routes>
+      </div>
     </div>
   );
 }

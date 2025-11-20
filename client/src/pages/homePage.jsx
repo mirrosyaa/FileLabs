@@ -1,5 +1,4 @@
 import { React, useState, useEffect } from "react";
-import Navbar from "../components/navbar";
 import Boxes from "../components/boxes";
 import Footer from "../components/footer";
 import axios from "axios";
@@ -52,7 +51,6 @@ function HomePage() {
 
   return (
     <div className={styles["home-page-wrapper"]}>
-      <Navbar />
       <div className={styles["greeting-header"]}>
         <h1>
           {greeting}, {username || "User"}

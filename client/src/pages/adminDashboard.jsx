@@ -4,7 +4,6 @@ import styles from "../CSS/adminDashboard.module.css";
 import AdminHeader from "../components/AdminHeader";
 import SearchBar from "../components/SearchBar";
 import UsersTable from "../components/UsersTable";
-import Navbar from "../components/navbar";
 import AddUserModal from "../modals/addUserModal";
 
 function AdminDashboard() {
@@ -36,7 +35,6 @@ function AdminDashboard() {
 
   return (
     <div>
-      <Navbar />
       <div className={styles["dashboard-container"]}>
         <AdminHeader />
         <div className={styles["dashboard-controls"]}>

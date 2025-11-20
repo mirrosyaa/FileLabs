@@ -2,6 +2,7 @@
 .dashboard-container {
   min-height: 100vh;
   padding: 2rem;
+  padding-top: calc(100px + 2rem);
   background-color: #f4f6f8;
   display: flex;
   flex-direction: column;

@@ -5,11 +5,16 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  position: relative;
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  width: 100%;
   box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
   border-bottom: 1px solid rgba(255, 255, 255, 0.05);
   overflow: visible;
   border-radius: 0 0 40px 40px;
+  z-index: 1000;
 }
 
 .nav-brand {
@@ -187,9 +192,9 @@
 
 /* Dropdown Menu */
 .profile-dropdown {
-  position: absolute;
-  top: calc(100% + 12px);
-  right: 0;
+  position: fixed;
+  top: calc(100px + 2px);
+  right: 0.1rem;
   background: #ffffff;
   border-radius: 12px;
   box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15);
@@ -280,6 +285,10 @@
     width: 52px;
     height: 52px;
   }
+
+  .profile-dropdown {
+    top: calc(80px + 2px);
+  }
 }
 
 @media (max-width: 768px) {
@@ -341,6 +350,10 @@
   .nav-button.active::after {
     display: none;
   }
+
+  .profile-dropdown {
+    top: calc(70px + 2px);
+  }
 }
 
 @media (max-width: 480px) {
@@ -401,5 +414,9 @@
 
   .nav-button:hover .icon-circle {
     transform: scale(1.02);
+  }
+
+  .profile-dropdown {
+    top: calc(60px + 2px);
   }
 }
