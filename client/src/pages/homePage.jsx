@@ -11,10 +11,10 @@ function HomePage() {
   const [username, setUsername] = useState("");
   const [greeting, setGreeting] = useState("");
   const [stats, setStats] = useState({
-    totalFiles: 0,
-    totalFolders: 0,
+    myFiles: 0,
+    sharedFiles: 0,
+    starredFiles: 0,
     storageUsed: 0,
-    recentFiles: 0,
   });
 
   // Function to fetch username
@@ -46,10 +46,10 @@ function HomePage() {
 
     // Mock stats - replace with actual API
     setStats({
-      totalFiles: 248,
-      totalFolders: 32,
+      myFiles: 156,
+      sharedFiles: 23,
+      starredFiles: 8,
       storageUsed: 4.2,
-      recentFiles: 12,
     });
   }, []);
 
