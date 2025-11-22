@@ -589,18 +589,29 @@ router.delete("/account", authenticateToken, async (req, res) => {
         return res.status(401).json({ message: "Incorrect password" });
       }
 
-      // Delete the user
-      const deleteSql = "DELETE FROM users WHERE userID = ?";
+      // Delete user's files first (due to foreign key constraint)
+      const deleteFilesSql = "DELETE FROM files WHERE user_id = ?";
 
-      db.query(deleteSql, [userId], (err, result) => {
+      db.query(deleteFilesSql, [userId], (err, fileResult) => {
         if (err) {
-          console.error("Error deleting user:", err);
-          return res.status(500).json({ message: "Error deleting account" });
+          console.error("Error deleting user files:", err);
+          return res.status(500).json({ message: "Error deleting user files" });
         }
 
-        res.json({
-          message: "Account deleted successfully",
-          deletedUserId: userId,
+        // Then delete the user
+        const deleteSql = "DELETE FROM users WHERE userID = ?";
+
+        db.query(deleteSql, [userId], (err, result) => {
+          if (err) {
+            console.error("Error deleting user:", err);
+            return res.status(500).json({ message: "Error deleting account" });
+          }
+
+          res.json({
+            message: "Account deleted successfully",
+            deletedUserId: userId,
+            deletedFiles: fileResult.affectedRows,
+          });
         });
       });
     } catch (error) {
@@ -631,24 +642,35 @@ router.delete("/admin/user/:userId", authenticateToken, (req, res) => {
     });
   }
 
-  // Delete the specified user
-  const sql = "DELETE FROM users WHERE userID = ?";
+  // Delete user's files first (due to foreign key constraint)
+  const deleteFilesSql = "DELETE FROM files WHERE user_id = ?";
 
-  db.query(sql, [targetUserId], (err, result) => {
+  db.query(deleteFilesSql, [targetUserId], (err, fileResult) => {
     if (err) {
-      console.error("Error deleting user:", err);
-      return res
-        .status(500)
-        .json({ message: "Error deleting user - is database connected?" });
+      console.error("Error deleting user files:", err);
+      return res.status(500).json({ message: "Error deleting user files" });
     }
 
-    if (result.affectedRows === 0) {
-      return res.status(404).json({ message: "User not found" });
-    }
+    // Then delete the specified user
+    const sql = "DELETE FROM users WHERE userID = ?";
 
-    res.json({
-      message: "User deleted successfully",
-      deletedUserId: targetUserId,
+    db.query(sql, [targetUserId], (err, result) => {
+      if (err) {
+        console.error("Error deleting user:", err);
+        return res
+          .status(500)
+          .json({ message: "Error deleting user - is database connected?" });
+      }
+
+      if (result.affectedRows === 0) {
+        return res.status(404).json({ message: "User not found" });
+      }
+
+      res.json({
+        message: "User deleted successfully",
+        deletedUserId: targetUserId,
+        deletedFiles: fileResult.affectedRows,
+      });
     });
   });
 });
