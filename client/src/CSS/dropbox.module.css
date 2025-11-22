@@ -1,0 +1,62 @@
+/* Styles for DropBox page (CSS Module) */
+
+.dropboxPage {
+  display: flex;
+  justify-content: center;
+  padding: 24px;
+  padding-top: 100px; /* space for navbar */
+}
+
+.dropboxWrapper {
+  width: 100%;
+  max-width: 820px;
+}
+
+.dropbox {
+  border: 2px dashed rgba(255,255,255,0.12);
+  border-radius: 12px;
+  padding: 56px;
+  text-align: center;
+  background: rgba(255,255,255,0.02);
+  transition: border-color 160ms ease, background 160ms ease, transform 120ms ease;
+}
+
+.dropboxDragging {
+  border-color: #5ec8ff;
+  background: rgba(94,200,255,0.04);
+  transform: translateY(-2px);
+}
+
+.dropboxHint {
+  margin: 0;
+  font-size: 18px;
+  color: rgba(255,255,255,0.9);
+}
+
+.chooseBtn {
+  margin-top: 20px;
+  padding: 14px 28px;
+  font-size: 16px;
+  border-radius: 10px;
+  border: none;
+  background: linear-gradient(180deg,#5ec8ff,#2aa7ea);
+  color: #052033;
+  cursor: pointer;
+  box-shadow: 0 6px 18px rgba(46,140,200,0.14);
+  transition: transform 120ms ease, box-shadow 120ms ease;
+}
+
+.chooseBtn:hover {
+  transform: translateY(-3px);
+}
+
+.fileInput {
+  display: none;
+}
+
+.selectedFile {
+  margin-top: 12px;
+  color: rgba(255,255,255,0.8);
+  word-break: break-all;
+  font-size: 14px;
+}
