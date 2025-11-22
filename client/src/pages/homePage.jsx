@@ -1,12 +1,21 @@
 import { React, useState, useEffect } from "react";
-import Boxes from "../components/boxes";
 import Footer from "../components/footer";
+import WelcomeBanner from "../components/WelcomeBanner";
+import StatsContainer from "../components/StatsContainer";
+import QuickActions from "../components/QuickActions";
+import RecentActivity from "../components/RecentActivity";
 import axios from "axios";
 import styles from "../CSS/homePage.module.css";
 
 function HomePage() {
   const [username, setUsername] = useState("");
   const [greeting, setGreeting] = useState("");
+  const [stats, setStats] = useState({
+    totalFiles: 0,
+    totalFolders: 0,
+    storageUsed: 0,
+    recentFiles: 0,
+  });
 
   // Function to fetch username
   const fetchUsername = async () => {
@@ -18,6 +27,7 @@ function HomePage() {
     }
   };
 
+  // Mock data for dashboard - replace with actual API calls later
   useEffect(() => {
     // Determine greeting based on time
     const determineGreeting = () => {
@@ -33,6 +43,14 @@ function HomePage() {
 
     fetchUsername();
     determineGreeting();
+
+    // Mock stats - replace with actual API
+    setStats({
+      totalFiles: 248,
+      totalFolders: 32,
+      storageUsed: 4.2,
+      recentFiles: 12,
+    });
   }, []);
 
   // Listen for username updates from settings modal
@@ -51,12 +69,10 @@ function HomePage() {
 
   return (
     <div className={styles["home-page-wrapper"]}>
-      <div className={styles["greeting-header"]}>
-        <h1>
-          {greeting}, {username || "User"}
-        </h1>
-      </div>
-      <Boxes />
+      <WelcomeBanner greeting={greeting} username={username} />
+      <StatsContainer stats={stats} />
+      <QuickActions />
+      <RecentActivity />
       <Footer />
     </div>
   );
