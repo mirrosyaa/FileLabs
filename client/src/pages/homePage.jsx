@@ -1,9 +1,8 @@
 import { React, useState, useEffect } from "react";
-import Navbar from "../components/navbar";
 import Boxes from "../components/boxes";
 import Footer from "../components/footer";
 import axios from "axios";
-import "../CSS/homePage.css";
+import styles from "../CSS/homePage.module.css";
 
 function HomePage() {
   const [username, setUsername] = useState("");
@@ -51,9 +50,8 @@ function HomePage() {
   }, []);
 
   return (
-    <div className="page-container">
-      <Navbar />
-      <div className="greeting-header">
+    <div className={styles["home-page-wrapper"]}>
+      <div className={styles["greeting-header"]}>
         <h1>
           {greeting}, {username || "User"}
         </h1>

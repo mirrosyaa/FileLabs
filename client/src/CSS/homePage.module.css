@@ -1,3 +1,9 @@
+.home-page-wrapper {
+  min-height: 100vh;
+  background-color: azure;
+  padding-top: 100px;
+}
+
 .greeting-header {
   text-align: left;
   margin: 2rem auto 1rem auto;
@@ -20,7 +26,17 @@
   }
 }
 
+@media (max-width: 1024px) {
+  .home-page-wrapper {
+    padding-top: 80px;
+  }
+}
+
 @media (max-width: 768px) {
+  .home-page-wrapper {
+    padding-top: 70px;
+  }
+
   .greeting-header {
     padding: 0 1rem;
     width: 92%;
@@ -32,6 +48,10 @@
 }
 
 @media (max-width: 480px) {
+  .home-page-wrapper {
+    padding-top: 60px;
+  }
+
   .greeting-header {
     padding: 0 0.75rem;
     width: 90%;

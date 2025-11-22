@@ -1,10 +1,9 @@
 import React, { useState, useRef, useEffect } from "react";
 import axios from "axios";
-import "../CSS/adminDashboard.css";
+import styles from "../CSS/adminDashboard.module.css";
 import AdminHeader from "../components/AdminHeader";
 import SearchBar from "../components/SearchBar";
 import UsersTable from "../components/UsersTable";
-import Navbar from "../components/navbar";
 import AddUserModal from "../modals/addUserModal";
 
 function AdminDashboard() {
@@ -36,32 +35,31 @@ function AdminDashboard() {
 
   return (
     <div>
-      <Navbar />
-      <div className="dashboard-container">
+      <div className={styles["dashboard-container"]}>
         <AdminHeader />
-        <div className="dashboard-controls">
-          <div className="search-filter-group">
+        <div className={styles["dashboard-controls"]}>
+          <div className={styles["search-filter-group"]}>
             <SearchBar searchTerm={searchTerm} setSearchTerm={setSearchTerm} />
-            <div className="filter-controls">
+            <div className={styles["filter-controls"]}>
               <button
-                className={`filter-btn ${
-                  userTypeFilter === "all" ? "active" : ""
+                className={`${styles["filter-btn"]} ${
+                  userTypeFilter === "all" ? styles.active : ""
                 }`}
                 onClick={() => setUserTypeFilter("all")}
               >
                 All Users
               </button>
               <button
-                className={`filter-btn ${
-                  userTypeFilter === "admin" ? "active" : ""
+                className={`${styles["filter-btn"]} ${
+                  userTypeFilter === "admin" ? styles.active : ""
                 }`}
                 onClick={() => setUserTypeFilter("admin")}
               >
                 👤 Admins
               </button>
               <button
-                className={`filter-btn ${
-                  userTypeFilter === "user" ? "active" : ""
+                className={`${styles["filter-btn"]} ${
+                  userTypeFilter === "user" ? styles.active : ""
                 }`}
                 onClick={() => setUserTypeFilter("user")}
               >
@@ -70,7 +68,7 @@ function AdminDashboard() {
             </div>
           </div>
           <button
-            className="add-btn"
+            className={styles["add-btn"]}
             onClick={() => setIsAddUserModalOpen(true)}
           >
             ➕ Add User

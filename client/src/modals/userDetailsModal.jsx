@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
-import "../CSS/userDetailsModal.css";
+import styles from "../CSS/userDetailsModal.module.css";
 import defaultPhoto from "../media/defaultProfile.jpg";
 
 function UserDetailsModal({
@@ -159,61 +159,74 @@ function UserDetailsModal({
 
   return (
     <div
-      className={`modal-overlay ${isClosing ? "closing" : ""}`}
+      className={`${styles["modal-overlay"]} ${
+        isClosing ? styles.closing : ""
+      }`}
       onClick={handleClose}
     >
-      <div className="modal-content" onClick={(e) => e.stopPropagation()}>
-        <button className="close-btn" onClick={handleClose}>
+      <div
+        className={styles["modal-content"]}
+        onClick={(e) => e.stopPropagation()}
+      >
+        <button className={styles["close-btn"]} onClick={handleClose}>
           ✕
         </button>
 
-        <h2 className="modal-title">User Details</h2>
+        <h2 className={styles["modal-title"]}>User Details</h2>
 
-        <div className="modal-body">
+        <div className={styles["modal-body"]}>
+          l-body']}>
           {loading ? (
-            <div className="loading-state">Loading user details...</div>
+            <div className={styles["loading-state"]}>
+              Loading user details...
+            </div>
           ) : error ? (
-            <div className="error-state">{error}</div>
+            <div className={styles["error-state"]}>{error}</div>
           ) : user ? (
             <>
-              <div className="user-profile-section">
+              <div className={styles["user-profile-section"]}>
+                ection']}>
                 <img
                   src={profilePhoto}
                   alt="Profile"
-                  className="user-profile-photo"
+                  className={styles["user-profile-photo"]}
                 />
-                <h3 className="user-display-name">{user.username}</h3>
-                <span className={`user-type-badge-large ${user.user_type}`}>
+                <h3 className={styles["user-display-name"]}>{user.username}</h3>
+                <span
+                  className={`${styles["user-type-badge-large"]} ${
+                    styles[user.user_type]
+                  }`}
+                >
                   {user.user_type === "admin" ? "👤 Admin" : "👥 User"}
                 </span>
               </div>
 
-              <div className="user-info-section">
-                <div className="info-group">
+              <div className={styles["user-info-section"]}>
+                ection']}>
+                <div className={styles["info-group"]}>
                   <label>Username</label>
                   <p>{user.username}</p>
                 </div>
-
-                <div className="info-group">
+                <div className={styles["info-group"]}>
                   <label>Email Address</label>
                   <p>{user.user_email}</p>
                 </div>
-
-                <div className="info-group">
+                <div className={styles["info-group"]}>
+                  -group']}>
                   <label>User Type</label>
-                  <div className="user-type-update">
+                  <div className={styles["user-type-update"]}>
                     <select
                       value={selectedUserType}
                       onChange={(e) => setSelectedUserType(e.target.value)}
-                      className="user-type-select"
+                      className={styles["user-type-select"]}
                       disabled={isUpdatingType || isSelf}
                     >
                       <option value="user">👥 Regular User</option>
                       <option value="admin">👤 Administrator</option>
                     </select>
                     <button
-                      className={`update-type-btn ${
-                        updateSuccess ? "success" : ""
+                      className={`${styles["update-type-btn"]} ${
+                        updateSuccess ? styles.success : ""
                       }`}
                       onClick={handleUpdateUserType}
                       disabled={
@@ -230,17 +243,17 @@ function UserDetailsModal({
                     </button>
                   </div>
                   {isSelf && (
-                    <small className="self-warning">
+                    <small className={styles["self-warning"]}>
                       You cannot change your own user type
                     </small>
                   )}
                 </div>
-
                 {updateError && (
-                  <div className="error-message-modal">{updateError}</div>
+                  <div className={styles["error-message-modal"]}>
+                    {updateError}
+                  </div>
                 )}
-
-                <div className="info-group">
+                <div className={styles["info-group"]}>
                   <label>Account Created</label>
                   <p>
                     {new Date(user.created_at).toLocaleDateString("en-US", {
@@ -260,19 +273,21 @@ function UserDetailsModal({
               </div>
 
               {deleteError && (
-                <div className="error-message-modal">{deleteError}</div>
+                <div className={styles["error-message-modal"]}>
+                  {deleteError}
+                </div>
               )}
 
-              <div className="modal-actions">
+              <div className={styles["modal-actions"]}>
                 <button
-                  className="delete-user-btn"
+                  className={styles["delete-user-btn"]}
                   onClick={handleDeleteUser}
                   disabled={isDeleting || isSelf}
                 >
                   {isDeleting ? "Deleting..." : "🗑️ Delete User"}
                 </button>
                 {isSelf && (
-                  <small className="self-warning">
+                  <small className={styles["self-warning"]}>
                     You cannot delete your own account
                   </small>
                 )}

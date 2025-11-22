@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
-import "../CSS/settingsModal.css";
+import styles from "../CSS/settingsModal.module.css";
 import defaultPhoto from "../media/defaultProfile.jpg";
 
 function SettingsModal({ isOpen, onClose }) {
@@ -293,29 +293,37 @@ function SettingsModal({ isOpen, onClose }) {
 
   return (
     <div
-      className={`modal-overlay ${isClosing ? "closing" : ""}`}
+      className={`${styles["modal-overlay"]} ${
+        isClosing ? styles.closing : ""
+      }`}
       onClick={handleOverlayClick}
     >
-      <div className="modal-content">
-        <div className="modal-header">
+      <div className={styles["modal-content"]}>
+        <div className={styles["modal-header"]}>
           <h2>Settings</h2>
-          <button className="close-button" onClick={handleCloseButton}>
+          <button
+            className={styles["close-button"]}
+            onClick={handleCloseButton}
+          >
             ×
           </button>
         </div>
 
-        <div className="modal-body">
+        <div className={styles["modal-body"]}>
           {/* Profile Photo and Username Display */}
-          <div className="profile-display">
-            <div className="photo-upload-container" onClick={handlePhotoClick}>
+          <div className={styles["profile-display"]}>
+            <div
+              className={styles["photo-upload-container"]}
+              onClick={handlePhotoClick}
+            >
               <img
                 src={profilePhoto}
                 alt="profile"
-                className="modal-profile-photo"
+                className={styles["modal-profile-photo"]}
               />
-              <div className="camera-overlay">
+              <div className={styles["camera-overlay"]}>
                 <svg
-                  className="camera-icon"
+                  className={styles["camera-icon"]}
                   xmlns="http://www.w3.org/2000/svg"
                   viewBox="0 0 24 24"
                   fill="white"
@@ -335,14 +343,16 @@ function SettingsModal({ isOpen, onClose }) {
                 style={{ display: "none" }}
               />
             </div>
-            <h3 className="modal-username">{username || "Loading..."}</h3>
+            <h3 className={styles["modal-username"]}>
+              {username || "Loading..."}
+            </h3>
           </div>
 
           {/* Change Account Details Section */}
-          <div className="setting-section">
+          <div className={styles["setting-section"]}>
             <h3>Change Account Details</h3>
 
-            <div className="setting-item">
+            <div className={styles["setting-item"]}>
               <label>Username</label>
               <input
                 type="text"
@@ -350,10 +360,12 @@ function SettingsModal({ isOpen, onClose }) {
                 onChange={(e) => setNewUsername(e.target.value)}
                 placeholder="Enter new username"
               />
-              <span className="current-value">Current: {username}</span>
+              <span className={styles["current-value"]}>
+                Current: {username}
+              </span>
             </div>
 
-            <div className="setting-item">
+            <div className={styles["setting-item"]}>
               <label>Email</label>
               <input
                 type="email"
@@ -361,16 +373,16 @@ function SettingsModal({ isOpen, onClose }) {
                 onChange={(e) => setNewEmail(e.target.value)}
                 placeholder="Enter new email"
               />
-              <span className="current-value">Current: {email}</span>
+              <span className={styles["current-value"]}>Current: {email}</span>
             </div>
 
             {accountError && (
-              <div className="error-message">{accountError}</div>
+              <div className={styles["error-message"]}>{accountError}</div>
             )}
 
             <button
-              className={`section-save-button ${
-                accountSuccess ? "success-state" : ""
+              className={`${styles["section-save-button"]} ${
+                accountSuccess ? styles["success-state"] : ""
               }`}
               onClick={handleAccountUpdate}
             >
@@ -379,10 +391,10 @@ function SettingsModal({ isOpen, onClose }) {
           </div>
 
           {/* Change Password Section */}
-          <div className="setting-section">
+          <div className={styles["setting-section"]}>
             <h3>Change Password</h3>
 
-            <div className="setting-item">
+            <div className={styles["setting-item"]}>
               <label>Current Password</label>
               <input
                 type="password"
@@ -392,7 +404,7 @@ function SettingsModal({ isOpen, onClose }) {
               />
             </div>
 
-            <div className="setting-item">
+            <div className={styles["setting-item"]}>
               <label>New Password</label>
               <input
                 type="password"
@@ -403,12 +415,12 @@ function SettingsModal({ isOpen, onClose }) {
             </div>
 
             {passwordError && (
-              <div className="error-message">{passwordError}</div>
+              <div className={styles["error-message"]}>{passwordError}</div>
             )}
 
             <button
-              className={`section-save-button ${
-                passwordSuccess ? "success-state" : ""
+              className={`${styles["section-save-button"]} ${
+                passwordSuccess ? styles["success-state"] : ""
               }`}
               onClick={handlePasswordChange}
             >

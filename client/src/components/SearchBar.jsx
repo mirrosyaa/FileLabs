@@ -1,16 +1,16 @@
 import React from "react";
-import "../CSS/adminDashboard.css";
+import styles from "../CSS/adminDashboard.module.css";
 
 function SearchBar({ searchTerm, setSearchTerm }) {
   return (
-    <div className="search-box">
+    <div className={styles["search-box"]}>
       <input
         type="text"
         placeholder="Search users..."
         value={searchTerm}
         onChange={(e) => setSearchTerm(e.target.value)}
       />
-      <button className="filter-btn"></button>
+      <button className={styles["filter-btn"]}></button>
     </div>
   );
 }
