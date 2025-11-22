@@ -1,7 +1,7 @@
 import React, { useRef, useState } from "react";
 import styles from "../CSS/dropbox.module.css";
 
-export default function DropBox() {
+function DropBox() {
   const inputRef = useRef(null);
   const [fileName, setFileName] = useState("");
 
@@ -17,15 +17,28 @@ export default function DropBox() {
         <div className={styles.dropbox}>
           <p className={styles.dropboxHint}>Drag file here</p>
 
-          <button type="button" onClick={handleChoose} className={styles.chooseBtn}>
+          <button
+            type="button"
+            onClick={handleChoose}
+            className={styles.chooseBtn}
+          >
             Choose file
           </button>
 
-          <input ref={inputRef} type="file" onChange={handleChange} className={styles.fileInput} />
+          <input
+            ref={inputRef}
+            type="file"
+            onChange={handleChange}
+            className={styles.fileInput}
+          />
 
-          {fileName && <p className={styles.selectedFile}>Selected: {fileName}</p>}
+          {fileName && (
+            <p className={styles.selectedFile}>Selected: {fileName}</p>
+          )}
         </div>
       </div>
     </div>
   );
 }
+
+export default DropBox;
