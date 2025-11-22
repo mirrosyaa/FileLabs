@@ -132,19 +132,6 @@
   font-weight: 600;
 }
 
-.nav-button.active::after {
-  content: "";
-  position: absolute;
-  bottom: -20px;
-  left: 50%;
-  transform: translateX(-50%);
-  width: 50px;
-  height: 3px;
-  background: linear-gradient(90deg, transparent, white, transparent);
-  border-radius: 2px 2px 0 0;
-  box-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
-}
-
 .nav-button.active .icon-circle::after {
   display: none;
 }

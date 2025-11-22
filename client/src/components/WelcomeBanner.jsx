@@ -8,7 +8,6 @@ function WelcomeBanner({ greeting, username }) {
         <h1>
           {greeting}, {username || "User"}
         </h1>
-        <p className={styles["subtitle"]}>Welcome to your file dashboard</p>
       </div>
     </div>
   );

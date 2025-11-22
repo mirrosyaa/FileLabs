@@ -20,13 +20,12 @@ function QuickActions() {
               strokeLinecap="round"
               strokeLinejoin="round"
             >
-              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
-              <polyline points="17 8 12 3 7 8" />
-              <line x1="12" y1="3" x2="12" y2="15" />
+              <path d="M13 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z" />
+              <polyline points="13 2 13 9 20 9" />
             </svg>
           }
-          title="Upload Files"
-          description="Add new files to your storage"
+          title="My Files"
+          description="View all your files"
         />
 
         <ActionCard
@@ -42,11 +41,11 @@ function QuickActions() {
               strokeLinecap="round"
               strokeLinejoin="round"
             >
-              <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z" />
+              <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
             </svg>
           }
-          title="New Folder"
-          description="Create a new folder"
+          title="Starred Files"
+          description="Access your favorites"
         />
 
         <ActionCard
@@ -66,8 +65,8 @@ function QuickActions() {
               <path d="m21 21-4.35-4.35" />
             </svg>
           }
-          title="Search Files"
-          description="Find your files quickly"
+          title="Search Tools"
+          description="Find files and tools"
         />
 
         <ActionCard
@@ -83,11 +82,13 @@ function QuickActions() {
               strokeLinecap="round"
               strokeLinejoin="round"
             >
-              <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
+              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+              <polyline points="7 10 12 15 17 10" />
+              <line x1="12" y1="15" x2="12" y2="3" />
             </svg>
           }
-          title="Starred"
-          description="Access your starred files"
+          title="Download Files"
+          description="Download your files"
         />
       </div>
     </div>

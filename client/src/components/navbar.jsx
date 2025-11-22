@@ -103,7 +103,12 @@ function Navbar() {
       </div>
 
       <div className={styles["nav-center"]}>
-        <button className={styles["nav-button"]}>
+        <Link
+          to="/file-converter"
+          className={`${styles["nav-button"]} ${
+            location.pathname === "/file-converter" ? styles["active"] : ""
+          }`}
+        >
           <div className={styles["icon-circle"]}>
             <svg
               xmlns="http://www.w3.org/2000/svg"
@@ -121,8 +126,8 @@ function Navbar() {
               <line x1="12" y1="3" x2="12" y2="15" />
             </svg>
           </div>
-          <span className={styles["button-label"]}>Upload</span>
-        </button>
+          <span className={styles["button-label"]}>File Converter</span>
+        </Link>
         <button className={styles["nav-button"]}>
           <div className={styles["icon-circle"]}>
             <svg
