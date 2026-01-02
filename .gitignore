@@ -19,6 +19,9 @@ client/build/
 client/dist/
 server/dist/
 
+# Uploads and temporary files
+server/uploads/
+
 # OS junk files
 .DS_Store
 Thumbs.db

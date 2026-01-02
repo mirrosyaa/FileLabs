@@ -1,0 +1,180 @@
+.converterPage {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  background: #041229;
+}
+
+.converterMain {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  padding-bottom: 80px;
+}
+
+.converterContent {
+  flex: 1;
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 24px;
+}
+
+.headerSection {
+  text-align: center;
+  padding: 100px 0 0 0;
+  margin-bottom: 0;
+}
+
+.pageTitle {
+  margin: 0;
+  font-size: 36px;
+  font-weight: 700;
+  color: rgba(255, 255, 255, 0.95);
+  background: linear-gradient(135deg, #5ec8ff, #2aa7ea);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.pageSubtitle {
+  margin: 0;
+  font-size: 16px;
+  color: rgba(255, 255, 255, 0.7);
+  font-weight: 400;
+}
+
+.messageContainer {
+  display: flex;
+  justify-content: center;
+  padding: 40px 24px;
+  animation: fadeIn 0.4s ease-in;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.successCard,
+.errorCard {
+  width: 100%;
+  max-width: 540px;
+  padding: 48px 40px;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 16px;
+  text-align: center;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+}
+
+.successCard {
+  border-color: rgba(94, 200, 255, 0.3);
+}
+
+.errorCard {
+  border-color: rgba(255, 100, 100, 0.3);
+}
+
+.successIcon,
+.errorIcon {
+  font-size: 64px;
+  margin-bottom: 20px;
+}
+
+.successTitle,
+.errorTitle {
+  margin: 0 0 16px 0;
+  font-size: 28px;
+  font-weight: 600;
+}
+
+.successTitle {
+  color: #5ec8ff;
+}
+
+.errorTitle {
+  color: rgba(255, 150, 150, 0.95);
+}
+
+.successMessage,
+.errorMessage {
+  margin: 0 0 24px 0;
+  font-size: 16px;
+  line-height: 1.6;
+  color: rgba(255, 255, 255, 0.85);
+}
+
+.filenameInfo {
+  margin: 0 0 24px 0;
+  padding: 12px 20px;
+  background: rgba(94, 200, 255, 0.1);
+  border: 1px solid rgba(94, 200, 255, 0.2);
+  border-radius: 8px;
+  font-size: 14px;
+  color: rgba(255, 255, 255, 0.8);
+  word-break: break-all;
+}
+
+.filenameInfo strong {
+  color: #5ec8ff;
+}
+
+.resetBtn {
+  padding: 14px 32px;
+  font-size: 16px;
+  font-weight: 600;
+  border-radius: 10px;
+  border: none;
+  background: linear-gradient(180deg, #5ec8ff, #2aa7ea);
+  color: #052033;
+  cursor: pointer;
+  box-shadow: 0 6px 18px rgba(46, 140, 200, 0.3);
+  transition: all 0.2s ease;
+}
+
+.resetBtn:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 8px 24px rgba(46, 140, 200, 0.4);
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+  .headerSection {
+    padding: 30px 0 16px;
+  }
+
+  .pageTitle {
+    font-size: 28px;
+  }
+
+  .pageSubtitle {
+    font-size: 14px;
+  }
+
+  .successCard,
+  .errorCard {
+    padding: 36px 28px;
+  }
+
+  .successIcon,
+  .errorIcon {
+    font-size: 52px;
+  }
+
+  .successTitle,
+  .errorTitle {
+    font-size: 24px;
+  }
+
+  .successMessage,
+  .errorMessage {
+    font-size: 15px;
+  }
+}
