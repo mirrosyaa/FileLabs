@@ -71,6 +71,10 @@ function FileConverter() {
   const [selectedFormat, setSelectedFormat] = useState('');
   const [uploadProgress, setUploadProgress] = useState(0);
   const [isConverting, setIsConverting] = useState(false);
+  const [conversionProgress, setConversionProgress] = useState(0);
+  const [isDownloading, setIsDownloading] = useState(false);
+  const [downloadProgress, setDownloadProgress] = useState(0);
+  const [hasDownloaded, setHasDownloaded] = useState(false);
   const [downloadUrl, setDownloadUrl] = useState(null);
   const [downloadFilename, setDownloadFilename] = useState('');
   const [error, setError] = useState(null);
@@ -166,7 +170,19 @@ function FileConverter() {
     }
 
     setIsConverting(true);
+    setConversionProgress(0);
     setError(null);
+
+    // Simulate progress for better UX
+    const progressInterval = setInterval(() => {
+      setConversionProgress((prev) => {
+        if (prev >= 90) {
+          clearInterval(progressInterval);
+          return 90; // Stop at 90% until actual conversion completes
+        }
+        return prev + 10;
+      });
+    }, 200);
 
     const formData = new FormData();
     files.forEach((file) => {
@@ -201,20 +217,47 @@ function FileConverter() {
       setDownloadUrl(url);
       setDownloadFilename(filename);
       
-      setFadeIn(false);
+      clearInterval(progressInterval);
+      setConversionProgress(100);
+      
+      // Small delay to show 100% before moving to download page
       setTimeout(() => {
-        setPage(4);
-        setFadeIn(true);
-      }, 300);
+        setFadeIn(false);
+        setTimeout(() => {
+          setPage(4);
+          setFadeIn(true);
+        }, 300);
+      }, 500);
     } catch (err) {
+      clearInterval(progressInterval);
+      setConversionProgress(0);
       setError(err.message || "An error occurred during conversion");
     } finally {
       setIsConverting(false);
     }
   };
 
-  const handleDownload = () => {
-    if (downloadUrl) {
+  const handleDownload = async () => {
+    if (!downloadUrl) return;
+
+    setIsDownloading(true);
+    setDownloadProgress(0);
+
+    // Simulate download progress for better UX
+    const progressInterval = setInterval(() => {
+      setDownloadProgress((prev) => {
+        if (prev >= 100) {
+          clearInterval(progressInterval);
+          return 100;
+        }
+        return prev + 20;
+      });
+    }, 100);
+
+    try {
+      // Small delay to show progress
+      await new Promise(resolve => setTimeout(resolve, 600));
+      
       const a = document.createElement("a");
       a.href = downloadUrl;
       a.download = downloadFilename;
@@ -222,6 +265,21 @@ function FileConverter() {
       a.click();
       window.URL.revokeObjectURL(downloadUrl);
       document.body.removeChild(a);
+      
+      clearInterval(progressInterval);
+      setDownloadProgress(100);
+      
+      // Reset after download
+      setTimeout(() => {
+        setIsDownloading(false);
+        setDownloadProgress(0);
+        setHasDownloaded(true);
+      }, 800);
+    } catch (err) {
+      clearInterval(progressInterval);
+      setIsDownloading(false);
+      setDownloadProgress(0);
+      setError("Download failed. Please try again.");
     }
   };
 
@@ -233,6 +291,7 @@ function FileConverter() {
       setSelectedFormat('');
       setDownloadUrl(null);
       setDownloadFilename('');
+      setHasDownloaded(false);
       setError(null);
       setFadeIn(true);
     }, 300);
@@ -292,7 +351,26 @@ function FileConverter() {
           {/* PAGE 3: Choose Conversion */}
           {page === 3 && (
             <div className={`${styles.pageContainer} ${fadeIn ? styles.fadeIn : styles.fadeOut}`}>
+              <button className={styles.backLink} onClick={handleReset}>
+                ← Back to upload
+              </button>
+              
               <h2 className={styles.conversionTitle}>Convert To</h2>
+              
+              {/* Conversion Loading Overlay */}
+              {isConverting && (
+                <div className={styles.convertingOverlay}>
+                  <div className={styles.spinner}></div>
+                  <p className={styles.uploadingText}>Converting files...</p>
+                  <div className={styles.progressBar}>
+                    <div 
+                      className={styles.progressFill} 
+                      style={{ width: `${conversionProgress}%` }}
+                    ></div>
+                  </div>
+                  <p className={styles.progressText}>{conversionProgress}%</p>
+                </div>
+              )}
               
               {hasMixedTypes && (
                 <div className={styles.warningBox}>
@@ -380,25 +458,71 @@ function FileConverter() {
                   ❌ {error}
                 </div>
               )}
-
-              <button className={styles.backLink} onClick={handleReset}>
-                ← Back to upload
-              </button>
             </div>
           )}
 
           {/* PAGE 4: Download */}
           {page === 4 && (
             <div className={`${styles.pageContainer} ${fadeIn ? styles.fadeIn : styles.fadeOut}`}>
+              {/* Download Loading Overlay */}
+              {isDownloading && (
+                <div className={styles.downloadingOverlay}>
+                  <div className={styles.spinner}></div>
+                  <p className={styles.uploadingText}>Downloading file...</p>
+                  <div className={styles.progressBar}>
+                    <div 
+                      className={styles.progressFill} 
+                      style={{ width: `${downloadProgress}%` }}
+                    ></div>
+                  </div>
+                  <p className={styles.progressText}>{downloadProgress}%</p>
+                </div>
+              )}
+
               <div className={styles.successContainer}>
-                <div className={styles.successIcon}>✅</div>
-                <h2 className={styles.successTitle}>Conversion Complete!</h2>
-                <button className={styles.downloadButton} onClick={handleDownload}>
-                  <span className={styles.downloadIcon}>⬇️</span>
-                  Download File
-                </button>
+                <div className={styles.successIconWrapper}>
+                  <div className={styles.successIconCircle}>
+                    <div className={styles.successIcon}>✓</div>
+                  </div>
+                </div>
+                {!hasDownloaded ? (
+                  <>
+                    <h2 className={styles.successTitle}>Conversion Complete!</h2>
+                    <p className={styles.successMessage}>Your file has been successfully converted</p>
+                  </>
+                ) : (
+                  <h2 className={styles.successTitle}>File Downloaded Successfully!</h2>
+                )}
+                
+                <div className={styles.downloadFileInfo}>
+                  <div className={styles.fileInfoIcon}>📄</div>
+                  <div className={styles.fileInfoText}>
+                    <div className={styles.fileName}>{downloadFilename}</div>
+                    <div className={styles.fileFormat}>Format: {selectedFormat.toUpperCase()}</div>
+                  </div>
+                </div>
+
+                {!hasDownloaded && (
+                  <button 
+                    className={styles.downloadButton} 
+                    onClick={handleDownload}
+                    disabled={isDownloading}
+                  >
+                    {isDownloading ? (
+                      <>
+                        <span className={styles.buttonSpinner}></span>
+                        Downloading...
+                      </>
+                    ) : (
+                      <>
+                        <span className={styles.downloadIcon}>⬇</span>
+                        Download File
+                      </>
+                    )}
+                  </button>
+                )}
                 <button className={styles.newConversionBtn} onClick={handleReset}>
-                  Convert Another File
+                  ← Convert Another File
                 </button>
               </div>
             </div>

@@ -198,6 +198,38 @@
   margin-bottom: 40px;
 }
 
+/* Conversion Loading Overlay */
+.convertingOverlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(10, 22, 40, 0.95);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  backdrop-filter: blur(10px);
+}
+
+/* Download Loading Overlay */
+.downloadingOverlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(10, 22, 40, 0.95);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  backdrop-filter: blur(10px);
+}
+
 .warningBox {
   background: rgba(255, 193, 7, 0.15);
   border: 2px solid rgba(255, 193, 7, 0.5);
@@ -397,16 +429,52 @@
 /* PAGE 4: Download/Success */
 .successContainer {
   text-align: center;
-  padding: 60px 40px;
+  padding: 80px 60px;
   background: rgba(255, 255, 255, 0.05);
   border-radius: 24px;
   backdrop-filter: blur(10px);
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+.successIconWrapper {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 30px;
+}
+
+.successIconCircle {
+  width: 120px;
+  height: 120px;
+  background: linear-gradient(135deg, #4caf50 0%, #388e3c 100%);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 10px 40px rgba(76, 175, 80, 0.5);
+  animation: scaleIn 0.6s ease-out;
 }
 
 .successIcon {
-  font-size: 100px;
-  margin-bottom: 24px;
-  animation: scaleIn 0.5s ease-out;
+  font-size: 70px;
+  color: #ffffff;
+  font-weight: bold;
+  animation: checkmark 0.8s ease-out 0.2s both;
+}
+
+@keyframes checkmark {
+  0% {
+    transform: scale(0) rotate(-45deg);
+    opacity: 0;
+  }
+  50% {
+    transform: scale(1.2) rotate(0deg);
+    opacity: 1;
+  }
+  100% {
+    transform: scale(1) rotate(0deg);
+    opacity: 1;
+  }
 }
 
 @keyframes scaleIn {
@@ -422,57 +490,110 @@
 
 .successTitle {
   color: #ffffff;
-  font-size: 36px;
+  font-size: 38px;
   font-weight: 700;
-  margin-bottom: 16px;
+  margin-bottom: 12px;
+  letter-spacing: -0.5px;
 }
 
 .successMessage {
   color: rgba(255, 255, 255, 0.7);
   font-size: 18px;
-  margin-bottom: 30px;
+  margin-bottom: 40px;
+  font-weight: 500;
 }
 
 .downloadFileInfo {
-  background: rgba(94, 200, 255, 0.1);
-  border: 2px solid rgba(94, 200, 255, 0.3);
-  border-radius: 12px;
-  padding: 16px 24px;
+  background: linear-gradient(135deg, rgba(94, 200, 255, 0.15) 0%, rgba(74, 159, 216, 0.1) 100%);
+  border: 2px solid rgba(94, 200, 255, 0.4);
+  border-radius: 16px;
+  padding: 24px 28px;
+  margin-bottom: 40px;
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  transition: all 0.3s ease;
+  animation: slideUp 0.5s ease-out 0.3s both;
+}
+
+.downloadFileInfo:hover {
+  transform: translateY(-2px);
+  border-color: rgba(94, 200, 255, 0.6);
+  box-shadow: 0 8px 25px rgba(94, 200, 255, 0.2);
+}
+
+.fileInfoIcon {
+  font-size: 48px;
+  filter: drop-shadow(0 4px 8px rgba(94, 200, 255, 0.3));
+}
+
+.fileInfoText {
+  flex: 1;
+  text-align: left;
+}
+
+.fileName {
+  color: #ffffff;
+  font-size: 18px;
+  font-weight: 700;
+  margin-bottom: 6px;
+  word-break: break-word;
+}
+
+.fileFormat {
   color: #5ec8ff;
-  font-size: 16px;
+  font-size: 14px;
   font-weight: 600;
-  margin-bottom: 30px;
-  word-break: break-all;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 .downloadButton {
   width: 100%;
-  max-width: 400px;
+  max-width: 450px;
   background: linear-gradient(135deg, #4caf50 0%, #388e3c 100%);
   color: #ffffff;
   border: none;
   border-radius: 16px;
-  padding: 24px 48px;
-  font-size: 24px;
+  padding: 22px 48px;
+  font-size: 22px;
   font-weight: 700;
   cursor: pointer;
   transition: all 0.3s ease;
-  box-shadow: 0 8px 35px rgba(76, 175, 80, 0.4);
+  box-shadow: 0 8px 30px rgba(76, 175, 80, 0.4);
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 12px;
-  margin: 0 auto 20px;
+  gap: 14px;
+  margin: 0 auto 24px;
+  animation: slideUp 0.5s ease-out 0.4s both;
 }
 
-.downloadButton:hover {
+.downloadButton:hover:not(:disabled) {
   transform: translateY(-4px) scale(1.02);
   box-shadow: 0 12px 45px rgba(76, 175, 80, 0.6);
   background: linear-gradient(135deg, #66bb6a 0%, #43a047 100%);
 }
 
+.downloadButton:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+  transform: none;
+}
+
 .downloadIcon {
-  font-size: 28px;
+  font-size: 26px;
   animation: bounce 2s infinite;
 }
 
@@ -482,21 +603,23 @@
 }
 
 .newConversionBtn {
-  background: rgba(255, 255, 255, 0.1);
-  border: 2px solid rgba(255, 255, 255, 0.3);
+  background: rgba(255, 255, 255, 0.08);
+  border: 2px solid rgba(255, 255, 255, 0.25);
   border-radius: 12px;
   color: #ffffff;
-  padding: 14px 32px;
+  padding: 16px 36px;
   font-size: 16px;
   font-weight: 600;
   cursor: pointer;
   transition: all 0.3s ease;
+  animation: slideUp 0.5s ease-out 0.5s both;
 }
 
 .newConversionBtn:hover {
   background: rgba(255, 255, 255, 0.15);
-  border-color: rgba(255, 255, 255, 0.5);
+  border-color: rgba(255, 255, 255, 0.4);
   transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(255, 255, 255, 0.1);
 }
 
 /* Responsive design */
