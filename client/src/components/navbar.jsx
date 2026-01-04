@@ -8,7 +8,7 @@ import SettingsModal from "../modals/settingsModal";
 import LogoutModal from "../modals/logoutModal";
 
 function Navbar() {
-  const [profilePhoto, setProfilePhoto] = useState(defaultPhoto);
+  const [profilePhoto, setProfilePhoto] = useState(null);
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const [settingsModalOpen, setSettingsModalOpen] = useState(false);
   const [logoutModalOpen, setLogoutModalOpen] = useState(false);
@@ -27,8 +27,13 @@ function Navbar() {
       const photoUrl = URL.createObjectURL(response.data);
       setProfilePhoto(photoUrl);
     } catch (err) {
-      console.error("Error fetching profile photo:", err);
-      setProfilePhoto(defaultPhoto);
+      // Silently fail for auth errors - user not logged in
+      if (err.response?.status === 401 || err.response?.status === 403) {
+        setProfilePhoto(defaultPhoto);
+      } else {
+        console.error("Error fetching profile photo:", err);
+        setProfilePhoto(defaultPhoto);
+      }
     }
   };
 
@@ -38,7 +43,10 @@ function Navbar() {
       const response = await axios.get("http://localhost:3001/users/profile");
       setUserType(response.data.user.user_type);
     } catch (err) {
-      console.error("Error fetching user profile:", err);
+      // Silently fail for auth errors - user not logged in
+      if (err.response?.status !== 401 && err.response?.status !== 403) {
+        console.error("Error fetching user profile:", err);
+      }
     }
   };
 
@@ -62,19 +70,34 @@ function Navbar() {
     };
   }, []);
 
-  const toggleDropdown = () => {
-    setDropdownOpen(!dropdownOpen);
+  const toggleDropdown = (e) => {
+    if (e) e.stopPropagation();
+    const newState = !dropdownOpen;
+    console.log("Toggle dropdown - New state will be:", newState);
+    setDropdownOpen(newState);
   };
 
-  const handleLogoutClick = () => {
+  const handleLogoutClick = (e) => {
+    if (e) e.stopPropagation();
+    console.log("Logout clicked - Opening logout modal");
     setLogoutModalOpen(true);
     setDropdownOpen(false);
   };
 
+  const handleSettingsClick = (e) => {
+    if (e) e.stopPropagation();
+    console.log("Settings clicked - Opening settings modal");
+    setSettingsModalOpen(true);
+    setDropdownOpen(false);
+  };
+
   const confirmLogout = () => {
+    console.log("Confirm logout - Clearing token and redirecting");
     setToken(null); // Clear the token
     navigate("/"); // Redirect to login page
   };
+
+  console.log("Navbar render - settingsModalOpen:", settingsModalOpen, "logoutModalOpen:", logoutModalOpen, "dropdownOpen:", dropdownOpen);
 
   useEffect(() => {
     const handleClickOutside = (event) => {
@@ -211,12 +234,24 @@ function Navbar() {
 
       <div className={styles["nav-right"]}>
         <div className={styles["profile-dropdown-container"]}>
-          <img
-            src={profilePhoto}
-            alt="profile"
+          <div
             className={styles["profile-photo"]}
             onClick={toggleDropdown}
-          />
+            style={{
+              backgroundImage: profilePhoto ? `url(${profilePhoto})` : `url(${defaultPhoto})`,
+              backgroundSize: 'cover',
+              backgroundPosition: 'center',
+              backgroundColor: '#4a5568',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              color: 'white',
+              fontSize: '24px',
+              fontWeight: 'bold'
+            }}
+          >
+            {!profilePhoto && !defaultPhoto && '👤'}
+          </div>
 
           {dropdownOpen && (
             <div className={styles["profile-dropdown"]}>
@@ -231,10 +266,7 @@ function Navbar() {
               )}
               <button
                 className={styles["dropdown-item"]}
-                onClick={() => {
-                  setSettingsModalOpen(true);
-                  setDropdownOpen(false);
-                }}
+                onClick={handleSettingsClick}
               >
                 Settings
               </button>

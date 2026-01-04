@@ -1,110 +1,241 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Navbar from "../components/navbar";
 import Footer from "../components/footer";
-import DropBox from "../components/dropBox";
-import ConversionOptions from "../components/ConversionOptions";
 import styles from "../CSS/fileConverter.module.css";
 
-function FileConverter() {
-  const [files, setFiles] = useState([]);
-  const [isProcessing, setIsProcessing] = useState(false);
-  const [result, setResult] = useState(null);
-  const [error, setError] = useState(null);
+// File type detection helper
+const detectFileType = (file) => {
+  const ext = file.name.split('.').pop().toLowerCase();
+  const mimeType = file.type;
 
-  const handleFilesSelected = (selectedFiles) => {
-    setFiles(selectedFiles);
-    setResult(null);
-    setError(null);
+  if (mimeType.startsWith('image/') || ['jpg', 'jpeg', 'png', 'gif', 'webp', 'bmp', 'svg'].includes(ext)) {
+    return 'image';
+  }
+  
+  if (mimeType.startsWith('audio/') || ['mp3', 'wav', 'm4a', 'flac', 'aac', 'ogg'].includes(ext)) {
+    return 'audio';
+  }
+  
+  if (mimeType.startsWith('video/') || ['mp4', 'mov', 'mkv', 'webm', 'avi', 'flv'].includes(ext)) {
+    return 'video';
+  }
+  
+  if (['pdf', 'doc', 'docx', 'txt', 'rtf', 'html'].includes(ext)) {
+    return 'document';
+  }
+  
+  return 'unknown';
+};
+
+// Get conversion options based on file type
+const getConversionOptions = (fileType, currentFiles = []) => {
+  // Only document conversions are currently supported
+  const options = {
+    image: [],
+    audio: [],
+    video: [],
+    document: [
+      { value: 'pdf', label: 'PDF', icon: '📄' },
+      { value: 'docx', label: 'DOCX', icon: '📄' },
+      { value: 'txt', label: 'TXT', icon: '📄' },
+      { value: 'rtf', label: 'RTF', icon: '📄' },
+      { value: 'html', label: 'HTML', icon: '📄' },
+    ],
+  };
+  
+  let availableOptions = options[fileType] || [];
+  
+  // Filter out the source format(s) from the conversion options
+  if (currentFiles.length > 0) {
+    const sourceFormats = new Set(
+      currentFiles.map(file => {
+        const ext = file.name.split('.').pop().toLowerCase();
+        // Normalize extensions
+        if (ext === 'jpeg') return 'jpg';
+        if (ext === 'doc') return 'docx';
+        return ext;
+      })
+    );
+    
+    availableOptions = availableOptions.filter(
+      option => !sourceFormats.has(option.value)
+    );
+  }
+  
+  return availableOptions;
+};
+
+function FileConverter() {
+  const [page, setPage] = useState(1); // 1 = upload, 2 = uploading, 3 = conversion, 4 = complete
+  const [files, setFiles] = useState([]);
+  const [selectedFormat, setSelectedFormat] = useState('');
+  const [uploadProgress, setUploadProgress] = useState(0);
+  const [isConverting, setIsConverting] = useState(false);
+  const [downloadUrl, setDownloadUrl] = useState(null);
+  const [downloadFilename, setDownloadFilename] = useState('');
+  const [error, setError] = useState(null);
+  const [isDragging, setIsDragging] = useState(false);
+  const [fadeIn, setFadeIn] = useState(true);
+
+  // Detect file types from uploaded files
+  const fileTypes = files.reduce((acc, file) => {
+    const type = detectFileType(file);
+    if (!acc[type]) acc[type] = [];
+    acc[type].push(file);
+    return acc;
+  }, {});
+
+  const primaryFileType = Object.keys(fileTypes)[0];
+  const hasMixedTypes = Object.keys(fileTypes).length > 1;
+
+  // Simulate upload progress
+  useEffect(() => {
+    if (page === 2) {
+      setUploadProgress(0);
+      const interval = setInterval(() => {
+        setUploadProgress(prev => {
+          if (prev >= 100) {
+            clearInterval(interval);
+            setTimeout(() => {
+              setFadeIn(false);
+              setTimeout(() => {
+                setPage(3);
+                setFadeIn(true);
+              }, 300);
+            }, 500);
+            return 100;
+          }
+          return prev + 10;
+        });
+      }, 150);
+      return () => clearInterval(interval);
+    }
+  }, [page]);
+
+  const handleDragEnter = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setIsDragging(true);
   };
 
-  const handleConvert = async (options) => {
-    setIsProcessing(true);
+  const handleDragLeave = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setIsDragging(false);
+  };
+
+  const handleDragOver = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+  };
+
+  const handleDrop = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setIsDragging(false);
+
+    const droppedFiles = Array.from(e.dataTransfer.files);
+    if (droppedFiles.length > 0) {
+      setFiles(droppedFiles);
+      setError(null);
+      setFadeIn(false);
+      setTimeout(() => {
+        setPage(2);
+        setFadeIn(true);
+      }, 300);
+    }
+  };
+
+  const handleFileSelect = (e) => {
+    const selectedFiles = Array.from(e.target.files);
+    if (selectedFiles.length > 0) {
+      setFiles(selectedFiles);
+      setError(null);
+      setFadeIn(false);
+      setTimeout(() => {
+        setPage(2);
+        setFadeIn(true);
+      }, 300);
+    }
+  };
+
+  const handleConvert = async () => {
+    if (!selectedFormat) {
+      setError('Please select a target format');
+      return;
+    }
+
+    setIsConverting(true);
     setError(null);
-    setResult(null);
 
     const formData = new FormData();
     files.forEach((file) => {
       formData.append("files", file);
     });
-    formData.append("operation", options.operation);
-    if (options.format) {
-      formData.append("format", options.format);
-    }
-    if (options.renamePattern) {
-      formData.append("renamePattern", options.renamePattern);
-    }
+    formData.append("operation", "convert");
+    formData.append("format", selectedFormat);
 
     try {
-      console.log('Sending conversion request...');
-      console.log('FormData contents:', {
-        files: files.map(f => f.name),
-        operation: options.operation,
-        format: options.format
-      });
-      
       const response = await fetch("http://localhost:3001/api/convert", {
         method: "POST",
         body: formData,
       });
 
-      console.log('Response status:', response.status);
-      console.log('Response headers:', Object.fromEntries(response.headers.entries()));
-
       if (!response.ok) {
         const errorData = await response.json().catch(() => ({ error: `HTTP ${response.status}` }));
-        console.error('Server error:', errorData);
         throw new Error(errorData.error || "Conversion failed");
       }
 
-      // Check if response is a file download
-      const contentType = response.headers.get("content-type");
-      if (contentType && contentType.includes("application/json")) {
-        const data = await response.json();
-        setResult(data);
-      } else {
-        // Handle file download
-        const blob = await response.blob();
-        const contentDisposition = response.headers.get("content-disposition");
-        let filename = "converted-file";
-        
-        if (contentDisposition) {
-          // Extract filename from: attachment; filename="file.pdf"
-          const filenameMatch = contentDisposition.match(/filename[^;=\n]*=((['"]).*?\2|[^;\n]*)/);
-          if (filenameMatch && filenameMatch[1]) {
-            filename = filenameMatch[1].replace(/['"]/g, '');
-          }
+      const blob = await response.blob();
+      const contentDisposition = response.headers.get("content-disposition");
+      let filename = "converted-file";
+      
+      if (contentDisposition) {
+        const filenameMatch = contentDisposition.match(/filename[^;=\n]*=((['"]).*?\2|[^;\n]*)/);
+        if (filenameMatch && filenameMatch[1]) {
+          filename = filenameMatch[1].replace(/['"]/g, '');
         }
-        
-        console.log('Downloaded filename:', filename);
-
-        const url = window.URL.createObjectURL(blob);
-        const a = document.createElement("a");
-        a.href = url;
-        a.download = filename;
-        document.body.appendChild(a);
-        a.click();
-        window.URL.revokeObjectURL(url);
-        document.body.removeChild(a);
-
-        setResult({
-          success: true,
-          message: "File downloaded successfully!",
-          filename: filename,
-        });
       }
+
+      const url = window.URL.createObjectURL(blob);
+      setDownloadUrl(url);
+      setDownloadFilename(filename);
+      
+      setFadeIn(false);
+      setTimeout(() => {
+        setPage(4);
+        setFadeIn(true);
+      }, 300);
     } catch (err) {
-      console.error("Conversion error:", err);
-      console.error("Error stack:", err.stack);
-      setError(err.message || "An error occurred during conversion. Check the console for details.");
+      setError(err.message || "An error occurred during conversion");
     } finally {
-      setIsProcessing(false);
+      setIsConverting(false);
+    }
+  };
+
+  const handleDownload = () => {
+    if (downloadUrl) {
+      const a = document.createElement("a");
+      a.href = downloadUrl;
+      a.download = downloadFilename;
+      document.body.appendChild(a);
+      a.click();
+      window.URL.revokeObjectURL(downloadUrl);
+      document.body.removeChild(a);
     }
   };
 
   const handleReset = () => {
-    setFiles([]);
-    setResult(null);
-    setError(null);
+    setFadeIn(false);
+    setTimeout(() => {
+      setPage(1);
+      setFiles([]);
+      setSelectedFormat('');
+      setDownloadUrl(null);
+      setDownloadFilename('');
+      setError(null);
+      setFadeIn(true);
+    }, 300);
   };
 
   return (
@@ -113,52 +244,166 @@ function FileConverter() {
       
       <main className={styles.converterMain}>
         <div className={styles.converterContent}>
-          {!result && (
-            <>
-              <div className={styles.headerSection}>
-                <h1 className={styles.pageTitle}>File Converter</h1>
-              </div>
-              <DropBox onFilesSelected={handleFilesSelected} />
-              <ConversionOptions
-                files={files}
-                onConvert={handleConvert}
-                isProcessing={isProcessing}
-              />
-            </>
-          )}
-
-          {error && (
-            <div className={styles.messageContainer}>
-              <div className={styles.errorCard}>
-                <div className={styles.errorIcon}>❌</div>
-                <h3 className={styles.errorTitle}>Error</h3>
-                <p className={styles.errorMessage}>{error}</p>
-                <button className={styles.resetBtn} onClick={handleReset}>
-                  Try Again
-                </button>
+          
+          {/* PAGE 1: Upload */}
+          {page === 1 && (
+            <div className={`${styles.pageContainer} ${fadeIn ? styles.fadeIn : styles.fadeOut}`}>
+              <h1 className={styles.mainTitle}>File Converter</h1>
+              
+              <div 
+                className={`${styles.uploadBox} ${isDragging ? styles.dragging : ''}`}
+                onDragEnter={handleDragEnter}
+                onDragOver={handleDragOver}
+                onDragLeave={handleDragLeave}
+                onDrop={handleDrop}
+              >
+                <div className={styles.uploadIcon}>📁</div>
+                <p className={styles.uploadText}>Drag & drop files here</p>
+                <label className={styles.browseBtn}>
+                  Browse Files
+                  <input
+                    type="file"
+                    multiple
+                    onChange={handleFileSelect}
+                    style={{ display: 'none' }}
+                  />
+                </label>
               </div>
             </div>
           )}
 
-          {result && (
-            <div className={styles.messageContainer}>
-              <div className={styles.successCard}>
+          {/* PAGE 2: Uploading */}
+          {page === 2 && (
+            <div className={`${styles.pageContainer} ${fadeIn ? styles.fadeIn : styles.fadeOut}`}>
+              <div className={styles.uploadingContainer}>
+                <div className={styles.spinner}></div>
+                <p className={styles.uploadingText}>Uploading files...</p>
+                <div className={styles.progressBar}>
+                  <div 
+                    className={styles.progressFill} 
+                    style={{ width: `${uploadProgress}%` }}
+                  ></div>
+                </div>
+                <p className={styles.progressText}>{uploadProgress}%</p>
+              </div>
+            </div>
+          )}
+
+          {/* PAGE 3: Choose Conversion */}
+          {page === 3 && (
+            <div className={`${styles.pageContainer} ${fadeIn ? styles.fadeIn : styles.fadeOut}`}>
+              <h2 className={styles.conversionTitle}>Convert To</h2>
+              
+              {hasMixedTypes && (
+                <div className={styles.warningBox}>
+                  ⚠️ Mixed file types detected. Please upload one type at a time.
+                </div>
+              )}
+
+
+              {!hasMixedTypes && primaryFileType && primaryFileType !== 'unknown' && (
+                <>
+                  {getConversionOptions(primaryFileType, files).length > 0 ? (
+                    <div className={styles.formatOptions}>
+                      <div className={styles.formatButtons}>
+                        {getConversionOptions(primaryFileType, files).map((format) => (
+                          <button
+                            key={format.value}
+                            className={`${styles.formatOption} ${selectedFormat === format.value ? styles.selectedFormat : ''}`}
+                            onClick={() => setSelectedFormat(format.value)}
+                          >
+                            <span className={styles.formatIcon}>{format.icon}</span>
+                            <span className={styles.formatName}>{format.label}</span>
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+                  ) : (
+                    <div className={styles.errorBox}>
+                      ❌ {primaryFileType === 'document' 
+                        ? 'No conversion options available. File is already in this format.'
+                        : 'Only document conversions are currently supported (PDF, DOCX, TXT, RTF, HTML).'}
+                    </div>
+                  )}
+
+                  <div className={styles.filesDisplay}>
+                    <div className={styles.filesHeader}>Selected Files:</div>
+                    {Object.entries(fileTypes).map(([type, typeFiles]) => (
+                      <div key={type} className={styles.fileTypeSection}>
+                        <div className={styles.fileTypeLabel}>
+                          {type === 'image' && '🖼️'}
+                          {type === 'audio' && '🎵'}
+                          {type === 'video' && '🎬'}
+                          {type === 'document' && '📄'}
+                          {type === 'unknown' && '❓'}
+                          {' '}
+                          {type.charAt(0).toUpperCase() + type.slice(1)} ({typeFiles.length})
+                        </div>
+                        <div className={styles.fileNames}>
+                          {typeFiles.map((file, idx) => (
+                            <div key={idx} className={styles.fileName}>{file.name}</div>
+                          ))}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+
+                  {selectedFormat && getConversionOptions(primaryFileType, files).length > 0 && (
+                    <button 
+                      className={`${styles.convertButton} ${styles.slideIn}`}
+                      onClick={handleConvert}
+                      disabled={isConverting}
+                    >
+                      {isConverting ? (
+                        <>
+                          <span className={styles.buttonSpinner}></span>
+                          Converting...
+                        </>
+                      ) : (
+                        <>
+                          Convert to {selectedFormat.toUpperCase()}
+                        </>
+                      )}
+                    </button>
+                  )}
+                </>
+              )}
+
+              {(primaryFileType === 'unknown' && !hasMixedTypes) && (
+                <div className={styles.errorBox}>
+                  ❌ Unsupported file type. Please upload document files (PDF, DOCX, TXT, RTF, HTML).
+                </div>
+              )}
+
+              {error && (
+                <div className={styles.errorBox}>
+                  ❌ {error}
+                </div>
+              )}
+
+              <button className={styles.backLink} onClick={handleReset}>
+                ← Back to upload
+              </button>
+            </div>
+          )}
+
+          {/* PAGE 4: Download */}
+          {page === 4 && (
+            <div className={`${styles.pageContainer} ${fadeIn ? styles.fadeIn : styles.fadeOut}`}>
+              <div className={styles.successContainer}>
                 <div className={styles.successIcon}>✅</div>
-                <h3 className={styles.successTitle}>Success!</h3>
-                <p className={styles.successMessage}>
-                  {result.message || "Your files have been processed successfully."}
-                </p>
-                {result.filename && (
-                  <p className={styles.filenameInfo}>
-                    Downloaded: <strong>{result.filename}</strong>
-                  </p>
-                )}
-                <button className={styles.resetBtn} onClick={handleReset}>
-                  Process More Files
+                <h2 className={styles.successTitle}>Conversion Complete!</h2>
+                <button className={styles.downloadButton} onClick={handleDownload}>
+                  <span className={styles.downloadIcon}>⬇️</span>
+                  Download File
+                </button>
+                <button className={styles.newConversionBtn} onClick={handleReset}>
+                  Convert Another File
                 </button>
               </div>
             </div>
           )}
+
         </div>
       </main>
 

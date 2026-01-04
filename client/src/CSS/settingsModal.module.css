@@ -10,8 +10,9 @@
   justify-content: center;
   align-items: center;
   padding-bottom: 10vh; /* Shifts modal up on screen */
-  z-index: 9999; /* Ensures modal appears above everything */
+  z-index: 99999; /* Ensures modal appears above everything */
   animation: fadeIn 0.3s ease;
+  pointer-events: auto;
 }
 
 .modal-overlay.closing {

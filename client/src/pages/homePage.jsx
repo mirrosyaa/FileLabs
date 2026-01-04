@@ -8,7 +8,7 @@ import axios from "axios";
 import styles from "../CSS/homePage.module.css";
 
 function HomePage() {
-  const [username, setUsername] = useState("");
+  const [username, setUsername] = useState("Guest");
   const [greeting, setGreeting] = useState("");
   const [stats, setStats] = useState({
     myFiles: 0,
@@ -20,10 +20,16 @@ function HomePage() {
   // Function to fetch username
   const fetchUsername = async () => {
     try {
-      const response = await axios.get("http://localhost:3001/users/profile");
+      const response = await axios.get("http://localhost:3001/users/profile", {
+        timeout: 5000
+      });
       setUsername(response.data.user.username);
     } catch (error) {
-      console.error("Error fetching username:", error);
+      // Silently fail for auth errors - keep default "Guest"
+      if (error.response?.status !== 401 && error.response?.status !== 403) {
+        console.error("Error fetching username:", error);
+      }
+      setUsername("Guest");
     }
   };
 
