@@ -1,9 +1,9 @@
 import { React, useState, useEffect } from "react";
+import Navbar from "../components/navbar";
 import Footer from "../components/footer";
-import WelcomeBanner from "../components/WelcomeBanner";
-import StatsContainer from "../components/StatsContainer";
-import QuickActions from "../components/QuickActions";
-import RecentActivity from "../components/RecentActivity";
+import WelcomeSection from "../components/WelcomeSection";
+import FileTypeCards from "../components/FileTypeCards";
+import CommonActions from "../components/CommonActions";
 import axios from "axios";
 import styles from "../CSS/homePage.module.css";
 
@@ -75,10 +75,10 @@ function HomePage() {
 
   return (
     <div className={styles["home-page-wrapper"]}>
-      <WelcomeBanner greeting={greeting} username={username} />
-      <StatsContainer stats={stats} />
-      <QuickActions />
-      <RecentActivity />
+      <Navbar />
+      <WelcomeSection greeting={greeting} username={username} />
+      <FileTypeCards />
+      <CommonActions />
       <Footer />
     </div>
   );

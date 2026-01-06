@@ -1,0 +1,243 @@
+/* Common Actions Section */
+.commonActionsSection {
+  padding: 40px 7% 60px;
+  background: linear-gradient(135deg, #1a2942 0%, #0a1628 100%);
+  transition: all 0.4s ease;
+}
+
+.sectionTitle {
+  color: #ffffff;
+  font-size: 28px;
+  font-weight: 700;
+  text-align: center;
+  margin-bottom: 30px;
+  letter-spacing: -0.5px;
+}
+
+.actionsRow {
+  display: flex;
+  justify-content: center;
+  gap: 20px;
+  flex-wrap: wrap;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+/* Common Action Buttons */
+.commonActionButton {
+  background: linear-gradient(135deg, rgba(94, 200, 255, 0.15) 0%, rgba(74, 159, 216, 0.1) 100%);
+  border: 2px solid rgba(94, 200, 255, 0.4);
+  border-radius: 16px;
+  padding: 18px 32px;
+  color: #ffffff;
+  font-size: 16px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  min-width: 150px;
+  backdrop-filter: blur(10px);
+}
+
+.commonActionButton:hover {
+  transform: translateY(-5px);
+  background: linear-gradient(135deg, rgba(94, 200, 255, 0.25) 0%, rgba(74, 159, 216, 0.2) 100%);
+  border-color: rgba(94, 200, 255, 0.6);
+  box-shadow: 0 10px 35px rgba(94, 200, 255, 0.3);
+}
+
+.actionIcon {
+  font-size: 40px;
+  filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.3));
+}
+
+.actionName {
+  font-size: 16px;
+  font-weight: 700;
+}
+
+/* Modal Styles */
+.modalOverlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(10, 22, 40, 0.95);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 10000;
+  backdrop-filter: blur(10px);
+  animation: fadeIn 0.3s ease;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.modalContent {
+  background: linear-gradient(135deg, #1a2942 0%, #0a1628 100%);
+  border: 2px solid rgba(94, 200, 255, 0.3);
+  border-radius: 24px;
+  padding: 50px 40px;
+  max-width: 600px;
+  width: 90%;
+  position: relative;
+  animation: slideUp 0.3s ease;
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.closeButton {
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  background: rgba(255, 255, 255, 0.1);
+  border: 2px solid rgba(255, 255, 255, 0.2);
+  color: #ffffff;
+  font-size: 32px;
+  width: 45px;
+  height: 45px;
+  border-radius: 50%;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.3s ease;
+  line-height: 1;
+}
+
+.closeButton:hover {
+  background: rgba(255, 255, 255, 0.2);
+  border-color: rgba(255, 255, 255, 0.4);
+  transform: rotate(90deg);
+}
+
+.modalTitle {
+  color: #ffffff;
+  font-size: 28px;
+  font-weight: 700;
+  text-align: center;
+  margin-bottom: 12px;
+}
+
+.modalSubtitle {
+  color: rgba(255, 255, 255, 0.7);
+  font-size: 16px;
+  text-align: center;
+  margin-bottom: 35px;
+}
+
+.fileTypeGrid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 20px;
+}
+
+.fileTypeOption {
+  background: rgba(255, 255, 255, 0.05);
+  border: 2px solid rgba(255, 255, 255, 0.2);
+  border-radius: 16px;
+  padding: 30px 20px;
+  color: #ffffff;
+  font-size: 18px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+}
+
+.fileTypeOption:hover {
+  background: rgba(94, 200, 255, 0.15);
+  border-color: rgba(94, 200, 255, 0.5);
+  transform: translateY(-3px);
+  box-shadow: 0 8px 25px rgba(94, 200, 255, 0.2);
+}
+
+.fileTypeIcon {
+  font-size: 52px;
+  filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.3));
+}
+
+.fileTypeName {
+  font-size: 18px;
+  font-weight: 700;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .commonActionsSection {
+    padding: 40px 5% 60px;
+  }
+
+  .sectionTitle {
+    font-size: 26px;
+    margin-bottom: 30px;
+  }
+
+  .actionsRow {
+    gap: 15px;
+  }
+
+  .commonActionButton {
+    min-width: 140px;
+    padding: 20px 30px;
+  }
+
+  .actionIcon {
+    font-size: 40px;
+  }
+
+  .actionName {
+    font-size: 16px;
+  }
+
+  .modalContent {
+    padding: 40px 30px;
+  }
+
+  .modalTitle {
+    font-size: 24px;
+  }
+
+  .modalSubtitle {
+    font-size: 14px;
+  }
+
+  .fileTypeGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .fileTypeOption {
+    padding: 25px 20px;
+  }
+
+  .fileTypeIcon {
+    font-size: 44px;
+  }
+
+  .fileTypeName {
+    font-size: 16px;
+  }
+}

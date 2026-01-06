@@ -147,9 +147,130 @@
   width: 120px;
   display: flex;
   justify-content: flex-end;
+  gap: 20px;
+  align-items: center;
   z-index: 10000;
   position: relative;
 }
+
+/* Tools Dropdown Container */
+.tools-dropdown-container {
+  position: relative;
+  z-index: 10001;
+}
+
+.tools-button {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 20px;
+  background: rgba(255, 255, 255, 0.08);
+  border-radius: 10px;
+  border: 1.5px solid rgba(255, 255, 255, 0.15);
+  transition: all 0.3s ease;
+}
+
+.tools-button:hover {
+  background: rgba(255, 255, 255, 0.12);
+  border-color: rgba(255, 255, 255, 0.25);
+}
+
+.dropdown-arrow {
+  font-size: 12px;
+  transition: transform 0.3s ease;
+}
+
+.tools-dropdown {
+  position: fixed;
+  top: calc(100px + 2px);
+  right: 150px;
+  background: linear-gradient(135deg, #1a2942 0%, #0a1628 100%);
+  border: 2px solid rgba(94, 200, 255, 0.3);
+  border-radius: 16px;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
+  min-width: 600px;
+  overflow: hidden;
+  z-index: 10003;
+  animation: dropdownFadeIn 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  pointer-events: auto;
+  backdrop-filter: blur(10px);
+}
+
+.tools-section {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 20px;
+  padding: 25px;
+}
+
+.tools-category {
+  padding: 15px;
+  background: rgba(255, 255, 255, 0.03);
+  border-radius: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  transition: all 0.3s ease;
+}
+
+.tools-category:hover {
+  background: rgba(255, 255, 255, 0.05);
+  border-color: rgba(94, 200, 255, 0.3);
+}
+
+.category-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 12px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.category-icon {
+  font-size: 24px;
+}
+
+.category-title {
+  color: #ffffff;
+  font-size: 16px;
+  font-weight: 700;
+}
+
+.category-links {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  animation: slideDown 0.25s ease-out;
+}
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.tool-link {
+  display: block;
+  padding: 8px 12px;
+  color: rgba(255, 255, 255, 0.8);
+  text-decoration: none;
+  font-size: 14px;
+  font-weight: 500;
+  border-radius: 6px;
+  transition: all 0.2s ease;
+}
+
+.tool-link:hover {
+  background: rgba(94, 200, 255, 0.15);
+  color: #5ec8ff;
+  padding-left: 16px;
+}
+
 
 .profile-dropdown-container {
   position: relative;

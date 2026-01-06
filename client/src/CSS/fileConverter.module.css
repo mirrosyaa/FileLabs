@@ -190,6 +190,15 @@
 }
 
 /* PAGE 3: Conversion */
+.conversionBox {
+  background: rgba(255, 255, 255, 0.05);
+  border: 3px dashed rgba(94, 200, 255, 0.4);
+  border-radius: 24px;
+  padding: 50px 40px;
+  backdrop-filter: blur(10px);
+  transition: all 0.3s ease;
+}
+
 .conversionTitle {
   color: #ffffff;
   font-size: 32px;
@@ -205,7 +214,7 @@
   left: 0;
   right: 0;
   bottom: 0;
-  background: rgba(10, 22, 40, 0.95);
+  background: #0a1628;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -221,7 +230,7 @@
   left: 0;
   right: 0;
   bottom: 0;
-  background: rgba(10, 22, 40, 0.95);
+  background: #0a1628;
   display: flex;
   flex-direction: column;
   align-items: center;

@@ -29,10 +29,16 @@ const detectFileType = (file) => {
 
 // Get conversion options based on file type
 const getConversionOptions = (fileType, currentFiles = []) => {
-  // Only document conversions are currently supported
   const options = {
     image: [],
-    audio: [],
+    audio: [
+      { value: 'mp3', label: 'MP3', icon: '🎵' },
+      { value: 'wav', label: 'WAV', icon: '🎵' },
+      { value: 'flac', label: 'FLAC', icon: '🎵' },
+      { value: 'aac', label: 'AAC', icon: '🎵' },
+      { value: 'ogg', label: 'OGG', icon: '🎵' },
+      { value: 'm4a', label: 'M4A', icon: '🎵' },
+    ],
     video: [],
     document: [
       { value: 'pdf', label: 'PDF', icon: '📄' },
@@ -220,14 +226,10 @@ function FileConverter() {
       clearInterval(progressInterval);
       setConversionProgress(100);
       
-      // Small delay to show 100% before moving to download page
-      setTimeout(() => {
-        setFadeIn(false);
-        setTimeout(() => {
-          setPage(4);
-          setFadeIn(true);
-        }, 300);
-      }, 500);
+      // Switch to download page immediately
+      setIsConverting(false);
+      setPage(4);
+      setFadeIn(true);
     } catch (err) {
       clearInterval(progressInterval);
       setConversionProgress(0);
@@ -351,12 +353,6 @@ function FileConverter() {
           {/* PAGE 3: Choose Conversion */}
           {page === 3 && (
             <div className={`${styles.pageContainer} ${fadeIn ? styles.fadeIn : styles.fadeOut}`}>
-              <button className={styles.backLink} onClick={handleReset}>
-                ← Back to upload
-              </button>
-              
-              <h2 className={styles.conversionTitle}>Convert To</h2>
-              
               {/* Conversion Loading Overlay */}
               {isConverting && (
                 <div className={styles.convertingOverlay}>
@@ -371,47 +367,54 @@ function FileConverter() {
                   <p className={styles.progressText}>{conversionProgress}%</p>
                 </div>
               )}
-              
-              {hasMixedTypes && (
-                <div className={styles.warningBox}>
-                  ⚠️ Mixed file types detected. Please upload one type at a time.
-                </div>
-              )}
+
+              <div className={styles.conversionBox}>
+                <button className={styles.backLink} onClick={handleReset}>
+                  ← Back to upload
+                </button>
+                
+                <h2 className={styles.conversionTitle}>Convert To</h2>
+                
+                {hasMixedTypes && (
+                  <div className={styles.warningBox}>
+                    ⚠️ Mixed file types detected. Please upload one type at a time.
+                  </div>
+                )}
 
 
-              {!hasMixedTypes && primaryFileType && primaryFileType !== 'unknown' && (
-                <>
-                  {getConversionOptions(primaryFileType, files).length > 0 ? (
-                    <div className={styles.formatOptions}>
-                      <div className={styles.formatButtons}>
-                        {getConversionOptions(primaryFileType, files).map((format) => (
-                          <button
-                            key={format.value}
-                            className={`${styles.formatOption} ${selectedFormat === format.value ? styles.selectedFormat : ''}`}
-                            onClick={() => setSelectedFormat(format.value)}
-                          >
-                            <span className={styles.formatIcon}>{format.icon}</span>
-                            <span className={styles.formatName}>{format.label}</span>
-                          </button>
-                        ))}
+                {!hasMixedTypes && primaryFileType && primaryFileType !== 'unknown' && (
+                  <>
+                    {getConversionOptions(primaryFileType, files).length > 0 ? (
+                      <div className={styles.formatOptions}>
+                        <div className={styles.formatButtons}>
+                          {getConversionOptions(primaryFileType, files).map((format) => (
+                            <button
+                              key={format.value}
+                              className={`${styles.formatOption} ${selectedFormat === format.value ? styles.selectedFormat : ''}`}
+                              onClick={() => setSelectedFormat(format.value)}
+                            >
+                              <span className={styles.formatIcon}>{format.icon}</span>
+                              <span className={styles.formatName}>{format.label}</span>
+                            </button>
+                          ))}
+                        </div>
                       </div>
-                    </div>
-                  ) : (
-                    <div className={styles.errorBox}>
-                      ❌ {primaryFileType === 'document' 
-                        ? 'No conversion options available. File is already in this format.'
-                        : 'Only document conversions are currently supported (PDF, DOCX, TXT, RTF, HTML).'}
-                    </div>
-                  )}
+                    ) : (
+                      <div className={styles.errorBox}>
+                        ❌ {primaryFileType === 'document' || primaryFileType === 'audio'
+                          ? 'No conversion options available. File is already in this format.'
+                          : 'Only document and audio conversions are currently supported.'}
+                      </div>
+                    )}
 
-                  <div className={styles.filesDisplay}>
-                    <div className={styles.filesHeader}>Selected Files:</div>
-                    {Object.entries(fileTypes).map(([type, typeFiles]) => (
-                      <div key={type} className={styles.fileTypeSection}>
-                        <div className={styles.fileTypeLabel}>
-                          {type === 'image' && '🖼️'}
-                          {type === 'audio' && '🎵'}
-                          {type === 'video' && '🎬'}
+                    <div className={styles.filesDisplay}>
+                      <div className={styles.filesHeader}>Selected Files:</div>
+                      {Object.entries(fileTypes).map(([type, typeFiles]) => (
+                        <div key={type} className={styles.fileTypeSection}>
+                          <div className={styles.fileTypeLabel}>
+                            {type === 'image' && '🖼️'}
+                            {type === 'audio' && '🎵'}
+                            {type === 'video' && '🎬'}
                           {type === 'document' && '📄'}
                           {type === 'unknown' && '❓'}
                           {' '}
@@ -449,7 +452,7 @@ function FileConverter() {
 
               {(primaryFileType === 'unknown' && !hasMixedTypes) && (
                 <div className={styles.errorBox}>
-                  ❌ Unsupported file type. Please upload document files (PDF, DOCX, TXT, RTF, HTML).
+                  ❌ Unsupported file type. Please upload document or audio files.
                 </div>
               )}
 
@@ -458,6 +461,7 @@ function FileConverter() {
                   ❌ {error}
                 </div>
               )}
+              </div>
             </div>
           )}
 
