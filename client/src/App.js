@@ -11,6 +11,7 @@ import AdminRouteProtector from "./Authentication/AdminRouteProtector";
 import LoginPage from "./pages/login";
 import HomePage from "./pages/homePage";
 import AdminDashboard from "./pages/adminDashboard";
+import FileConverter from "./pages/fileConverter";
 import LoadingScreen from "./pages/loadingScreen";
 import Navbar from "./components/navbar";
 import { useAuth } from "./Authentication/authProvider";
@@ -74,6 +75,14 @@ function AppContent() {
             element={
               <RouteProtector>
                 <HomePage />
+              </RouteProtector>
+            }
+          />
+          <Route
+            path="/file-converter"
+            element={
+              <RouteProtector>
+                <FileConverter />
               </RouteProtector>
             }
           />

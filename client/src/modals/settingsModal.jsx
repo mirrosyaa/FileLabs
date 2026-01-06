@@ -5,7 +5,7 @@ import defaultPhoto from "../media/defaultProfile.jpg";
 
 function SettingsModal({ isOpen, onClose }) {
   const [profilePhoto, setProfilePhoto] = useState(defaultPhoto);
-  const [username, setUsername] = useState("");
+  const [username, setUsername] = useState("Guest");
   const [email, setEmail] = useState("");
 
   // Account details form state
@@ -22,14 +22,20 @@ function SettingsModal({ isOpen, onClose }) {
 
   // Closing animation state
   const [isClosing, setIsClosing] = useState(false);
+  
   useEffect(() => {
+    console.log("Settings modal isOpen:", isOpen);
     if (isOpen) {
+      // Set defaults immediately
+      setProfilePhoto(defaultPhoto);
+      
       // Fetch user profile data when modal opens
       const fetchUserData = async () => {
         try {
           // Get user profile info
           const profileResponse = await axios.get(
-            "http://localhost:3001/users/profile"
+            "http://localhost:3001/users/profile",
+            { timeout: 5000 }
           );
           const user = profileResponse.data.user;
           setUsername(user.username);
@@ -40,12 +46,15 @@ function SettingsModal({ isOpen, onClose }) {
           // Get user profile photo
           const photoResponse = await axios.get(
             "http://localhost:3001/users/my-profile-photo",
-            { responseType: "blob" }
+            { responseType: "blob", timeout: 5000 }
           );
           const photoUrl = URL.createObjectURL(photoResponse.data);
           setProfilePhoto(photoUrl);
         } catch (err) {
-          console.log("Error loading profile data:", err);
+          // Silently fail for auth errors, keep defaults
+          if (err.response?.status !== 401 && err.response?.status !== 403) {
+            console.log("Error loading profile data:", err);
+          }
           setProfilePhoto(defaultPhoto);
         }
       };

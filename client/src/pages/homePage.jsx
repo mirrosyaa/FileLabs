@@ -1,23 +1,39 @@
 import { React, useState, useEffect } from "react";
-import Boxes from "../components/boxes";
+import Navbar from "../components/navbar";
 import Footer from "../components/footer";
+import WelcomeSection from "../components/WelcomeSection";
+import FileTypeCards from "../components/FileTypeCards";
+import CommonActions from "../components/CommonActions";
 import axios from "axios";
 import styles from "../CSS/homePage.module.css";
 
 function HomePage() {
-  const [username, setUsername] = useState("");
+  const [username, setUsername] = useState("Guest");
   const [greeting, setGreeting] = useState("");
+  const [stats, setStats] = useState({
+    myFiles: 0,
+    sharedFiles: 0,
+    starredFiles: 0,
+    storageUsed: 0,
+  });
 
   // Function to fetch username
   const fetchUsername = async () => {
     try {
-      const response = await axios.get("http://localhost:3001/users/profile");
+      const response = await axios.get("http://localhost:3001/users/profile", {
+        timeout: 5000
+      });
       setUsername(response.data.user.username);
     } catch (error) {
-      console.error("Error fetching username:", error);
+      // Silently fail for auth errors - keep default "Guest"
+      if (error.response?.status !== 401 && error.response?.status !== 403) {
+        console.error("Error fetching username:", error);
+      }
+      setUsername("Guest");
     }
   };
 
+  // Mock data for dashboard - replace with actual API calls later
   useEffect(() => {
     // Determine greeting based on time
     const determineGreeting = () => {
@@ -33,6 +49,14 @@ function HomePage() {
 
     fetchUsername();
     determineGreeting();
+
+    // Mock stats - replace with actual API
+    setStats({
+      myFiles: 156,
+      sharedFiles: 23,
+      starredFiles: 8,
+      storageUsed: 4.2,
+    });
   }, []);
 
   // Listen for username updates from settings modal
@@ -51,12 +75,10 @@ function HomePage() {
 
   return (
     <div className={styles["home-page-wrapper"]}>
-      <div className={styles["greeting-header"]}>
-        <h1>
-          {greeting}, {username || "User"}
-        </h1>
-      </div>
-      <Boxes />
+      <Navbar />
+      <WelcomeSection greeting={greeting} username={username} />
+      <FileTypeCards />
+      <CommonActions />
       <Footer />
     </div>
   );

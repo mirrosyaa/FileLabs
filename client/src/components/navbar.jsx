@@ -8,8 +8,10 @@ import SettingsModal from "../modals/settingsModal";
 import LogoutModal from "../modals/logoutModal";
 
 function Navbar() {
-  const [profilePhoto, setProfilePhoto] = useState(defaultPhoto);
+  const [profilePhoto, setProfilePhoto] = useState(null);
   const [dropdownOpen, setDropdownOpen] = useState(false);
+  const [toolsDropdownOpen, setToolsDropdownOpen] = useState(false);
+  const [hoveredCategory, setHoveredCategory] = useState(null);
   const [settingsModalOpen, setSettingsModalOpen] = useState(false);
   const [logoutModalOpen, setLogoutModalOpen] = useState(false);
   const { setToken } = useAuth();
@@ -27,8 +29,13 @@ function Navbar() {
       const photoUrl = URL.createObjectURL(response.data);
       setProfilePhoto(photoUrl);
     } catch (err) {
-      console.error("Error fetching profile photo:", err);
-      setProfilePhoto(defaultPhoto);
+      // Silently fail for auth errors - user not logged in
+      if (err.response?.status === 401 || err.response?.status === 403) {
+        setProfilePhoto(defaultPhoto);
+      } else {
+        console.error("Error fetching profile photo:", err);
+        setProfilePhoto(defaultPhoto);
+      }
     }
   };
 
@@ -38,7 +45,10 @@ function Navbar() {
       const response = await axios.get("http://localhost:3001/users/profile");
       setUserType(response.data.user.user_type);
     } catch (err) {
-      console.error("Error fetching user profile:", err);
+      // Silently fail for auth errors - user not logged in
+      if (err.response?.status !== 401 && err.response?.status !== 403) {
+        console.error("Error fetching user profile:", err);
+      }
     }
   };
 
@@ -62,25 +72,49 @@ function Navbar() {
     };
   }, []);
 
-  const toggleDropdown = () => {
-    setDropdownOpen(!dropdownOpen);
+  const toggleDropdown = (e) => {
+    if (e) e.stopPropagation();
+    const newState = !dropdownOpen;
+    console.log("Toggle dropdown - New state will be:", newState);
+    setDropdownOpen(newState);
   };
 
-  const handleLogoutClick = () => {
+  const toggleToolsDropdown = (e) => {
+    if (e) e.stopPropagation();
+    setToolsDropdownOpen(!toolsDropdownOpen);
+  };
+
+  const handleLogoutClick = (e) => {
+    if (e) e.stopPropagation();
+    console.log("Logout clicked - Opening logout modal");
     setLogoutModalOpen(true);
     setDropdownOpen(false);
   };
 
+  const handleSettingsClick = (e) => {
+    if (e) e.stopPropagation();
+    console.log("Settings clicked - Opening settings modal");
+    setSettingsModalOpen(true);
+    setDropdownOpen(false);
+  };
+
   const confirmLogout = () => {
+    console.log("Confirm logout - Clearing token and redirecting");
     setToken(null); // Clear the token
     navigate("/"); // Redirect to login page
   };
+
+  console.log("Navbar render - settingsModalOpen:", settingsModalOpen, "logoutModalOpen:", logoutModalOpen, "dropdownOpen:", dropdownOpen);
 
   useEffect(() => {
     const handleClickOutside = (event) => {
       const dropdownContainer = document.querySelector(
         `.${styles["profile-dropdown-container"]}`
       );
+      const toolsContainer = document.querySelector(
+        `.${styles["tools-dropdown-container"]}`
+      );
+      
       if (
         dropdownOpen &&
         dropdownContainer &&
@@ -88,13 +122,21 @@ function Navbar() {
       ) {
         setDropdownOpen(false);
       }
+      
+      if (
+        toolsDropdownOpen &&
+        toolsContainer &&
+        !toolsContainer.contains(event.target)
+      ) {
+        setToolsDropdownOpen(false);
+      }
     };
 
     document.addEventListener("mousedown", handleClickOutside);
     return () => {
       document.removeEventListener("mousedown", handleClickOutside);
     };
-  }, [dropdownOpen]);
+  }, [dropdownOpen, toolsDropdownOpen]);
 
   return (
     <nav className={styles.navbar}>
@@ -103,7 +145,12 @@ function Navbar() {
       </div>
 
       <div className={styles["nav-center"]}>
-        <button className={styles["nav-button"]}>
+        <Link
+          to="/file-converter"
+          className={`${styles["nav-button"]} ${
+            location.pathname === "/file-converter" ? styles["active"] : ""
+          }`}
+        >
           <div className={styles["icon-circle"]}>
             <svg
               xmlns="http://www.w3.org/2000/svg"
@@ -121,8 +168,8 @@ function Navbar() {
               <line x1="12" y1="3" x2="12" y2="15" />
             </svg>
           </div>
-          <span className={styles["button-label"]}>Upload</span>
-        </button>
+          <span className={styles["button-label"]}>File Converter</span>
+        </Link>
         <button className={styles["nav-button"]}>
           <div className={styles["icon-circle"]}>
             <svg
@@ -205,13 +252,127 @@ function Navbar() {
       </div>
 
       <div className={styles["nav-right"]}>
+        {/* Tools Dropdown */}
+        <div className={styles["tools-dropdown-container"]}>
+          <button 
+            className={`${styles["nav-button"]} ${styles["tools-button"]}`}
+            onClick={toggleToolsDropdown}
+          >
+            <span className={styles["button-label"]}>Tools</span>
+            <span className={styles["dropdown-arrow"]}>{toolsDropdownOpen ? '▲' : '▼'}</span>
+          </button>
+
+          {toolsDropdownOpen && (
+            <div className={styles["tools-dropdown"]}>
+              <div className={styles["tools-section"]}>
+                <div 
+                  className={styles["tools-category"]}
+                  onMouseEnter={() => setHoveredCategory('images')}
+                  onMouseLeave={() => setHoveredCategory(null)}
+                >
+                  <div className={styles["category-header"]}>
+                    <span className={styles["category-icon"]}>🖼️</span>
+                    <span className={styles["category-title"]}>Image Tools</span>
+                  </div>
+                  {hoveredCategory === 'images' && (
+                    <div className={styles["category-links"]}>
+                      <Link to="/tools/images/convert" className={styles["tool-link"]} onClick={() => setToolsDropdownOpen(false)}>Convert</Link>
+                      <Link to="/tools/images/compress" className={styles["tool-link"]} onClick={() => setToolsDropdownOpen(false)}>Compress/Optimize</Link>
+                      <Link to="/tools/images/resize" className={styles["tool-link"]} onClick={() => setToolsDropdownOpen(false)}>Resize</Link>
+                      <Link to="/tools/images/crop" className={styles["tool-link"]} onClick={() => setToolsDropdownOpen(false)}>Crop</Link>
+                      <Link to="/tools/images/metadata" className={styles["tool-link"]} onClick={() => setToolsDropdownOpen(false)}>Add Metadata</Link>
+                      <Link to="/tools/images/watermark" className={styles["tool-link"]} onClick={() => setToolsDropdownOpen(false)}>Add Watermarks</Link>
+                    </div>
+                  )}
+                </div>
+
+                <div 
+                  className={styles["tools-category"]}
+                  onMouseEnter={() => setHoveredCategory('video')}
+                  onMouseLeave={() => setHoveredCategory(null)}
+                >
+                  <div className={styles["category-header"]}>
+                    <span className={styles["category-icon"]}>🎬</span>
+                    <span className={styles["category-title"]}>Video Tools</span>
+                  </div>
+                  {hoveredCategory === 'video' && (
+                    <div className={styles["category-links"]}>
+                      <Link to="/tools/video/convert" className={styles["tool-link"]} onClick={() => setToolsDropdownOpen(false)}>Convert</Link>
+                      <Link to="/tools/video/compress" className={styles["tool-link"]} onClick={() => setToolsDropdownOpen(false)}>Compress</Link>
+                      <Link to="/tools/video/cut" className={styles["tool-link"]} onClick={() => setToolsDropdownOpen(false)}>Cut/Trim</Link>
+                      <Link to="/tools/video/merge" className={styles["tool-link"]} onClick={() => setToolsDropdownOpen(false)}>Merge</Link>
+                      <Link to="/tools/video/resolution" className={styles["tool-link"]} onClick={() => setToolsDropdownOpen(false)}>Change Resolution</Link>
+                      <Link to="/tools/video/extract-audio" className={styles["tool-link"]} onClick={() => setToolsDropdownOpen(false)}>Extract Audio</Link>
+                      <Link to="/tools/video/auto-split" className={styles["tool-link"]} onClick={() => setToolsDropdownOpen(false)}>Auto Split</Link>
+                    </div>
+                  )}
+                </div>
+
+                <div 
+                  className={styles["tools-category"]}
+                  onMouseEnter={() => setHoveredCategory('audio')}
+                  onMouseLeave={() => setHoveredCategory(null)}
+                >
+                  <div className={styles["category-header"]}>
+                    <span className={styles["category-icon"]}>🎵</span>
+                    <span className={styles["category-title"]}>Audio Tools</span>
+                  </div>
+                  {hoveredCategory === 'audio' && (
+                    <div className={styles["category-links"]}>
+                      <Link to="/file-converter" className={styles["tool-link"]} onClick={() => setToolsDropdownOpen(false)}>Convert</Link>
+                      <Link to="/tools/audio/trim" className={styles["tool-link"]} onClick={() => setToolsDropdownOpen(false)}>Trim</Link>
+                      <Link to="/tools/audio/merge" className={styles["tool-link"]} onClick={() => setToolsDropdownOpen(false)}>Merge</Link>
+                      <Link to="/tools/audio/compress" className={styles["tool-link"]} onClick={() => setToolsDropdownOpen(false)}>Compress</Link>
+                      <Link to="/tools/audio/metadata" className={styles["tool-link"]} onClick={() => setToolsDropdownOpen(false)}>Edit Metadata</Link>
+                      <Link to="/tools/audio/normalize" className={styles["tool-link"]} onClick={() => setToolsDropdownOpen(false)}>Normalize Volume</Link>
+                    </div>
+                  )}
+                </div>
+
+                <div 
+                  className={styles["tools-category"]}
+                  onMouseEnter={() => setHoveredCategory('documents')}
+                  onMouseLeave={() => setHoveredCategory(null)}
+                >
+                  <div className={styles["category-header"]}>
+                    <span className={styles["category-icon"]}>📄</span>
+                    <span className={styles["category-title"]}>Document Tools</span>
+                  </div>
+                  {hoveredCategory === 'documents' && (
+                    <div className={styles["category-links"]}>
+                      <Link to="/file-converter" className={styles["tool-link"]} onClick={() => setToolsDropdownOpen(false)}>Convert</Link>
+                      <Link to="/tools/documents/compress-pdf" className={styles["tool-link"]} onClick={() => setToolsDropdownOpen(false)}>Compress PDF</Link>
+                      <Link to="/tools/documents/merge-pdf" className={styles["tool-link"]} onClick={() => setToolsDropdownOpen(false)}>Merge PDF</Link>
+                      <Link to="/tools/documents/download-url" className={styles["tool-link"]} onClick={() => setToolsDropdownOpen(false)}>Download from URL</Link>
+                      <Link to="/tools/documents/auto-rename" className={styles["tool-link"]} onClick={() => setToolsDropdownOpen(false)}>Auto Rename</Link>
+                      <Link to="/tools/documents/extract-images" className={styles["tool-link"]} onClick={() => setToolsDropdownOpen(false)}>Extract Images</Link>
+                    </div>
+                  )}
+                </div>
+              </div>
+            </div>
+          )}
+        </div>
+
         <div className={styles["profile-dropdown-container"]}>
-          <img
-            src={profilePhoto}
-            alt="profile"
+          <div
             className={styles["profile-photo"]}
             onClick={toggleDropdown}
-          />
+            style={{
+              backgroundImage: profilePhoto ? `url(${profilePhoto})` : `url(${defaultPhoto})`,
+              backgroundSize: 'cover',
+              backgroundPosition: 'center',
+              backgroundColor: '#4a5568',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              color: 'white',
+              fontSize: '24px',
+              fontWeight: 'bold'
+            }}
+          >
+            {!profilePhoto && !defaultPhoto && '👤'}
+          </div>
 
           {dropdownOpen && (
             <div className={styles["profile-dropdown"]}>
@@ -226,10 +387,7 @@ function Navbar() {
               )}
               <button
                 className={styles["dropdown-item"]}
-                onClick={() => {
-                  setSettingsModalOpen(true);
-                  setDropdownOpen(false);
-                }}
+                onClick={handleSettingsClick}
               >
                 Settings
               </button>
