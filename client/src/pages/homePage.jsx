@@ -10,12 +10,6 @@ import styles from "../CSS/homePage.module.css";
 function HomePage() {
   const [username, setUsername] = useState("Guest");
   const [greeting, setGreeting] = useState("");
-  const [stats, setStats] = useState({
-    myFiles: 0,
-    sharedFiles: 0,
-    starredFiles: 0,
-    storageUsed: 0,
-  });
 
   // Function to fetch username
   const fetchUsername = async () => {
@@ -49,14 +43,6 @@ function HomePage() {
 
     fetchUsername();
     determineGreeting();
-
-    // Mock stats - replace with actual API
-    setStats({
-      myFiles: 156,
-      sharedFiles: 23,
-      starredFiles: 8,
-      storageUsed: 4.2,
-    });
   }, []);
 
   // Listen for username updates from settings modal

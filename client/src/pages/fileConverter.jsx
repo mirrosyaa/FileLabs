@@ -1,75 +1,11 @@
 import React, { useState, useEffect } from "react";
-import Navbar from "../components/navbar";
 import Footer from "../components/footer";
+import UploadPage from "../components/converterPages/UploadPage";
+import UploadingPage from "../components/converterPages/UploadingPage";
+import ConversionPage from "../components/converterPages/ConversionPage";
+import DownloadPage from "../components/converterPages/DownloadPage";
+import { detectFileType } from "../utils/fileConverterHelpers";
 import styles from "../CSS/fileConverter.module.css";
-
-// File type detection helper
-const detectFileType = (file) => {
-  const ext = file.name.split('.').pop().toLowerCase();
-  const mimeType = file.type;
-
-  if (mimeType.startsWith('image/') || ['jpg', 'jpeg', 'png', 'gif', 'webp', 'bmp', 'svg'].includes(ext)) {
-    return 'image';
-  }
-  
-  if (mimeType.startsWith('audio/') || ['mp3', 'wav', 'm4a', 'flac', 'aac', 'ogg'].includes(ext)) {
-    return 'audio';
-  }
-  
-  if (mimeType.startsWith('video/') || ['mp4', 'mov', 'mkv', 'webm', 'avi', 'flv'].includes(ext)) {
-    return 'video';
-  }
-  
-  if (['pdf', 'doc', 'docx', 'txt', 'rtf', 'html'].includes(ext)) {
-    return 'document';
-  }
-  
-  return 'unknown';
-};
-
-// Get conversion options based on file type
-const getConversionOptions = (fileType, currentFiles = []) => {
-  const options = {
-    image: [],
-    audio: [
-      { value: 'mp3', label: 'MP3', icon: '🎵' },
-      { value: 'wav', label: 'WAV', icon: '🎵' },
-      { value: 'flac', label: 'FLAC', icon: '🎵' },
-      { value: 'aac', label: 'AAC', icon: '🎵' },
-      { value: 'ogg', label: 'OGG', icon: '🎵' },
-      { value: 'm4a', label: 'M4A', icon: '🎵' },
-    ],
-    video: [],
-    document: [
-      { value: 'pdf', label: 'PDF', icon: '📄' },
-      { value: 'docx', label: 'DOCX', icon: '📄' },
-      { value: 'txt', label: 'TXT', icon: '📄' },
-      { value: 'rtf', label: 'RTF', icon: '📄' },
-      { value: 'html', label: 'HTML', icon: '📄' },
-    ],
-  };
-  
-  let availableOptions = options[fileType] || [];
-  
-  // Filter out the source format(s) from the conversion options
-  if (currentFiles.length > 0) {
-    const sourceFormats = new Set(
-      currentFiles.map(file => {
-        const ext = file.name.split('.').pop().toLowerCase();
-        // Normalize extensions
-        if (ext === 'jpeg') return 'jpg';
-        if (ext === 'doc') return 'docx';
-        return ext;
-      })
-    );
-    
-    availableOptions = availableOptions.filter(
-      option => !sourceFormats.has(option.value)
-    );
-  }
-  
-  return availableOptions;
-};
 
 function FileConverter() {
   const [page, setPage] = useState(1); // 1 = upload, 2 = uploading, 3 = conversion, 4 = complete
@@ -300,236 +236,61 @@ function FileConverter() {
   };
 
   return (
-    <div className={styles.converterPage}>
-      <Navbar />
-      
+    <div className={styles.converterPage}>      
       <main className={styles.converterMain}>
         <div className={styles.converterContent}>
           
           {/* PAGE 1: Upload */}
           {page === 1 && (
-            <div className={`${styles.pageContainer} ${fadeIn ? styles.fadeIn : styles.fadeOut}`}>
-              <h1 className={styles.mainTitle}>File Converter</h1>
-              
-              <div 
-                className={`${styles.uploadBox} ${isDragging ? styles.dragging : ''}`}
-                onDragEnter={handleDragEnter}
-                onDragOver={handleDragOver}
-                onDragLeave={handleDragLeave}
-                onDrop={handleDrop}
-              >
-                <div className={styles.uploadIcon}>📁</div>
-                <p className={styles.uploadText}>Drag & drop files here</p>
-                <label className={styles.browseBtn}>
-                  Browse Files
-                  <input
-                    type="file"
-                    multiple
-                    onChange={handleFileSelect}
-                    style={{ display: 'none' }}
-                  />
-                </label>
-              </div>
-            </div>
+            <UploadPage
+              fadeIn={fadeIn}
+              isDragging={isDragging}
+              onDragEnter={handleDragEnter}
+              onDragOver={handleDragOver}
+              onDragLeave={handleDragLeave}
+              onDrop={handleDrop}
+              onFileSelect={handleFileSelect}
+            />
           )}
 
           {/* PAGE 2: Uploading */}
           {page === 2 && (
-            <div className={`${styles.pageContainer} ${fadeIn ? styles.fadeIn : styles.fadeOut}`}>
-              <div className={styles.uploadingContainer}>
-                <div className={styles.spinner}></div>
-                <p className={styles.uploadingText}>Uploading files...</p>
-                <div className={styles.progressBar}>
-                  <div 
-                    className={styles.progressFill} 
-                    style={{ width: `${uploadProgress}%` }}
-                  ></div>
-                </div>
-                <p className={styles.progressText}>{uploadProgress}%</p>
-              </div>
-            </div>
+            <UploadingPage
+              fadeIn={fadeIn}
+              uploadProgress={uploadProgress}
+            />
           )}
 
           {/* PAGE 3: Choose Conversion */}
           {page === 3 && (
-            <div className={`${styles.pageContainer} ${fadeIn ? styles.fadeIn : styles.fadeOut}`}>
-              {/* Conversion Loading Overlay */}
-              {isConverting && (
-                <div className={styles.convertingOverlay}>
-                  <div className={styles.spinner}></div>
-                  <p className={styles.uploadingText}>Converting files...</p>
-                  <div className={styles.progressBar}>
-                    <div 
-                      className={styles.progressFill} 
-                      style={{ width: `${conversionProgress}%` }}
-                    ></div>
-                  </div>
-                  <p className={styles.progressText}>{conversionProgress}%</p>
-                </div>
-              )}
-
-              <div className={styles.conversionBox}>
-                <button className={styles.backLink} onClick={handleReset}>
-                  ← Back to upload
-                </button>
-                
-                <h2 className={styles.conversionTitle}>Convert To</h2>
-                
-                {hasMixedTypes && (
-                  <div className={styles.warningBox}>
-                    ⚠️ Mixed file types detected. Please upload one type at a time.
-                  </div>
-                )}
-
-
-                {!hasMixedTypes && primaryFileType && primaryFileType !== 'unknown' && (
-                  <>
-                    {getConversionOptions(primaryFileType, files).length > 0 ? (
-                      <div className={styles.formatOptions}>
-                        <div className={styles.formatButtons}>
-                          {getConversionOptions(primaryFileType, files).map((format) => (
-                            <button
-                              key={format.value}
-                              className={`${styles.formatOption} ${selectedFormat === format.value ? styles.selectedFormat : ''}`}
-                              onClick={() => setSelectedFormat(format.value)}
-                            >
-                              <span className={styles.formatIcon}>{format.icon}</span>
-                              <span className={styles.formatName}>{format.label}</span>
-                            </button>
-                          ))}
-                        </div>
-                      </div>
-                    ) : (
-                      <div className={styles.errorBox}>
-                        ❌ {primaryFileType === 'document' || primaryFileType === 'audio'
-                          ? 'No conversion options available. File is already in this format.'
-                          : 'Only document and audio conversions are currently supported.'}
-                      </div>
-                    )}
-
-                    <div className={styles.filesDisplay}>
-                      <div className={styles.filesHeader}>Selected Files:</div>
-                      {Object.entries(fileTypes).map(([type, typeFiles]) => (
-                        <div key={type} className={styles.fileTypeSection}>
-                          <div className={styles.fileTypeLabel}>
-                            {type === 'image' && '🖼️'}
-                            {type === 'audio' && '🎵'}
-                            {type === 'video' && '🎬'}
-                          {type === 'document' && '📄'}
-                          {type === 'unknown' && '❓'}
-                          {' '}
-                          {type.charAt(0).toUpperCase() + type.slice(1)} ({typeFiles.length})
-                        </div>
-                        <div className={styles.fileNames}>
-                          {typeFiles.map((file, idx) => (
-                            <div key={idx} className={styles.fileName}>{file.name}</div>
-                          ))}
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-
-                  {selectedFormat && getConversionOptions(primaryFileType, files).length > 0 && (
-                    <button 
-                      className={`${styles.convertButton} ${styles.slideIn}`}
-                      onClick={handleConvert}
-                      disabled={isConverting}
-                    >
-                      {isConverting ? (
-                        <>
-                          <span className={styles.buttonSpinner}></span>
-                          Converting...
-                        </>
-                      ) : (
-                        <>
-                          Convert to {selectedFormat.toUpperCase()}
-                        </>
-                      )}
-                    </button>
-                  )}
-                </>
-              )}
-
-              {(primaryFileType === 'unknown' && !hasMixedTypes) && (
-                <div className={styles.errorBox}>
-                  ❌ Unsupported file type. Please upload document or audio files.
-                </div>
-              )}
-
-              {error && (
-                <div className={styles.errorBox}>
-                  ❌ {error}
-                </div>
-              )}
-              </div>
-            </div>
+            <ConversionPage
+              fadeIn={fadeIn}
+              isConverting={isConverting}
+              conversionProgress={conversionProgress}
+              hasMixedTypes={hasMixedTypes}
+              primaryFileType={primaryFileType}
+              files={files}
+              fileTypes={fileTypes}
+              selectedFormat={selectedFormat}
+              setSelectedFormat={setSelectedFormat}
+              handleConvert={handleConvert}
+              handleReset={handleReset}
+              error={error}
+            />
           )}
 
           {/* PAGE 4: Download */}
           {page === 4 && (
-            <div className={`${styles.pageContainer} ${fadeIn ? styles.fadeIn : styles.fadeOut}`}>
-              {/* Download Loading Overlay */}
-              {isDownloading && (
-                <div className={styles.downloadingOverlay}>
-                  <div className={styles.spinner}></div>
-                  <p className={styles.uploadingText}>Downloading file...</p>
-                  <div className={styles.progressBar}>
-                    <div 
-                      className={styles.progressFill} 
-                      style={{ width: `${downloadProgress}%` }}
-                    ></div>
-                  </div>
-                  <p className={styles.progressText}>{downloadProgress}%</p>
-                </div>
-              )}
-
-              <div className={styles.successContainer}>
-                <div className={styles.successIconWrapper}>
-                  <div className={styles.successIconCircle}>
-                    <div className={styles.successIcon}>✓</div>
-                  </div>
-                </div>
-                {!hasDownloaded ? (
-                  <>
-                    <h2 className={styles.successTitle}>Conversion Complete!</h2>
-                    <p className={styles.successMessage}>Your file has been successfully converted</p>
-                  </>
-                ) : (
-                  <h2 className={styles.successTitle}>File Downloaded Successfully!</h2>
-                )}
-                
-                <div className={styles.downloadFileInfo}>
-                  <div className={styles.fileInfoIcon}>📄</div>
-                  <div className={styles.fileInfoText}>
-                    <div className={styles.fileName}>{downloadFilename}</div>
-                    <div className={styles.fileFormat}>Format: {selectedFormat.toUpperCase()}</div>
-                  </div>
-                </div>
-
-                {!hasDownloaded && (
-                  <button 
-                    className={styles.downloadButton} 
-                    onClick={handleDownload}
-                    disabled={isDownloading}
-                  >
-                    {isDownloading ? (
-                      <>
-                        <span className={styles.buttonSpinner}></span>
-                        Downloading...
-                      </>
-                    ) : (
-                      <>
-                        <span className={styles.downloadIcon}>⬇</span>
-                        Download File
-                      </>
-                    )}
-                  </button>
-                )}
-                <button className={styles.newConversionBtn} onClick={handleReset}>
-                  ← Convert Another File
-                </button>
-              </div>
-            </div>
+            <DownloadPage
+              fadeIn={fadeIn}
+              isDownloading={isDownloading}
+              downloadProgress={downloadProgress}
+              hasDownloaded={hasDownloaded}
+              downloadFilename={downloadFilename}
+              selectedFormat={selectedFormat}
+              handleDownload={handleDownload}
+              handleReset={handleReset}
+            />
           )}
 
         </div>
