@@ -1,5 +1,5 @@
 import React from "react";
-import styles from "../../CSS/fileConverter.module.css";
+import styles from "../../CSS/Pages/fileConverter.module.css";
 import { getConversionOptions } from "../../utils/fileConverterHelpers";
 
 function ConversionPage({ 

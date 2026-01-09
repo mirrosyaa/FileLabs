@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
-import styles from "../CSS/userDetailsModal.module.css";
+import styles from "../CSS/Modals/userDetailsModal.module.css";
 import defaultPhoto from "../media/defaultProfile.jpg";
 
 function UserDetailsModal({

@@ -1,5 +1,5 @@
 import React from "react";
-import styles from "../../CSS/fileConverter.module.css";
+import styles from "../../CSS/Pages/fileConverter.module.css";
 
 function UploadingPage({ fadeIn, uploadProgress }) {
   return (

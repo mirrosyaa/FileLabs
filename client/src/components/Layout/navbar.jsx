@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import styles from "../../CSS/navbar.module.css";
+import styles from "../../CSS/Layout/navbar.module.css";
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import axios from "axios";
 import defaultPhoto from "../../media/defaultProfile.jpg";

@@ -1,11 +1,10 @@
 import { React, useState, useEffect } from "react";
-import Navbar from "../components/Layout/navbar";
 import Footer from "../components/Layout/footer";
 import WelcomeSection from "../components/HomePage/WelcomeSection";
 import FileTypeCards from "../components/HomePage/FileTypeCards";
 import CommonActions from "../components/HomePage/CommonActions";
 import axios from "axios";
-import styles from "../CSS/homePage.module.css";
+import styles from "../CSS/Pages/homePage.module.css";
 
 function HomePage() {
   const [username, setUsername] = useState("Guest");

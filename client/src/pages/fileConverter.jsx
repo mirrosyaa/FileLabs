@@ -5,7 +5,7 @@ import UploadingPage from "./converterPages/UploadingPage";
 import ConversionPage from "./converterPages/ConversionPage";
 import DownloadPage from "./converterPages/DownloadPage";
 import { detectFileType } from "../utils/fileConverterHelpers";
-import styles from "../CSS/fileConverter.module.css";
+import styles from "../CSS/Pages/fileConverter.module.css";
 
 function FileConverter() {
   const [page, setPage] = useState(1); // 1 = upload, 2 = uploading, 3 = conversion, 4 = complete

@@ -1,6 +1,6 @@
 import React from "react";
-import StatCard from "./StatCard";
-import styles from "../CSS/homePage.module.css";
+import StatCard from "../Cards/StatCard";
+import styles from "../../CSS/Pages/homePage.module.css";
 
 function StatsContainer({ stats }) {
   return (

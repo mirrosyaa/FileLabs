@@ -2,7 +2,7 @@ import React, { useState, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../../Authentication/authProvider";
 import axios from "axios";
-import styles from "../../CSS/login.module.css";
+import styles from "../../CSS/Pages/login.module.css";
 
 function LoginForm() {
   const navigate = useNavigate();

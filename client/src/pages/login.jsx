@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import LoginForm from "../components/Forms/loginForm";
-import styles from "../CSS/login.module.css";
+import styles from "../CSS/Pages/login.module.css";
 
 function LoginPage() {
   const [fadeOut, setFadeOut] = useState(false);

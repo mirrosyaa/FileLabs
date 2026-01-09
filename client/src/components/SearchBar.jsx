@@ -1,5 +1,5 @@
 import React from "react";
-import styles from "../CSS/adminDashboard.module.css";
+import styles from "../CSS/Pages/adminDashboard.module.css";
 
 function SearchBar({ searchTerm, setSearchTerm }) {
   return (

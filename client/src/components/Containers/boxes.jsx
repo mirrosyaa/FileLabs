@@ -1,5 +1,5 @@
 import React from "react";
-import styles from "../CSS/boxes.module.css";
+import styles from "../../CSS/Components/boxes.module.css";
 
 function Boxes() {
   return (

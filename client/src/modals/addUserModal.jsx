@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import axios from "axios";
-import styles from "../CSS/addUserModal.module.css";
+import styles from "../CSS/Modals/addUserModal.module.css";
 
 function AddUserModal({ isOpen, onClose, onUserAdded }) {
   const [username, setUsername] = useState("");
