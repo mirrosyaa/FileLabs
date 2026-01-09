@@ -1,6 +1,6 @@
 /* Welcome Section */
 .welcomeSection {
-  padding: 110px 7% 40px;
+  padding: 4% 7% 2%;
   background: linear-gradient(135deg, #0a1628 0%, #1a2942 100%);
   text-align: center;
 }
@@ -37,7 +37,7 @@
 /* Responsive Design */
 @media (max-width: 768px) {
   .welcomeSection {
-    padding: 120px 5% 40px;
+    padding: 5% 5% 5%;
   }
 
   .greeting {

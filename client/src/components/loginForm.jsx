@@ -1,4 +1,3 @@
-// ...existing code...
 import React, { useState, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../Authentication/authProvider";

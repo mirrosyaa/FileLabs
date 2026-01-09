@@ -21,7 +21,7 @@ function HomePage() {
   const fetchUsername = async () => {
     try {
       const response = await axios.get("http://localhost:3001/users/profile", {
-        timeout: 5000
+        timeout: 5000,
       });
       setUsername(response.data.user.username);
     } catch (error) {
@@ -75,10 +75,8 @@ function HomePage() {
 
   return (
     <div className={styles["home-page-wrapper"]}>
-      <Navbar />
       <WelcomeSection greeting={greeting} username={username} />
       <FileTypeCards />
-      <CommonActions />
       <Footer />
     </div>
   );

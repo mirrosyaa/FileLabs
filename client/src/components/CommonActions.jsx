@@ -8,18 +8,18 @@ function CommonActions() {
   const navigate = useNavigate();
 
   const commonActions = [
-    { name: "Convert", icon: "🔄" },
-    { name: "Compress", icon: "📦" },
-    { name: "Merge", icon: "🔗" },
-    { name: "Cut", icon: "✂️" },
-    { name: "Resize", icon: "📐" },
+    { name: "Convert", icon: "" },
+    { name: "Compress", icon: "" },
+    { name: "Merge", icon: "" },
+    { name: "Cut", icon: "" },
+    { name: "Resize", icon: "" },
   ];
 
   const fileTypeOptions = [
-    { type: "Documents", icon: "📄", path: "/tools/documents/" },
-    { type: "Images", icon: "🖼️", path: "/tools/images/" },
-    { type: "Audio", icon: "🎵", path: "/tools/audio/" },
-    { type: "Video", icon: "🎬", path: "/tools/video/" },
+    { type: "Documents", icon: "", path: "/tools/documents/" },
+    { type: "Images", icon: "", path: "/tools/images/" },
+    { type: "Audio", icon: "", path: "/tools/audio/" },
+    { type: "Video", icon: "", path: "/tools/video/" },
   ];
 
   const handleActionClick = (action) => {
@@ -60,7 +60,10 @@ function CommonActions() {
       {/* Modal for file type selection */}
       {showModal && (
         <div className={styles.modalOverlay} onClick={closeModal}>
-          <div className={styles.modalContent} onClick={(e) => e.stopPropagation()}>
+          <div
+            className={styles.modalContent}
+            onClick={(e) => e.stopPropagation()}
+          >
             <button className={styles.closeButton} onClick={closeModal}>
               ×
             </button>
@@ -68,7 +71,8 @@ function CommonActions() {
               Select File Type for {selectedAction?.name}
             </h3>
             <p className={styles.modalSubtitle}>
-              Choose what type of files you want to {selectedAction?.name.toLowerCase()}
+              Choose what type of files you want to{" "}
+              {selectedAction?.name.toLowerCase()}
             </p>
             <div className={styles.fileTypeGrid}>
               {fileTypeOptions.map((fileType, index) => (

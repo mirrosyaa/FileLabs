@@ -4,12 +4,11 @@ import styles from "../CSS/fileTypeCards.module.css";
 
 function FileTypeCards() {
   const navigate = useNavigate();
-  const [hoveredCard, setHoveredCard] = useState(null);
 
   const fileTypes = [
     {
       title: "Documents",
-      icon: "📄",
+      icon: "",
       color: "#4a9fd8",
       actions: [
         { name: "Convert", path: "/file-converter" },
@@ -22,7 +21,7 @@ function FileTypeCards() {
     },
     {
       title: "Images",
-      icon: "🖼️",
+      icon: "",
       color: "#e91e63",
       actions: [
         { name: "Convert", path: "/tools/images/convert" },
@@ -35,7 +34,7 @@ function FileTypeCards() {
     },
     {
       title: "Audio",
-      icon: "🎵",
+      icon: "",
       color: "#9c27b0",
       actions: [
         { name: "Convert", path: "/file-converter" },
@@ -48,7 +47,7 @@ function FileTypeCards() {
     },
     {
       title: "Video",
-      icon: "🎬",
+      icon: "",
       color: "#ff9800",
       actions: [
         { name: "Convert", path: "/tools/video/convert" },
@@ -68,33 +67,27 @@ function FileTypeCards() {
 
   return (
     <div className={styles.fileTypeSection}>
-      <h2 className={styles.sectionTitle}>Choose a File Type</h2>
       <div className={styles.cardsGrid}>
         {fileTypes.map((type, index) => (
           <div
             key={index}
             className={styles.card}
             style={{ "--card-color": type.color }}
-            onMouseEnter={() => setHoveredCard(index)}
-            onMouseLeave={() => setHoveredCard(null)}
           >
             <div className={styles.cardHeader}>
-              <span className={styles.cardIcon}>{type.icon}</span>
               <h3 className={styles.cardTitle}>{type.title}</h3>
             </div>
-            {hoveredCard === index && (
-              <div className={styles.actionsGrid}>
-                {type.actions.map((action, actionIndex) => (
-                  <button
-                    key={actionIndex}
-                    className={styles.actionButton}
-                    onClick={() => handleActionClick(action.path)}
-                  >
-                    {action.name}
-                  </button>
-                ))}
-              </div>
-            )}
+            <div className={styles.actionsGrid}>
+              {type.actions.map((action, actionIndex) => (
+                <button
+                  key={actionIndex}
+                  className={styles.actionButton}
+                  onClick={() => handleActionClick(action.path)}
+                >
+                  {action.name}
+                </button>
+              ))}
+            </div>
           </div>
         ))}
       </div>
