@@ -270,8 +270,93 @@ const convertFormat = async (files, targetFormat) => {
           throw new Error('Conversion failed - output not found');
         }
       }
+      // Image format conversions using sharp
+      else if (['jpg', 'jpeg', 'png', 'webp', 'gif', 'bmp', 'tiff', 'tif', 'ico'].includes(inputExt) && 
+                ['jpg', 'jpeg', 'png', 'webp', 'gif', 'bmp', 'tiff', 'ico'].includes(targetFormat)) {
+        try {
+          let sharpInstance = sharp(inputPath);
+          
+          // Normalize target format
+          let outputFormat = targetFormat === 'jpeg' ? 'jpg' : targetFormat;
+          let actualFormat = outputFormat === 'jpg' ? 'jpeg' : outputFormat;
+          
+          // Configure output based on format
+          switch (actualFormat) {
+            case 'jpeg':
+              sharpInstance = sharpInstance.jpeg({ quality: 90 });
+              break;
+            case 'png':
+              sharpInstance = sharpInstance.png({ compressionLevel: 6 });
+              break;
+            case 'webp':
+              sharpInstance = sharpInstance.webp({ quality: 90 });
+              break;
+            case 'gif':
+              sharpInstance = sharpInstance.gif();
+              break;
+            case 'bmp':
+              // Sharp doesn't support BMP output directly, convert to PNG first then use external tool
+              const tempPngPath = path.join(path.dirname(inputPath), `${baseName}_temp.png`);
+              await sharp(inputPath).png().toFile(tempPngPath);
+              // Use ImageMagick if available, otherwise just deliver PNG
+              try {
+                await execPromise(`convert "${tempPngPath}" "${outputPath}"`);
+                await fs.remove(tempPngPath);
+              } catch (err) {
+                console.log('ImageMagick not available, delivering as PNG instead');
+                await fs.move(tempPngPath, outputPath.replace('.bmp', '.png'));
+                outputFiles.push({
+                  path: outputPath.replace('.bmp', '.png'),
+                  originalname: `${baseName}.png`,
+                  mimetype: 'image/png'
+                });
+                tempFiles.push(outputPath.replace('.bmp', '.png'));
+                continue;
+              }
+              break;
+            case 'tiff':
+              sharpInstance = sharpInstance.tiff({ compression: 'lzw' });
+              break;
+            case 'ico':
+              // ICO format requires special handling, resize to standard icon size
+              sharpInstance = sharpInstance.resize(256, 256, { fit: 'contain', background: { r: 0, g: 0, b: 0, alpha: 0 } }).png();
+              outputPath = outputPath.replace('.ico', '.png');
+              actualFormat = 'png';
+              console.log('Note: ICO conversion delivers as PNG format');
+              break;
+          }
+          
+          // Perform conversion (skip if BMP already handled)
+          if (outputFormat !== 'bmp' || !await fs.pathExists(outputPath)) {
+            await sharpInstance.toFile(outputPath);
+          }
+          
+          const mimeTypes = {
+            'jpeg': 'image/jpeg',
+            'jpg': 'image/jpeg',
+            'png': 'image/png',
+            'webp': 'image/webp',
+            'gif': 'image/gif',
+            'bmp': 'image/bmp',
+            'tiff': 'image/tiff',
+            'ico': 'image/x-icon'
+          };
+          
+          outputFiles.push({
+            path: outputPath,
+            originalname: `${baseName}.${targetFormat === 'ico' ? 'png' : targetFormat}`,
+            mimetype: mimeTypes[actualFormat] || 'image/png'
+          });
+          tempFiles.push(outputPath);
+          
+          console.log(`Image converted successfully: ${inputExt} -> ${targetFormat}`);
+        } catch (err) {
+          console.error('Image conversion error:', err);
+          throw new Error(`Failed to convert image: ${err.message}`);
+        }
+      }
       else {
-        throw new Error(`Conversion from ${inputExt} to ${targetFormat} is not supported. Supported: PDF↔TXT↔HTML↔DOCX↔RTF`);
+        throw new Error(`Conversion from ${inputExt} to ${targetFormat} is not supported. Supported: PDF↔TXT↔HTML↔DOCX↔RTF, Image formats: JPG↔PNG↔WebP↔GIF↔TIFF`);
       }
     }
 

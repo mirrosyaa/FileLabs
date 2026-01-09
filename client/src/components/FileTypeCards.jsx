@@ -25,7 +25,7 @@ function FileTypeCards() {
       icon: "🖼️",
       color: "#e91e63",
       actions: [
-        { name: "Convert", path: "/tools/images/convert" },
+        { name: "Convert", path: "/file-converter" },
         { name: "Compress/Optimize", path: "/tools/images/compress" },
         { name: "Resize", path: "/tools/images/resize" },
         { name: "Crop", path: "/tools/images/crop" },

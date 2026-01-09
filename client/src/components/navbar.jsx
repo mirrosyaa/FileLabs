@@ -276,7 +276,7 @@ function Navbar() {
                   </div>
                   {hoveredCategory === 'images' && (
                     <div className={styles["category-links"]}>
-                      <Link to="/tools/images/convert" className={styles["tool-link"]} onClick={() => setToolsDropdownOpen(false)}>Convert</Link>
+                      <Link to="/file-converter" className={styles["tool-link"]} onClick={() => setToolsDropdownOpen(false)}>Convert</Link>
                       <Link to="/tools/images/compress" className={styles["tool-link"]} onClick={() => setToolsDropdownOpen(false)}>Compress/Optimize</Link>
                       <Link to="/tools/images/resize" className={styles["tool-link"]} onClick={() => setToolsDropdownOpen(false)}>Resize</Link>
                       <Link to="/tools/images/crop" className={styles["tool-link"]} onClick={() => setToolsDropdownOpen(false)}>Crop</Link>
