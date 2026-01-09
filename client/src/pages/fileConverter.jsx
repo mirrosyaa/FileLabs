@@ -300,9 +300,7 @@ function FileConverter() {
   };
 
   return (
-    <div className={styles.converterPage}>
-      <Navbar />
-      
+    <div className={styles.converterPage}>      
       <main className={styles.converterMain}>
         <div className={styles.converterContent}>
           
