@@ -1,11 +1,11 @@
 import React, { useState, useEffect } from "react";
-import styles from "../CSS/navbar.module.css";
+import styles from "../../CSS/navbar.module.css";
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import axios from "axios";
-import defaultPhoto from "../media/defaultProfile.jpg";
-import { useAuth } from "../Authentication/authProvider";
-import SettingsModal from "../modals/settingsModal";
-import LogoutModal from "../modals/logoutModal";
+import defaultPhoto from "../../media/defaultProfile.jpg";
+import { useAuth } from "../../Authentication/authProvider";
+import SettingsModal from "../../modals/settingsModal";
+import LogoutModal from "../../modals/logoutModal";
 
 function Navbar() {
   const [profilePhoto, setProfilePhoto] = useState(null);

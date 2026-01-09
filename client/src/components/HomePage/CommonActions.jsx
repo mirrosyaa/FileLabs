@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import styles from "../CSS/commonActions.module.css";
+import styles from "../../CSS/commonActions.module.css";
 
 function CommonActions() {
   const [selectedAction, setSelectedAction] = useState(null);

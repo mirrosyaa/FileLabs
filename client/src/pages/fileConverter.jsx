@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from "react";
-import Footer from "../components/footer";
-import UploadPage from "../components/converterPages/UploadPage";
-import UploadingPage from "../components/converterPages/UploadingPage";
-import ConversionPage from "../components/converterPages/ConversionPage";
-import DownloadPage from "../components/converterPages/DownloadPage";
+import Footer from "../components/Layout/footer";
+import UploadPage from "./converterPages/UploadPage";
+import UploadingPage from "./converterPages/UploadingPage";
+import ConversionPage from "./converterPages/ConversionPage";
+import DownloadPage from "./converterPages/DownloadPage";
 import { detectFileType } from "../utils/fileConverterHelpers";
 import styles from "../CSS/fileConverter.module.css";
 

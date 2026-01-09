@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import styles from "../CSS/fileTypeCards.module.css";
+import styles from "../../CSS/fileTypeCards.module.css";
 
 function FileTypeCards() {
   const navigate = useNavigate();

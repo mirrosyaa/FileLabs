@@ -13,7 +13,7 @@ import HomePage from "./pages/homePage";
 import AdminDashboard from "./pages/adminDashboard";
 import FileConverter from "./pages/fileConverter";
 import LoadingScreen from "./pages/loadingScreen";
-import Navbar from "./components/navbar";
+import Navbar from "./components/Layout/navbar";
 import { useAuth } from "./Authentication/authProvider";
 
 function AppContent() {
