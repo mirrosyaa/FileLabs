@@ -1,26 +1,30 @@
 import React from "react";
 import styles from "../../CSS/Pages/fileConverter.module.css";
 
-function DownloadPage({ 
-  fadeIn, 
-  isDownloading, 
-  downloadProgress, 
-  hasDownloaded, 
-  downloadFilename, 
-  selectedFormat, 
-  handleDownload, 
-  handleReset 
+function DownloadPage({
+  fadeIn,
+  isDownloading,
+  downloadProgress,
+  hasDownloaded,
+  downloadFilename,
+  selectedFormat,
+  handleDownload,
+  handleReset,
 }) {
   return (
-    <div className={`${styles.pageContainer} ${fadeIn ? styles.fadeIn : styles.fadeOut}`}>
+    <div
+      className={`${styles.pageContainer} ${
+        fadeIn ? styles.fadeIn : styles.fadeOut
+      }`}
+    >
       {/* Download Loading Overlay */}
       {isDownloading && (
         <div className={styles.downloadingOverlay}>
           <div className={styles.spinner}></div>
           <p className={styles.uploadingText}>Downloading file...</p>
           <div className={styles.progressBar}>
-            <div 
-              className={styles.progressFill} 
+            <div
+              className={styles.progressFill}
               style={{ width: `${downloadProgress}%` }}
             ></div>
           </div>
@@ -37,23 +41,17 @@ function DownloadPage({
         {!hasDownloaded ? (
           <>
             <h2 className={styles.successTitle}>Conversion Complete!</h2>
-            <p className={styles.successMessage}>Your file has been successfully converted</p>
+            <p className={styles.successMessage}>
+              Your file has been successfully converted
+            </p>
           </>
         ) : (
           <h2 className={styles.successTitle}>File Downloaded Successfully!</h2>
         )}
-        
-        <div className={styles.downloadFileInfo}>
-          <div className={styles.fileInfoIcon}>📄</div>
-          <div className={styles.fileInfoText}>
-            <div className={styles.fileName}>{downloadFilename}</div>
-            <div className={styles.fileFormat}>Format: {selectedFormat.toUpperCase()}</div>
-          </div>
-        </div>
 
         {!hasDownloaded && (
-          <button 
-            className={styles.downloadButton} 
+          <button
+            className={styles.downloadButton}
             onClick={handleDownload}
             disabled={isDownloading}
           >
@@ -71,7 +69,7 @@ function DownloadPage({
           </button>
         )}
         <button className={styles.newConversionBtn} onClick={handleReset}>
-          ← Convert Another File
+          Convert Another File
         </button>
       </div>
     </div>

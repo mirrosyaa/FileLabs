@@ -3,7 +3,9 @@
   display: flex;
   flex-direction: column;
   min-height: 100vh;
+  max-height: 100vh;
   background: linear-gradient(135deg, #0a1628 0%, #1a2942 100%);
+  overflow: hidden;
 }
 
 .converterMain {
@@ -11,14 +13,18 @@
   display: flex;
   align-items: center;
   justify-content: center;
+  padding-top: 100px;
+  padding-bottom: 60px;
 }
 
 .converterContent {
   width: 100%;
+  height: 100%;
   padding-left: 7%;
   padding-right: 7%;
-  padding-top: 2.5%;
   margin: 0 auto;
+  display: flex;
+  flex-direction: column;
 }
 
 /* Page transitions */
@@ -100,8 +106,13 @@
 }
 
 @keyframes float {
-  0%, 100% { transform: translateY(0px); }
-  50% { transform: translateY(-10px); }
+  0%,
+  100% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
 }
 
 .uploadText {
@@ -156,12 +167,14 @@
 }
 
 @keyframes spin {
-  to { transform: rotate(360deg); }
+  to {
+    transform: rotate(360deg);
+  }
 }
 
 .uploadingText {
   color: #ffffff;
-  font-size: 24px;
+  font-size: 28px;
   font-weight: 600;
   margin-bottom: 30px;
 }
@@ -202,7 +215,7 @@
 
 .conversionTitle {
   color: #ffffff;
-  font-size: 32px;
+  font-size: 40px;
   font-weight: 700;
   text-align: center;
   margin-bottom: 40px;
@@ -222,6 +235,7 @@
   justify-content: center;
   z-index: 1000;
   backdrop-filter: blur(10px);
+  animation: fadeIn 0.3s ease-in-out;
 }
 
 /* Download Loading Overlay */
@@ -287,7 +301,7 @@
 
 .fileTypeLabel {
   color: rgba(255, 255, 255, 0.8);
-  font-size: 16px;
+  font-size: 18px;
   font-weight: 600;
   margin-bottom: 8px;
 }
@@ -300,7 +314,7 @@
 
 .fileName {
   color: rgba(255, 255, 255, 0.6);
-  font-size: 14px;
+  font-size: 16px;
   padding: 8px 12px;
   background: rgba(255, 255, 255, 0.05);
   border-radius: 8px;
@@ -361,8 +375,8 @@
 }
 
 .formatName {
-  font-size: 15px;
-  font-weight: 600;
+  font-size: 24px;
+  font-weight: 700;
 }
 
 .convertButton {
@@ -425,8 +439,6 @@
   color: rgba(255, 255, 255, 0.6);
   font-size: 16px;
   cursor: pointer;
-  margin-top: 24px;
-  padding: 12px 20px;
   border-radius: 8px;
   transition: all 0.3s ease;
 }
@@ -514,7 +526,11 @@
 }
 
 .downloadFileInfo {
-  background: linear-gradient(135deg, rgba(94, 200, 255, 0.15) 0%, rgba(74, 159, 216, 0.1) 100%);
+  background: linear-gradient(
+    135deg,
+    rgba(94, 200, 255, 0.15) 0%,
+    rgba(74, 159, 216, 0.1) 100%
+  );
   border: 2px solid rgba(94, 200, 255, 0.4);
   border-radius: 16px;
   padding: 24px 28px;
@@ -586,7 +602,7 @@
   align-items: center;
   justify-content: center;
   gap: 14px;
-  margin: 0 auto 24px;
+  margin: 0 auto 40px;
   animation: slideUp 0.5s ease-out 0.4s both;
 }
 
@@ -608,8 +624,13 @@
 }
 
 @keyframes bounce {
-  0%, 100% { transform: translateY(0); }
-  50% { transform: translateY(-8px); }
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-4px);
+  }
 }
 
 .newConversionBtn {
@@ -617,7 +638,7 @@
   border: 2px solid rgba(255, 255, 255, 0.25);
   border-radius: 12px;
   color: #ffffff;
-  padding: 16px 36px;
+  padding: 20px 36px;
   font-size: 16px;
   font-weight: 600;
   cursor: pointer;
