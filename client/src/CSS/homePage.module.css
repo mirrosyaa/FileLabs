@@ -4,6 +4,8 @@
   flex-direction: column;
   background: linear-gradient(135deg, #0f1419 0%, #1a2332 100%);
   padding-top: 100px;
+  max-height: 100vh;
+  overflow: hidden;
 }
 
 /* Welcome Section */
