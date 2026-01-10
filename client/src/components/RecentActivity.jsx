@@ -1,6 +1,6 @@
 import React from "react";
 import ActivityItem from "./ActivityItem";
-import styles from "../CSS/homePage.module.css";
+import styles from "../CSS/Pages/homePage.module.css";
 
 function RecentActivity() {
   return (

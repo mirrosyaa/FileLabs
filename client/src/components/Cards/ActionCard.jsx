@@ -1,5 +1,5 @@
 import React from "react";
-import styles from "../CSS/homePage.module.css";
+import styles from "../../CSS/Pages/homePage.module.css";
 
 function ActionCard({ icon, title, description, onClick }) {
   return (

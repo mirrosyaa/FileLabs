@@ -1,27 +1,20 @@
 import { React, useState, useEffect } from "react";
-import Navbar from "../components/navbar";
-import Footer from "../components/footer";
-import WelcomeSection from "../components/WelcomeSection";
-import FileTypeCards from "../components/FileTypeCards";
-import CommonActions from "../components/CommonActions";
+import Footer from "../components/Layout/footer";
+import WelcomeSection from "../components/HomePage/WelcomeSection";
+import FileTypeCards from "../components/HomePage/FileTypeCards";
+import CommonActions from "../components/HomePage/CommonActions";
 import axios from "axios";
-import styles from "../CSS/homePage.module.css";
+import styles from "../CSS/Pages/homePage.module.css";
 
 function HomePage() {
   const [username, setUsername] = useState("Guest");
   const [greeting, setGreeting] = useState("");
-  const [stats, setStats] = useState({
-    myFiles: 0,
-    sharedFiles: 0,
-    starredFiles: 0,
-    storageUsed: 0,
-  });
 
   // Function to fetch username
   const fetchUsername = async () => {
     try {
       const response = await axios.get("http://localhost:3001/users/profile", {
-        timeout: 5000
+        timeout: 5000,
       });
       setUsername(response.data.user.username);
     } catch (error) {
@@ -49,14 +42,6 @@ function HomePage() {
 
     fetchUsername();
     determineGreeting();
-
-    // Mock stats - replace with actual API
-    setStats({
-      myFiles: 156,
-      sharedFiles: 23,
-      starredFiles: 8,
-      storageUsed: 4.2,
-    });
   }, []);
 
   // Listen for username updates from settings modal
@@ -75,10 +60,8 @@ function HomePage() {
 
   return (
     <div className={styles["home-page-wrapper"]}>
-      <Navbar />
       <WelcomeSection greeting={greeting} username={username} />
       <FileTypeCards />
-      <CommonActions />
       <Footer />
     </div>
   );

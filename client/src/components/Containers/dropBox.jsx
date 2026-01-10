@@ -1,5 +1,5 @@
 import React, { useRef, useState } from "react";
-import styles from "../CSS/dropbox.module.css";
+import styles from "../../CSS/Components/dropbox.module.css";
 
 function DropBox({ onFilesSelected }) {
   const inputRef = useRef(null);

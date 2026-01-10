@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
-import styles from "../CSS/settingsModal.module.css";
+import styles from "../CSS/Modals/settingsModal.module.css";
 import defaultPhoto from "../media/defaultProfile.jpg";
 
 function SettingsModal({ isOpen, onClose }) {

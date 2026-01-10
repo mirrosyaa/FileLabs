@@ -3,6 +3,7 @@ const cors = require("cors");
 const axios = require("axios");
 const usersRoutes = require("./routes/users");
 const convertRoutes = require("./routes/convert");
+const compressRoutes = require("./routes/compress");
 
 const app = express();
 const PORT = 3001;
@@ -12,12 +13,13 @@ app.use(cors({
   origin: 'http://localhost:3000',
   credentials: true
 }));
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
+app.use(express.json({ limit: '200mb' }));
+app.use(express.urlencoded({ extended: true, limit: '200mb' }));
 
 // Routes
 app.use("/users", usersRoutes);
 app.use("/api", convertRoutes);
+app.use("/api", compressRoutes);
 
 // Test route
 app.get("/", (req, res) => {

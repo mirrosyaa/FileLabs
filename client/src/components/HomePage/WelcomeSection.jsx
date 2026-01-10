@@ -1,5 +1,5 @@
 import React from "react";
-import styles from "../CSS/welcomeSection.module.css";
+import styles from "../../CSS/Components/welcomeSection.module.css";
 
 function WelcomeSection({ greeting, username }) {
   return (

@@ -4,9 +4,9 @@ import React, {
   forwardRef,
   useImperativeHandle,
 } from "react";
-import styles from "../CSS/adminDashboard.module.css";
+import styles from "../../CSS/Pages/adminDashboard.module.css";
 import axios from "axios";
-import UserDetailsModal from "../modals/userDetailsModal";
+import UserDetailsModal from "../../modals/userDetailsModal";
 
 const UsersTable = forwardRef(
   ({ searchTerm = "", userTypeFilter = "all", currentAdminId = null }, ref) => {

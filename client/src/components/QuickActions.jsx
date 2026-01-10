@@ -1,5 +1,5 @@
 import React from "react";
-import ActionCard from "./ActionCard";
+import ActionCard from "./Cards/ActionCard";
 import styles from "../CSS/homePage.module.css";
 
 function QuickActions() {

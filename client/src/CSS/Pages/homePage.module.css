@@ -1,8 +1,11 @@
 .home-page-wrapper {
   min-height: 100vh;
+  display: flex;
+  flex-direction: column;
   background: linear-gradient(135deg, #0f1419 0%, #1a2332 100%);
   padding-top: 100px;
-  padding-bottom: 3rem;
+  max-height: 100vh;
+  overflow: hidden;
 }
 
 /* Welcome Section */

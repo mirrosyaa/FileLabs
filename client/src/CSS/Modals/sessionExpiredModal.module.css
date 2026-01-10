@@ -1,0 +1,96 @@
+.modalOverlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(10, 22, 40, 0.95);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 10000;
+  backdrop-filter: blur(8px);
+  animation: fadeIn 0.3s ease-out;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.modalContent {
+  background: linear-gradient(135deg, #1a2942 0%, #0a1628 100%);
+  border: 2px solid rgba(255, 82, 82, 0.5);
+  border-radius: 24px;
+  padding: 48px 40px;
+  max-width: 480px;
+  width: 90%;
+  text-align: center;
+  box-shadow: 
+    0 20px 60px rgba(0, 0, 0, 0.5),
+    0 0 100px rgba(255, 82, 82, 0.2);
+  animation: slideUp 0.4s ease-out;
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px) scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.iconWrapper {
+  margin-bottom: 24px;
+}
+
+.icon {
+  font-size: 72px;
+}
+
+.title {
+  color: #ff5252;
+  font-size: 32px;
+  font-weight: 700;
+  margin-bottom: 16px;
+  letter-spacing: -0.5px;
+}
+
+.message {
+  color: rgba(255, 255, 255, 0.85);
+  font-size: 17px;
+  line-height: 1.6;
+  margin-bottom: 32px;
+  font-weight: 500;
+}
+
+.confirmButton {
+  width: 100%;
+  background: linear-gradient(135deg, #ff5252 0%, #e53935 100%);
+  color: #ffffff;
+  border: none;
+  border-radius: 16px;
+  padding: 18px 40px;
+  font-size: 18px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 6px 30px rgba(255, 82, 82, 0.4);
+}
+
+.confirmButton:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 10px 40px rgba(255, 82, 82, 0.6);
+  background: linear-gradient(135deg, #ff6b6b 0%, #f44336 100%);
+}
+
+.confirmButton:active {
+  transform: translateY(-1px);
+}

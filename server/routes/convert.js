@@ -24,26 +24,52 @@ const storage = multer.diskStorage({
 const upload = multer({
   storage: storage,
   limits: {
-    fileSize: 50 * 1024 * 1024, // 50MB limit
+    fileSize: 200 * 1024 * 1024, // 200MB limit
   },
   fileFilter: (req, file, cb) => {
-    // Accept common document formats
+    // Accept common document, image, audio, and video formats
     const allowedTypes = [
+      // Documents
       "application/pdf",
       "application/msword",
       "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
       "text/plain",
       "application/rtf",
+      // Images
       "image/png",
       "image/jpeg",
       "image/jpg",
+      "image/gif",
+      "image/webp",
+      "image/bmp",
+      "image/tiff",
+      "image/x-icon",
+      // Audio
+      "audio/mpeg",
+      "audio/mp3",
+      "audio/wav",
+      "audio/wave",
+      "audio/x-wav",
+      "audio/flac",
+      "audio/aac",
+      "audio/ogg",
+      "audio/mp4",
+      "audio/x-m4a",
+      // Video
+      "video/mp4",
+      "video/webm",
+      "video/x-msvideo",
+      "video/quicktime",
+      "video/x-matroska",
+      "video/x-flv",
     ];
 
-    if (allowedTypes.includes(file.mimetype) || 
-        file.originalname.match(/\.(pdf|doc|docx|txt|rtf|png|jpg|jpeg)$/i)) {
+    const fileExtensionMatch = file.originalname.match(/\.(pdf|doc|docx|txt|rtf|html|png|jpg|jpeg|gif|webp|bmp|tiff|ico|mp3|wav|flac|aac|ogg|m4a|mp4|webm|avi|mov|mkv|flv)$/i);
+
+    if (allowedTypes.includes(file.mimetype) || fileExtensionMatch) {
       cb(null, true);
     } else {
-      cb(new Error("Invalid file type. Only PDF, DOCX, DOC, TXT, RTF, and images are allowed."));
+      cb(new Error("Invalid file type. Only documents, images, audio, and video files are allowed."));
     }
   },
 });

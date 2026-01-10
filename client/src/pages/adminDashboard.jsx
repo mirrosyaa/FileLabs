@@ -1,9 +1,9 @@
 import React, { useState, useRef, useEffect } from "react";
 import axios from "axios";
-import styles from "../CSS/adminDashboard.module.css";
-import AdminHeader from "../components/AdminHeader";
+import styles from "../CSS/Pages/adminDashboard.module.css";
+import AdminHeader from "../components/Admin/AdminHeader";
 import SearchBar from "../components/SearchBar";
-import UsersTable from "../components/UsersTable";
+import UsersTable from "../components/Admin/UsersTable";
 import AddUserModal from "../modals/addUserModal";
 
 function AdminDashboard() {
