@@ -80,8 +80,13 @@ function Compressor() {
         setUploadProgress((prev) => {
           if (prev >= 100) {
             clearInterval(interval);
-            setIsUploading(false);
-            changePage(2);
+            // Fade out uploading page before changing
+            setFadeIn(false);
+            setTimeout(() => {
+              setIsUploading(false);
+              setPage(2);
+              setFadeIn(true);
+            }, 300);
             return 100;
           }
           return prev + 10;
@@ -131,9 +136,14 @@ function Compressor() {
       setCompressedFiles([{ url, name: files.length > 1 ? "compressed.zip" : `compressed_${files[0].name}` }]);
       setCompressionProgress(100);
       
+      // Fade out compressing page before changing
       setTimeout(() => {
-        setIsCompressing(false);
-        changePage(3);
+        setFadeIn(false);
+        setTimeout(() => {
+          setIsCompressing(false);
+          setPage(3);
+          setFadeIn(true);
+        }, 300);
       }, 500);
     } catch (err) {
       console.error("Compression error:", err);
@@ -199,8 +209,6 @@ function Compressor() {
     <div className={styles.compressorPage}>
       <div className={styles.compressorMain}>
         <div className={styles.compressorContent}>
-          <h1 className={styles.mainTitle}>File Compressor</h1>
-
           {/* Page 1: Upload */}
           {page === 1 && !isUploading && (
             <UploadPage

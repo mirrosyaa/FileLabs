@@ -74,16 +74,6 @@
   letter-spacing: -0.5px;
 }
 
-/* Upload Area */
-.mainTitle {
-  color: #ffffff;
-  font-size: 42px;
-  font-weight: 700;
-  text-align: center;
-  margin-bottom: 60px;
-  letter-spacing: -0.5px;
-}
-
 .uploadBox {
   background: rgba(255, 255, 255, 0.05);
   border: 3px dashed rgba(94, 200, 255, 0.4);
@@ -93,7 +83,6 @@
   cursor: pointer;
   transition: all 0.3s ease;
   backdrop-filter: blur(10px);
-  position: relative;
 }
 
 .uploadBox:hover {
@@ -133,12 +122,6 @@
   margin: 0 0 16px 0;
 }
 
-.uploadOr {
-  color: rgba(255, 255, 255, 0.5);
-  font-size: 16px;
-  margin: 20px 0;
-}
-
 .browseBtn {
   display: inline-block;
   background: linear-gradient(135deg, #5ec8ff 0%, #4a9fd8 100%);
@@ -156,16 +139,6 @@
   transform: translateY(-2px);
   box-shadow: 0 8px 30px rgba(94, 200, 255, 0.5);
   background: linear-gradient(135deg, #6dd4ff 0%, #5aabdf 100%);
-}
-
-.fileInput {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  opacity: 0;
-  cursor: pointer;
 }
 
 /* PAGE 2: Uploading */
@@ -440,6 +413,22 @@
   z-index: 1000;
   backdrop-filter: blur(10px);
   animation: fadeIn 0.3s ease-in-out;
+}
+
+/* Download Loading Overlay */
+.downloadingOverlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: #0a1628;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  backdrop-filter: blur(10px);
 }
 
 /* PAGE 4: Download/Success */
