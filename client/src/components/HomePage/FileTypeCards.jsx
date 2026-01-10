@@ -50,7 +50,7 @@ function FileTypeCards() {
       icon: "",
       color: "#ff9800",
       actions: [
-        { name: "Convert", path: "/tools/video/convert" },
+        { name: "Convert", path: "/file-converter" },
         { name: "Compress", path: "/tools/video/compress" },
         { name: "Cut/Trim", path: "/tools/video/cut" },
         { name: "Merge", path: "/tools/video/merge" },

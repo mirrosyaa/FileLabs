@@ -90,9 +90,10 @@ function ConversionPage({
                   <div className={styles.errorBox}>
                     {primaryFileType === "document" ||
                     primaryFileType === "audio" ||
-                    primaryFileType === "image"
+                    primaryFileType === "image" ||
+                    primaryFileType === "video"
                       ? "No conversion options available. File is already in this format."
-                      : "Only document, audio, and image conversions are currently supported."}
+                      : "Only document, audio, image, and video conversions are currently supported."}
                   </div>
                 )}
 
@@ -133,7 +134,7 @@ function ConversionPage({
 
           {primaryFileType === "unknown" && !hasMixedTypes && (
             <div className={styles.errorBox}>
-              Unsupported file type. Please upload document, audio, or image
+              Unsupported file type. Please upload document, audio, image, or video
               files.
             </div>
           )}

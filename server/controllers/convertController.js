@@ -355,8 +355,156 @@ const convertFormat = async (files, targetFormat) => {
           throw new Error(`Failed to convert image: ${err.message}`);
         }
       }
+      // Video format conversions using ffmpeg
+      else if (['mp4', 'webm', 'avi', 'mov', 'mkv', 'flv'].includes(inputExt) && 
+                ['mp4', 'webm', 'avi', 'mov', 'mkv', 'flv'].includes(targetFormat)) {
+        try {
+          // Check if ffmpeg is available
+          try {
+            await execPromise('which ffmpeg');
+          } catch (err) {
+            throw new Error('ffmpeg is not installed. Please install ffmpeg to convert video files.');
+          }
+
+          // Build ffmpeg command based on target format
+          let ffmpegCmd = `ffmpeg -i "${inputPath}" `;
+          
+          switch (targetFormat) {
+            case 'mp4':
+              // H.264 codec for MP4 (most compatible)
+              ffmpegCmd += `-c:v libx264 -preset medium -crf 23 -c:a aac -b:a 128k "${outputPath}"`;
+              break;
+            case 'webm':
+              // VP9 codec for WebM
+              ffmpegCmd += `-c:v libvpx-vp9 -crf 30 -b:v 0 -c:a libopus "${outputPath}"`;
+              break;
+            case 'avi':
+              // MPEG-4 codec for AVI
+              ffmpegCmd += `-c:v mpeg4 -q:v 5 -c:a libmp3lame -q:a 5 "${outputPath}"`;
+              break;
+            case 'mov':
+              // H.264 codec for MOV (QuickTime)
+              ffmpegCmd += `-c:v libx264 -preset medium -crf 23 -c:a aac -b:a 128k "${outputPath}"`;
+              break;
+            case 'mkv':
+              // H.264 codec for MKV (Matroska)
+              ffmpegCmd += `-c:v libx264 -preset medium -crf 23 -c:a aac -b:a 128k "${outputPath}"`;
+              break;
+            case 'flv':
+              // H.264 codec for FLV
+              ffmpegCmd += `-c:v libx264 -preset medium -crf 23 -c:a aac -b:a 128k "${outputPath}"`;
+              break;
+          }
+
+          console.log(`Running ffmpeg command: ${ffmpegCmd}`);
+          const { stdout, stderr } = await execPromise(ffmpegCmd);
+          
+          if (stderr && !stderr.includes('time=')) {
+            console.log('ffmpeg stderr:', stderr);
+          }
+
+          if (await fs.pathExists(outputPath)) {
+            const mimeTypes = {
+              'mp4': 'video/mp4',
+              'webm': 'video/webm',
+              'avi': 'video/x-msvideo',
+              'mov': 'video/quicktime',
+              'mkv': 'video/x-matroska',
+              'flv': 'video/x-flv'
+            };
+
+            outputFiles.push({
+              path: outputPath,
+              originalname: `${baseName}.${targetFormat}`,
+              mimetype: mimeTypes[targetFormat] || 'video/mp4'
+            });
+            tempFiles.push(outputPath);
+            
+            console.log(`Video converted successfully: ${inputExt} -> ${targetFormat}`);
+          } else {
+            throw new Error('Video conversion output file not found');
+          }
+        } catch (err) {
+          console.error('Video conversion error:', err);
+          throw new Error(`Failed to convert video: ${err.message}`);
+        }
+      }
+      // Audio format conversions using ffmpeg
+      else if (['mp3', 'wav', 'flac', 'aac', 'ogg', 'm4a'].includes(inputExt) && 
+                ['mp3', 'wav', 'flac', 'aac', 'ogg', 'm4a'].includes(targetFormat)) {
+        try {
+          // Check if ffmpeg is available
+          try {
+            await execPromise('which ffmpeg');
+          } catch (err) {
+            throw new Error('ffmpeg is not installed. Please install ffmpeg to convert audio files.');
+          }
+
+          // Build ffmpeg command based on target format
+          let ffmpegCmd = `ffmpeg -i "${inputPath}" `;
+          
+          switch (targetFormat) {
+            case 'mp3':
+              // MP3 with good quality
+              ffmpegCmd += `-c:a libmp3lame -b:a 192k "${outputPath}"`;
+              break;
+            case 'wav':
+              // WAV (uncompressed)
+              ffmpegCmd += `-c:a pcm_s16le "${outputPath}"`;
+              break;
+            case 'flac':
+              // FLAC (lossless compression)
+              ffmpegCmd += `-c:a flac -compression_level 5 "${outputPath}"`;
+              break;
+            case 'aac':
+              // AAC with good quality
+              ffmpegCmd += `-c:a aac -b:a 192k "${outputPath}"`;
+              break;
+            case 'ogg':
+              // OGG Vorbis
+              ffmpegCmd += `-c:a libvorbis -q:a 5 "${outputPath}"`;
+              break;
+            case 'm4a':
+              // M4A (AAC in MP4 container)
+              ffmpegCmd += `-c:a aac -b:a 192k "${outputPath}"`;
+              break;
+          }
+
+          console.log(`Running ffmpeg command: ${ffmpegCmd}`);
+          const { stdout, stderr } = await execPromise(ffmpegCmd);
+          
+          if (stderr && !stderr.includes('time=')) {
+            console.log('ffmpeg stderr:', stderr);
+          }
+
+          if (await fs.pathExists(outputPath)) {
+            const mimeTypes = {
+              'mp3': 'audio/mpeg',
+              'wav': 'audio/wav',
+              'flac': 'audio/flac',
+              'aac': 'audio/aac',
+              'ogg': 'audio/ogg',
+              'm4a': 'audio/mp4'
+            };
+
+            outputFiles.push({
+              path: outputPath,
+              originalname: `${baseName}.${targetFormat}`,
+              mimetype: mimeTypes[targetFormat] || 'audio/mpeg'
+            });
+            tempFiles.push(outputPath);
+            
+            console.log(`Audio converted successfully: ${inputExt} -> ${targetFormat}`);
+          } else {
+            throw new Error('Audio conversion output file not found');
+          }
+        } catch (err) {
+          console.error('Audio conversion error:', err);
+          throw new Error(`Failed to convert audio: ${err.message}`);
+        }
+      }
       else {
-        throw new Error(`Conversion from ${inputExt} to ${targetFormat} is not supported. Supported: PDF↔TXT↔HTML↔DOCX↔RTF, Image formats: JPG↔PNG↔WebP↔GIF↔TIFF`);
+        throw new Error(`Conversion from ${inputExt} to ${targetFormat} is not supported. Supported: PDF↔TXT↔HTML↔DOCX↔RTF, Image formats: JPG↔PNG↔WebP↔GIF↔TIFF, Audio formats: MP3↔WAV↔FLAC↔AAC↔OGG↔M4A, Video formats: MP4↔WebM↔AVI↔MOV↔MKV↔FLV`);
       }
     }
 

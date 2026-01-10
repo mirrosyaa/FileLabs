@@ -42,7 +42,14 @@ export const getConversionOptions = (fileType, currentFiles = []) => {
       { value: 'ogg', label: 'OGG', icon: '🎵' },
       { value: 'm4a', label: 'M4A', icon: '🎵' },
     ],
-    video: [],
+    video: [
+      { value: 'mp4', label: 'MP4', icon: '🎬' },
+      { value: 'webm', label: 'WebM', icon: '🎬' },
+      { value: 'avi', label: 'AVI', icon: '🎬' },
+      { value: 'mov', label: 'MOV', icon: '🎬' },
+      { value: 'mkv', label: 'MKV', icon: '🎬' },
+      { value: 'flv', label: 'FLV', icon: '🎬' },
+    ],
     document: [
       { value: 'pdf', label: 'PDF', icon: '📄' },
       { value: 'docx', label: 'DOCX', icon: '📄' },
