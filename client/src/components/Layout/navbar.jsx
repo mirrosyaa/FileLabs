@@ -160,7 +160,12 @@ function Navbar() {
           </div>
           <span className={styles["button-label"]}>File Converter</span>
         </Link>
-        <button className={styles["nav-button"]}>
+        <Link
+          to="/compressor"
+          className={`${styles["nav-button"]} ${
+            location.pathname === "/compressor" ? styles["active"] : ""
+          }`}
+        >
           <div className={styles["icon-circle"]}>
             <svg
               xmlns="http://www.w3.org/2000/svg"
@@ -173,12 +178,14 @@ function Navbar() {
               strokeLinecap="round"
               strokeLinejoin="round"
             >
-              <path d="M13 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z" />
-              <polyline points="13 2 13 9 20 9" />
+              <polyline points="16 16 12 12 8 16" />
+              <line x1="12" y1="12" x2="12" y2="21" />
+              <path d="M20.39 18.39A5 5 0 0 0 18 9h-1.26A8 8 0 1 0 3 16.3" />
+              <polyline points="16 16 12 12 8 16" />
             </svg>
           </div>
-          <span className={styles["button-label"]}>Files</span>
-        </button>
+          <span className={styles["button-label"]}>Compressor</span>
+        </Link>
         <Link
           to="/home"
           className={`${styles["nav-button"]} ${
