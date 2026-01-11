@@ -11,7 +11,7 @@ function Compressor() {
   const [page, setPage] = useState(1);
   const [fadeIn, setFadeIn] = useState(true);
   const [files, setFiles] = useState([]);
-  const [compressionLevel, setCompressionLevel] = useState("medium");
+  const [compressionLevel, setCompressionLevel] = useState("");
   const [isDragging, setIsDragging] = useState(false);
   const [isUploading, setIsUploading] = useState(false);
   const [uploadProgress, setUploadProgress] = useState(0);
@@ -186,7 +186,7 @@ function Compressor() {
     setTimeout(() => {
       setPage(1);
       setFiles([]);
-      setCompressionLevel("medium");
+      setCompressionLevel("");
       setCompressedFiles([]);
       setError("");
       setUploadProgress(0);

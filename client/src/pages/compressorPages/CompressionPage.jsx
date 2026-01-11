@@ -23,21 +23,9 @@ function CompressionPage({
           ← Back to upload
         </button>
 
-        <h2 className={styles.compressionTitle}>Compression Settings</h2>
+        <h2 className={styles.compressionTitle}>Choose Compression Level</h2>
         
-        <div className={styles.filesDisplay}>
-          <div className={styles.filesHeader}>Selected Files:</div>
-          <div className={styles.fileNames}>
-            {files.map((file, index) => (
-              <div key={index} className={styles.fileName}>
-                {file.name}
-              </div>
-            ))}
-          </div>
-        </div>
-
         <div className={styles.compressionOptions}>
-          <div className={styles.compressionLabel}>Choose Compression Level</div>
           <div className={styles.levelButtons}>
             <button
               className={`${styles.levelOption} ${compressionLevel === "low" ? styles.selected : ""}`}
@@ -63,11 +51,24 @@ function CompressionPage({
           </div>
         </div>
 
+        <div className={styles.filesDisplay}>
+          <div className={styles.filesHeader}>Selected Files:</div>
+          <div className={styles.fileNames}>
+            {files.map((file, index) => (
+              <div key={index} className={styles.fileName}>
+                {file.name}
+              </div>
+            ))}
+          </div>
+        </div>
+
         {error && <div className={styles.errorBox}>{error}</div>}
 
-        <button onClick={onCompress} className={`${styles.convertButton} ${styles.slideIn}`}>
-          Compress Files
-        </button>
+        {compressionLevel && (
+          <button onClick={onCompress} className={`${styles.convertButton} ${styles.slideIn}`}>
+            Compress Files
+          </button>
+        )}
       </div>
     </div>
   );
