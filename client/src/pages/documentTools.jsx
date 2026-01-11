@@ -13,48 +13,42 @@ function DocumentTools() {
       name: "Compress PDF",
       description: "Reduce PDF file size while maintaining quality",
       icon: "📄",
-      path: "/document-tools/compress-pdf",
-      comingSoon: true
+      path: "/document-tools/compress-pdf"
     },
     {
       id: 2,
       name: "Merge PDF",
       description: "Combine multiple PDF files into one document",
       icon: "🔀",
-      path: "/document-tools/merge-pdf",
-      comingSoon: true
+      path: "/document-tools/merge-pdf"
     },
     {
       id: 3,
       name: "Download from URL",
       description: "Download files directly from web URLs",
       icon: "⬇️",
-      path: "/document-tools/download-url",
-      comingSoon: true
+      path: "/document-tools/download-url"
     },
     {
       id: 4,
       name: "Auto Rename",
       description: "Automatically rename files with smart patterns",
       icon: "🔄",
-      path: "/document-tools/auto-rename",
-      comingSoon: true
+      path: "/document-tools/auto-rename"
     },
     {
       id: 5,
       name: "Extract Images",
       description: "Extract all images from PDF documents",
       icon: "🖼️",
-      path: "/document-tools/extract-images",
-      comingSoon: true
+      path: "/document-tools/extract-images"
     },
     {
       id: 6,
       name: "Add Watermark",
       description: "Add watermarks to your PDF documents",
       icon: "💧",
-      path: "/document-tools/watermark",
-      comingSoon: true
+      path: "/document-tools/watermark"
     }
   ];
 
@@ -75,8 +69,8 @@ function DocumentTools() {
               {tools.map((tool) => (
                 <div 
                   key={tool.id} 
-                  className={`${styles.toolCard} ${tool.comingSoon ? styles.disabled : ''}`}
-                  onClick={() => handleToolClick(tool)}
+                  className={styles.toolCard}
+                  onClick={() => navigate(tool.path)}
                 >
                   <div className={styles.toolIcon}>
                     {tool.icon}
@@ -84,9 +78,6 @@ function DocumentTools() {
                   <div className={styles.toolContent}>
                     <h3 className={styles.toolName}>{tool.name}</h3>
                     <p className={styles.toolDescription}>{tool.description}</p>
-                    {tool.comingSoon && (
-                      <span className={styles.comingSoonBadge}>Coming Soon</span>
-                    )}
                   </div>
                 </div>
               ))}

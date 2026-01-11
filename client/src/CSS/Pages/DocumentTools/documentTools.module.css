@@ -110,7 +110,7 @@
 }
 
 .toolIcon {
-  font-size: 3rem;
+  font-size: 3.5rem;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -125,15 +125,15 @@
 
 .toolName {
   color: #ffffff;
-  font-size: 20px;
+  font-size: 24px;
   font-weight: 700;
-  margin-bottom: 6px;
+  margin-bottom: 8px;
 }
 
 .toolDescription {
   color: rgba(255, 255, 255, 0.7);
-  font-size: 13px;
-  line-height: 1.4;
+  font-size: 15px;
+  line-height: 1.5;
   margin-bottom: 10px;
 }
 
