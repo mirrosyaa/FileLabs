@@ -11,7 +11,7 @@ function Compressor() {
   const [page, setPage] = useState(1);
   const [fadeIn, setFadeIn] = useState(true);
   const [files, setFiles] = useState([]);
-  const [compressionLevel, setCompressionLevel] = useState("");
+  const [compressionLevel, setCompressionLevel] = useState(0);
   const [isDragging, setIsDragging] = useState(false);
   const [isUploading, setIsUploading] = useState(false);
   const [uploadProgress, setUploadProgress] = useState(0);
@@ -105,7 +105,18 @@ function Compressor() {
       files.forEach((file) => {
         formData.append("files", file);
       });
-      formData.append("compressionLevel", compressionLevel);
+      
+      // Map 6 compression levels (0-5) to backend values (low, medium, high)
+      let backendLevel;
+      if (compressionLevel <= 1) {
+        backendLevel = "low";
+      } else if (compressionLevel <= 3) {
+        backendLevel = "medium";
+      } else {
+        backendLevel = "high";
+      }
+      
+      formData.append("compressionLevel", backendLevel);
 
       // Simulate progress
       const progressInterval = setInterval(() => {

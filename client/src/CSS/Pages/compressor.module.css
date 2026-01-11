@@ -258,6 +258,99 @@
   margin-bottom: 30px;
 }
 
+.sliderContainer {
+  padding: 30px 20px;
+}
+
+.sliderTicks {
+  display: flex;
+  justify-content: space-between;
+  padding: 0 12px;
+  margin-bottom: 8px;
+}
+
+.tick {
+  width: 2px;
+  height: 10px;
+  background: rgba(255, 255, 255, 0.4);
+  border-radius: 2px;
+}
+
+.compressionSlider {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 100%;
+  height: 8px;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 10px;
+  outline: none;
+  margin-bottom: 25px;
+}
+
+.compressionSlider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 24px;
+  height: 24px;
+  background: linear-gradient(135deg, #5ec8ff 0%, #4a9fd8 100%);
+  border-radius: 50%;
+  cursor: pointer;
+  box-shadow: 0 4px 15px rgba(94, 200, 255, 0.5);
+  transition: all 0.2s ease;
+}
+
+.compressionSlider::-webkit-slider-thumb:hover {
+  transform: scale(1.2);
+  box-shadow: 0 6px 25px rgba(94, 200, 255, 0.7);
+}
+
+.compressionSlider::-moz-range-thumb {
+  width: 24px;
+  height: 24px;
+  background: linear-gradient(135deg, #5ec8ff 0%, #4a9fd8 100%);
+  border-radius: 50%;
+  cursor: pointer;
+  border: none;
+  box-shadow: 0 4px 15px rgba(94, 200, 255, 0.5);
+  transition: all 0.2s ease;
+}
+
+.compressionSlider::-moz-range-thumb:hover {
+  transform: scale(1.2);
+  box-shadow: 0 6px 25px rgba(94, 200, 255, 0.7);
+}
+
+.sliderLabels {
+  display: flex;
+  justify-content: space-between;
+  padding: 0 11px;
+  position: relative;
+}
+
+.sliderLabel {
+  color: rgba(255, 255, 255, 0.5);
+  font-size: 11px;
+  font-weight: 500;
+  text-align: center;
+  transition: all 0.3s ease;
+  white-space: nowrap;
+  position: absolute;
+  transform: translateX(-50%);
+}
+
+.sliderLabel:nth-child(1) { left: 0%; }
+.sliderLabel:nth-child(2) { left: 20%; }
+.sliderLabel:nth-child(3) { left: 40%; }
+.sliderLabel:nth-child(4) { left: 60%; }
+.sliderLabel:nth-child(5) { left: 80%; }
+.sliderLabel:nth-child(6) { left: 100%; }
+
+.sliderLabel.activeLabel {
+  color: #5ec8ff;
+  font-weight: 700;
+  font-size: 13px;
+}
+
 .compressionLabel {
   color: #ffffff;
   font-size: 18px;
