@@ -1,0 +1,102 @@
+import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import styles from "../CSS/Pages/DocumentTools/documentTools.module.css";
+import Footer from "../components/Layout/footer";
+
+function DocumentTools() {
+  const [fadeIn, setFadeIn] = useState(true);
+  const navigate = useNavigate();
+
+  const tools = [
+    {
+      id: 1,
+      name: "Compress PDF",
+      description: "Reduce PDF file size while maintaining quality",
+      icon: "📄",
+      path: "/document-tools/compress-pdf",
+      comingSoon: true
+    },
+    {
+      id: 2,
+      name: "Merge PDF",
+      description: "Combine multiple PDF files into one document",
+      icon: "🔀",
+      path: "/document-tools/merge-pdf",
+      comingSoon: true
+    },
+    {
+      id: 3,
+      name: "Download from URL",
+      description: "Download files directly from web URLs",
+      icon: "⬇️",
+      path: "/document-tools/download-url",
+      comingSoon: true
+    },
+    {
+      id: 4,
+      name: "Auto Rename",
+      description: "Automatically rename files with smart patterns",
+      icon: "🔄",
+      path: "/document-tools/auto-rename",
+      comingSoon: true
+    },
+    {
+      id: 5,
+      name: "Extract Images",
+      description: "Extract all images from PDF documents",
+      icon: "🖼️",
+      path: "/document-tools/extract-images",
+      comingSoon: true
+    },
+    {
+      id: 6,
+      name: "Add Watermark",
+      description: "Add watermarks to your PDF documents",
+      icon: "💧",
+      path: "/document-tools/watermark",
+      comingSoon: true
+    }
+  ];
+
+  const handleToolClick = (tool) => {
+    if (!tool.comingSoon) {
+      navigate(tool.path);
+    }
+  };
+
+  return (
+    <div className={styles.documentToolsPage}>
+      <div className={styles.documentToolsMain}>
+        <div className={styles.documentToolsContent}>
+          <div className={`${styles.pageContainer} ${fadeIn ? styles.fadeIn : styles.fadeOut}`}>
+            <h1 className={styles.mainTitle}>Document Tools</h1>
+            
+            <div className={styles.toolsGrid}>
+              {tools.map((tool) => (
+                <div 
+                  key={tool.id} 
+                  className={`${styles.toolCard} ${tool.comingSoon ? styles.disabled : ''}`}
+                  onClick={() => handleToolClick(tool)}
+                >
+                  <div className={styles.toolIcon}>
+                    {tool.icon}
+                  </div>
+                  <div className={styles.toolContent}>
+                    <h3 className={styles.toolName}>{tool.name}</h3>
+                    <p className={styles.toolDescription}>{tool.description}</p>
+                    {tool.comingSoon && (
+                      <span className={styles.comingSoonBadge}>Coming Soon</span>
+                    )}
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      </div>
+      <Footer />
+    </div>
+  );
+}
+
+export default DocumentTools;
