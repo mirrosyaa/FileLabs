@@ -4,6 +4,7 @@ import {
   Routes,
   Route,
   useLocation,
+  useNavigate,
 } from "react-router-dom";
 import AuthProvider from "./Authentication/authProvider";
 import RouteProtector from "./Authentication/RouteProtector";
@@ -15,16 +16,24 @@ import FileConverter from "./pages/fileConverter";
 import Compressor from "./pages/compressor";
 import LoadingScreen from "./pages/loadingScreen";
 import Navbar from "./components/Layout/navbar";
+import SessionExpiredModal from "./modals/sessionExpiredModal";
 import { useAuth } from "./Authentication/authProvider";
 
 function AppContent() {
   const [loading, setLoading] = useState(false);
   const location = useLocation();
+  const navigate = useNavigate();
   const previousLocation = React.useRef(location.pathname);
-  const { token } = useAuth();
+  const { token, showSessionExpired, setShowSessionExpired } = useAuth();
 
   // Check if user is logged in (not on login page)
   const isLoggedIn = token && location.pathname !== "/";
+
+  // Handle session expired modal close
+  const handleSessionExpiredClose = () => {
+    setShowSessionExpired(false);
+    navigate("/");
+  };
 
   useEffect(() => {
     const fromLogin = previousLocation.current === "/";
@@ -57,6 +66,11 @@ function AppContent() {
 
   return (
     <div id="App">
+      {/* Session Expired Modal */}
+      {showSessionExpired && (
+        <SessionExpiredModal onClose={handleSessionExpiredClose} />
+      )}
+
       {/* Persistent Navbar - only shown when logged in */}
       {isLoggedIn ? (
         <div id="Navbar">
