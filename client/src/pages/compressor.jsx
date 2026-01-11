@@ -74,7 +74,11 @@ function Compressor() {
 
     if (alreadyCompressed.length > 0) {
       const fileNames = alreadyCompressed.map(f => f.name).join(', ');
-      setError(`Cannot compress already compressed files: ${fileNames}`);
+      setFadeIn(false);
+      setTimeout(() => {
+        setError(`Cannot compress already compressed files: ${fileNames}`);
+        setFadeIn(true);
+      }, 300);
       return;
     }
 
