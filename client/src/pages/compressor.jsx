@@ -66,6 +66,18 @@ function Compressor() {
   const handleFiles = (selectedFiles) => {
     if (selectedFiles.length === 0) return;
 
+    // Check if files are already compressed
+    const compressedExtensions = ['.zip', '.rar', '.7z', '.tar', '.gz', '.bz2', '.xz'];
+    const alreadyCompressed = selectedFiles.filter(file => 
+      compressedExtensions.some(ext => file.name.toLowerCase().endsWith(ext))
+    );
+
+    if (alreadyCompressed.length > 0) {
+      const fileNames = alreadyCompressed.map(f => f.name).join(', ');
+      setError(`Cannot compress already compressed files: ${fileNames}`);
+      return;
+    }
+
     setFiles(selectedFiles);
     setError("");
     
@@ -165,31 +177,35 @@ function Compressor() {
   };
 
   const handleDownload = () => {
-    setIsDownloading(true);
-    setDownloadProgress(0);
+    setFadeIn(false);
+    setTimeout(() => {
+      setFadeIn(true);
+      setIsDownloading(true);
+      setDownloadProgress(0);
 
-    const interval = setInterval(() => {
-      setDownloadProgress((prev) => {
-        if (prev >= 100) {
-          clearInterval(interval);
-          
-          // Trigger download
-          compressedFiles.forEach(file => {
-            const link = document.createElement("a");
-            link.href = file.url;
-            link.download = file.name;
-            document.body.appendChild(link);
-            link.click();
-            document.body.removeChild(link);
-          });
+      const interval = setInterval(() => {
+        setDownloadProgress((prev) => {
+          if (prev >= 100) {
+            clearInterval(interval);
+            
+            // Trigger download
+            compressedFiles.forEach(file => {
+              const link = document.createElement("a");
+              link.href = file.url;
+              link.download = file.name;
+              document.body.appendChild(link);
+              link.click();
+              document.body.removeChild(link);
+            });
 
-          setIsDownloading(false);
-          setHasDownloaded(true);
-          return 100;
-        }
-        return prev + 10;
-      });
-    }, 100);
+            setIsDownloading(false);
+            setHasDownloaded(true);
+            return 100;
+          }
+          return prev + 10;
+        });
+      }, 100);
+    }, 300);
   };
 
   const handleReset = () => {
@@ -230,6 +246,8 @@ function Compressor() {
               onDragLeave={handleDragLeave}
               onDrop={handleDrop}
               onFileSelect={handleFileSelect}
+              error={error}
+              onReset={handleReset}
             />
           )}
 

@@ -78,7 +78,7 @@ function CompressionPage({
 
         {error && <div className={styles.errorBox}>{error}</div>}
 
-        {compressionLevel && (
+        {compressionLevel !== "" && (
           <button onClick={onCompress} className={`${styles.convertButton} ${styles.slideIn}`}>
             Compress Files
           </button>

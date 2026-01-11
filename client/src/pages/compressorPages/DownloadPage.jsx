@@ -13,7 +13,7 @@ function DownloadPage({
     <div className={`${styles.pageContainer} ${fadeIn ? styles.fadeIn : styles.fadeOut}`}>
       {/* Download Loading Overlay */}
       {isDownloading && (
-        <div className={styles.uploadingContainer}>
+        <div className={`${styles.uploadingContainer} ${fadeIn ? styles.fadeIn : styles.fadeOut}`}>
           <div className={styles.spinner}></div>
           <p className={styles.uploadingText}>Downloading files...</p>
           <div className={styles.progressBar}>
