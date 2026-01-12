@@ -419,6 +419,59 @@
   font-weight: 500;
 }
 
+.errorIconWrapper {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 30px;
+}
+
+.errorIconCircle {
+  width: 100px;
+  height: 100px;
+  background: rgba(255, 82, 82, 0.15);
+  border: 3px solid rgba(255, 82, 82, 0.5);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 50px;
+  animation: pulse 2s ease-in-out infinite;
+}
+
+@keyframes pulse {
+  0%, 100% {
+    transform: scale(1);
+    box-shadow: 0 0 0 0 rgba(255, 82, 82, 0.4);
+  }
+  50% {
+    transform: scale(1.05);
+    box-shadow: 0 0 0 10px rgba(255, 82, 82, 0);
+  }
+}
+
+.errorTitle {
+  color: #ff5252;
+  font-size: 32px;
+  font-weight: 700;
+  text-align: center;
+  margin-bottom: 24px;
+  letter-spacing: -0.5px;
+}
+
+.errorMessageBox {
+  background: rgba(255, 82, 82, 0.1);
+  border: 2px solid rgba(255, 82, 82, 0.4);
+  border-radius: 16px;
+  padding: 24px 32px;
+  color: #ff8a8a;
+  font-size: 18px;
+  font-weight: 500;
+  text-align: center;
+  margin-bottom: 32px;
+  line-height: 1.6;
+  word-break: break-word;
+}
+
 .compressButton,
 .convertButton {
   width: 100%;

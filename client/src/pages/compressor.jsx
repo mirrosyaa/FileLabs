@@ -112,6 +112,8 @@ function Compressor() {
   };
 
   const handleCompress = async () => {
+    if (isCompressing) return; // Prevent double compression
+    
     setError("");
     setIsCompressing(true);
     setCompressionProgress(0);
@@ -160,7 +162,12 @@ function Compressor() {
       const blob = await response.blob();
       const url = window.URL.createObjectURL(blob);
       
-      setCompressedFiles([{ url, name: files.length > 1 ? "compressed.zip" : `compressed_${files[0].name}` }]);
+      // Generate filename: if single file use its name, otherwise use "files"
+      const baseName = files.length === 1 
+        ? files[0].name.replace(/\.[^/.]+$/, "") // Remove extension
+        : "files";
+      
+      setCompressedFiles([{ url, name: `${baseName}_compressed.zip` }]);
       setCompressionProgress(100);
       
       // Fade out compressing page before changing
@@ -181,6 +188,8 @@ function Compressor() {
   };
 
   const handleDownload = () => {
+    if (hasDownloaded) return; // Prevent double downloads
+    
     setFadeIn(false);
     setTimeout(() => {
       setFadeIn(true);
@@ -192,15 +201,20 @@ function Compressor() {
           if (prev >= 100) {
             clearInterval(interval);
             
-            // Trigger download
-            compressedFiles.forEach(file => {
+            // Trigger download - only one file in array
+            if (compressedFiles.length > 0) {
+              const file = compressedFiles[0];
               const link = document.createElement("a");
               link.href = file.url;
               link.download = file.name;
+              link.style.display = 'none';
               document.body.appendChild(link);
               link.click();
-              document.body.removeChild(link);
-            });
+              setTimeout(() => {
+                document.body.removeChild(link);
+                window.URL.revokeObjectURL(file.url);
+              }, 100);
+            }
 
             setIsDownloading(false);
             setHasDownloaded(true);
@@ -217,7 +231,7 @@ function Compressor() {
     setTimeout(() => {
       setPage(1);
       setFiles([]);
-      setCompressionLevel("");
+      setCompressionLevel(0);
       setCompressedFiles([]);
       setError("");
       setUploadProgress(0);

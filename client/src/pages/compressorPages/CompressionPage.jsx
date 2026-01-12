@@ -25,6 +25,8 @@ function CompressionPage({
     setCompressionLevel(value);
   };
 
+  const currentLevel = levels.find(l => l.value === compressionLevel) || levels[0];
+
   return (
     <div className={`${styles.pageContainer} ${fadeIn ? styles.fadeIn : styles.fadeOut}`}>
       <div className={styles.compressionBox}>
@@ -33,6 +35,20 @@ function CompressionPage({
         </button>
 
         <h2 className={styles.compressionTitle}>Choose Compression Level</h2>
+        
+        <div className={styles.currentLevelDisplay} style={{
+          textAlign: 'center',
+          fontSize: '20px',
+          fontWeight: '600',
+          color: '#5ec8ff',
+          marginBottom: '20px',
+          padding: '12px',
+          background: 'rgba(94, 200, 255, 0.1)',
+          borderRadius: '12px',
+          border: '2px solid rgba(94, 200, 255, 0.3)'
+        }}>
+          Selected: {currentLevel.name}
+        </div>
         
         <div className={styles.compressionOptions}>
           <div className={styles.sliderContainer}>
@@ -78,11 +94,9 @@ function CompressionPage({
 
         {error && <div className={styles.errorBox}>{error}</div>}
 
-        {compressionLevel !== "" && (
-          <button onClick={onCompress} className={`${styles.convertButton} ${styles.slideIn}`}>
-            Compress Files
-          </button>
-        )}
+        <button onClick={onCompress} className={`${styles.convertButton} ${styles.slideIn}`}>
+          Compress Files
+        </button>
       </div>
     </div>
   );
