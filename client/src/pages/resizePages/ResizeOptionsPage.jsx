@@ -2,43 +2,57 @@ import React, { useState } from "react";
 import styles from "../../CSS/Pages/imageResize.module.css";
 
 function ResizeOptionsPage({ fadeIn, files, onResize, onBack }) {
-  const [resizeMethod, setResizeMethod] = useState("dimensions"); // dimensions, percentage, aspectRatio
+  const [resizeMethod, setResizeMethod] = useState("preset"); // preset, custom, percentage
+  const [presetSize, setPresetSize] = useState("");
   const [width, setWidth] = useState("");
   const [height, setHeight] = useState("");
   const [percentage, setPercentage] = useState(100);
-  const [aspectRatio, setAspectRatio] = useState("free");
   const [maintainAspectRatio, setMaintainAspectRatio] = useState(true);
 
-  const aspectRatios = [
-    { value: "free", label: "Free", ratio: null },
-    { value: "1:1", label: "1:1 (Square)", ratio: 1 },
-    { value: "4:3", label: "4:3", ratio: 4/3 },
-    { value: "16:9", label: "16:9 (Widescreen)", ratio: 16/9 },
-    { value: "3:2", label: "3:2", ratio: 3/2 },
-    { value: "21:9", label: "21:9 (Ultra Wide)", ratio: 21/9 }
+  // Common preset sizes
+  const presetSizes = [
+    { label: "Instagram Square", width: 1080, height: 1080 },
+    { label: "Instagram Portrait", width: 1080, height: 1350 },
+    { label: "Instagram Landscape", width: 1080, height: 566 },
+    { label: "Facebook Post", width: 1200, height: 630 },
+    { label: "Twitter Post", width: 1200, height: 675 },
+    { label: "YouTube Thumbnail", width: 1280, height: 720 },
+    { label: "Full HD", width: 1920, height: 1080 },
+    { label: "4K", width: 3840, height: 2160 },
+    { label: "HD Ready", width: 1280, height: 720 },
+    { label: "Profile Picture", width: 500, height: 500 },
   ];
 
   const handleSubmit = () => {
-    const options = {
+    let options = {
       method: resizeMethod,
-      width: parseInt(width) || null,
-      height: parseInt(height) || null,
-      percentage: percentage,
-      aspectRatio: aspectRatio,
       maintainAspectRatio: maintainAspectRatio
     };
+
+    if (resizeMethod === "preset") {
+      const selected = presetSizes.find(p => p.label === presetSize);
+      options.width = selected.width;
+      options.height = selected.height;
+      options.maintainAspectRatio = false; // Preset sizes are exact
+    } else if (resizeMethod === "custom") {
+      options.width = parseInt(width) || null;
+      options.height = parseInt(height) || null;
+    } else if (resizeMethod === "percentage") {
+      options.percentage = percentage;
+    }
+
     onResize(options);
   };
 
   const isValid = () => {
-    if (resizeMethod === "dimensions") {
+    if (resizeMethod === "preset") {
+      return presetSize !== "";
+    }
+    if (resizeMethod === "custom") {
       return width || height;
     }
     if (resizeMethod === "percentage") {
       return percentage > 0 && percentage <= 500;
-    }
-    if (resizeMethod === "aspectRatio") {
-      return aspectRatio !== "free" && (width || height);
     }
     return false;
   };
@@ -63,34 +77,51 @@ function ResizeOptionsPage({ fadeIn, files, onResize, onBack }) {
           <p className={styles.formatLabel}>Choose Resize Method</p>
           <div className={styles.formatButtons}>
             <button
-              className={`${styles.formatOption} ${resizeMethod === "dimensions" ? styles.selectedFormat : ""}`}
-              onClick={() => setResizeMethod("dimensions")}
+              className={`${styles.formatOption} ${resizeMethod === "preset" ? styles.selectedFormat : ""}`}
+              onClick={() => setResizeMethod("preset")}
             >
-              <div className={styles.formatIcon}>📏</div>
-              <div className={styles.formatName}>Dimensions</div>
-              <div className={styles.formatDescription}>Set width & height</div>
+              <div className={styles.formatName}>Preset Sizes</div>
+              <div className={styles.formatDescription}>Common formats</div>
+            </button>
+            <button
+              className={`${styles.formatOption} ${resizeMethod === "custom" ? styles.selectedFormat : ""}`}
+              onClick={() => setResizeMethod("custom")}
+            >
+              <div className={styles.formatName}>Custom Size</div>
+              <div className={styles.formatDescription}>Set dimensions</div>
             </button>
             <button
               className={`${styles.formatOption} ${resizeMethod === "percentage" ? styles.selectedFormat : ""}`}
               onClick={() => setResizeMethod("percentage")}
             >
-              <div className={styles.formatIcon}>📊</div>
-              <div className={styles.formatName}>Percentage</div>
-              <div className={styles.formatDescription}>Scale by %</div>
-            </button>
-            <button
-              className={`${styles.formatOption} ${resizeMethod === "aspectRatio" ? styles.selectedFormat : ""}`}
-              onClick={() => setResizeMethod("aspectRatio")}
-            >
-              <div className={styles.formatIcon}>📐</div>
-              <div className={styles.formatName}>Aspect Ratio</div>
-              <div className={styles.formatDescription}>Lock ratio</div>
+              <div className={styles.formatName}>Scale</div>
+              <div className={styles.formatDescription}>By percentage</div>
             </button>
           </div>
         </div>
 
-        {/* Dimensions Method */}
-        {resizeMethod === "dimensions" && (
+        {/* Preset Sizes Method */}
+        {resizeMethod === "preset" && (
+          <div className={styles.inputGroup} style={{ marginBottom: '20px' }}>
+            <label className={styles.label}>Select Preset Size</label>
+            <select
+              className={styles.input}
+              value={presetSize}
+              onChange={(e) => setPresetSize(e.target.value)}
+              style={{ cursor: 'pointer' }}
+            >
+              <option value="">Choose a size...</option>
+              {presetSizes.map((preset) => (
+                <option key={preset.label} value={preset.label}>
+                  {preset.label} ({preset.width} × {preset.height})
+                </option>
+              ))}
+            </select>
+          </div>
+        )}
+
+        {/* Custom Dimensions Method */}
+        {resizeMethod === "custom" && (
           <div className={styles.dimensionsGrid}>
             <div className={styles.inputGroup}>
               <label className={styles.label}>Width (px)</label>
@@ -117,7 +148,7 @@ function ResizeOptionsPage({ fadeIn, files, onResize, onBack }) {
           </div>
         )}
 
-        {resizeMethod === "dimensions" && (
+        {resizeMethod === "custom" && (
           <div className={styles.checkboxGroup}>
             <label className={styles.checkboxLabel}>
               <input

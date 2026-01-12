@@ -51,7 +51,8 @@ router.post('/', upload.array('files', 50), async (req, res) => {
       let resizeOptions = {};
 
       // Handle different resize methods
-      if (options.method === 'dimensions') {
+      if (options.method === 'preset' || options.method === 'custom') {
+        // Both preset and custom use width/height directly
         if (options.width && options.height) {
           resizeOptions = {
             width: parseInt(options.width),
@@ -70,31 +71,6 @@ router.post('/', upload.array('files', 50), async (req, res) => {
           width: Math.round(metadata.width * scale),
           height: Math.round(metadata.height * scale)
         };
-      } else if (options.method === 'aspectRatio' && options.aspectRatio !== 'free') {
-        const aspectRatioMap = {
-          '1:1': 1,
-          '4:3': 4/3,
-          '16:9': 16/9,
-          '3:2': 3/2,
-          '21:9': 21/9
-        };
-        const ratio = aspectRatioMap[options.aspectRatio];
-
-        if (options.width) {
-          const width = parseInt(options.width);
-          resizeOptions = {
-            width: width,
-            height: Math.round(width / ratio),
-            fit: 'fill'
-          };
-        } else if (options.height) {
-          const height = parseInt(options.height);
-          resizeOptions = {
-            width: Math.round(height * ratio),
-            height: height,
-            fit: 'fill'
-          };
-        }
       }
 
       await sharp(file.path)
