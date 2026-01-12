@@ -220,7 +220,8 @@ function ImageCrop() {
                 onDragLeave={handleDragLeave}
                 onDrop={handleDrop}
               >
-                <p className={styles.uploadText}>Drag and drop files here</p>
+                <div className={styles.uploadIcon}>📁</div>
+                <p className={styles.uploadText}>Drag & drop files here</p>
                 <label className={styles.browseBtn}>
                   Browse Files
                   <input
