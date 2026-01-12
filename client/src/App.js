@@ -15,6 +15,9 @@ import AdminDashboard from "./pages/adminDashboard";
 import FileConverter from "./pages/fileConverter";
 import Compressor from "./pages/compressor";
 import DocumentTools from "./pages/documentTools";
+import UrlDownloader from "./pages/urlDownloader";
+import ImageResize from "./pages/imageResize";
+import ImageCrop from "./pages/imageCrop";
 import LoadingScreen from "./pages/loadingScreen";
 import Navbar from "./components/Layout/navbar";
 import SessionExpiredModal from "./modals/sessionExpiredModal";
@@ -115,6 +118,30 @@ function AppContent() {
             element={
               <RouteProtector>
                 <DocumentTools />
+              </RouteProtector>
+            }
+          />
+          <Route
+            path="/document-tools/download-url"
+            element={
+              <RouteProtector>
+                <UrlDownloader />
+              </RouteProtector>
+            }
+          />
+          <Route
+            path="/tools/images/resize"
+            element={
+              <RouteProtector>
+                <ImageResize />
+              </RouteProtector>
+            }
+          />
+          <Route
+            path="/tools/images/crop"
+            element={
+              <RouteProtector>
+                <ImageCrop />
               </RouteProtector>
             }
           />

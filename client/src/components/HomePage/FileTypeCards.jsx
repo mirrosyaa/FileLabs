@@ -14,7 +14,7 @@ function FileTypeCards() {
         { name: "Convert", path: "/file-converter" },
         { name: "Compress PDF", path: "/tools/documents/compress-pdf" },
         { name: "Merge PDF", path: "/tools/documents/merge-pdf" },
-        { name: "Download from URL", path: "/tools/documents/download-url" },
+        { name: "Download from URL", path: "/document-tools/download-url" },
         { name: "Auto Rename", path: "/tools/documents/auto-rename" },
         { name: "Extract Images", path: "/tools/documents/extract-images" },
       ],
