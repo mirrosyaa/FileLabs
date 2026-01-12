@@ -4,6 +4,8 @@ const axios = require("axios");
 const usersRoutes = require("./routes/users");
 const convertRoutes = require("./routes/convert");
 const compressRoutes = require("./routes/compress");
+const resizeRoutes = require("./routes/resize");
+const cropRoutes = require("./routes/crop");
 
 const app = express();
 const PORT = 3001;
@@ -20,6 +22,8 @@ app.use(express.urlencoded({ extended: true, limit: '200mb' }));
 app.use("/users", usersRoutes);
 app.use("/api", convertRoutes);
 app.use("/api", compressRoutes);
+app.use("/api/image/resize", resizeRoutes);
+app.use("/api/image/crop", cropRoutes);
 
 // Download from URL endpoint
 app.post("/api/download-url", async (req, res) => {

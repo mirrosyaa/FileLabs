@@ -1,17 +1,22 @@
 import React, { useState, useEffect } from "react";
 import Footer from "../components/Layout/footer";
+import UploadPage from "./cropPages/UploadPage";
+import UploadingPage from "./cropPages/UploadingPage";
+import InteractiveCropPage from "./cropPages/InteractiveCropPage";
+import ProcessingPage from "./cropPages/ProcessingPage";
+import CompletePage from "./cropPages/CompletePage";
+import axios from "axios";
 import styles from "../CSS/Pages/imageCrop.module.css";
 
 function ImageCrop() {
-  const [page, setPage] = useState(1); // 1 = upload, 2 = uploading, 3 = options, 4 = processing, 5 = complete
+  const [page, setPage] = useState(1); // 1 = upload, 2 = uploading, 3 = interactive crop, 4 = processing, 5 = complete
   const [files, setFiles] = useState([]);
-  const [cropX, setCropX] = useState("");
-  const [cropY, setCropY] = useState("");
-  const [cropWidth, setCropWidth] = useState("");
-  const [cropHeight, setCropHeight] = useState("");
+  const [currentFileIndex, setCurrentFileIndex] = useState(0);
+  const [croppedData, setCroppedData] = useState([]);
   const [uploadProgress, setUploadProgress] = useState(0);
-  const [isProcessing, setIsProcessing] = useState(false);
   const [processingProgress, setProcessingProgress] = useState(0);
+  const [downloadProgress, setDownloadProgress] = useState(0);
+  const [isDownloading, setIsDownloading] = useState(false);
   const [hasDownloaded, setHasDownloaded] = useState(false);
   const [downloadUrl, setDownloadUrl] = useState(null);
   const [downloadFilename, setDownloadFilename] = useState("");
@@ -83,8 +88,10 @@ function ImageCrop() {
 
   const handleFileSelect = (e) => {
     const selectedFiles = Array.from(e.target.files);
-    if (selectedFiles.length > 0) {
-      setFiles(selectedFiles);
+    const imageFiles = selectedFiles.filter(file => file.type.startsWith('image/'));
+    
+    if (imageFiles.length > 0) {
+      setFiles(imageFiles);
       setError(null);
       setFadeIn(false);
       setTimeout(() => {
@@ -94,54 +101,56 @@ function ImageCrop() {
     }
   };
 
-  const handleCrop = async () => {
-    if (!cropWidth || !cropHeight) {
-      setError("Please enter crop width and height");
-      return;
-    }
+  const handleCropComplete = async (croppedAreaPixels) => {
+    const newCroppedData = [...croppedData];
+    newCroppedData[currentFileIndex] = croppedAreaPixels;
+    setCroppedData(newCroppedData);
 
-    setFadeIn(false);
-    setTimeout(() => {
-      setPage(4);
-      setIsProcessing(true);
-      setProcessingProgress(0);
-      setError(null);
-      setFadeIn(true);
+    // Move to next file or processing
+    if (currentFileIndex < files.length - 1) {
+      setCurrentFileIndex(currentFileIndex + 1);
+    } else {
+      // All files cropped, process them
+      setFadeIn(false);
+      setTimeout(async () => {
+        setPage(4);
+        setProcessingProgress(0);
+        setFadeIn(true);
 
-      const progressInterval = setInterval(() => {
-        setProcessingProgress((prev) => {
-          if (prev >= 90) {
-            clearInterval(progressInterval);
-            return 90;
+        const startTime = Date.now();
+        const minProcessingTime = 1000;
+
+        // Simulate progress
+        const progressInterval = setInterval(() => {
+          setProcessingProgress((prev) => {
+            if (prev >= 90) {
+              clearInterval(progressInterval);
+              return 90;
+            }
+            return prev + 10;
+          });
+        }, 200);
+
+        try {
+          const formData = new FormData();
+          
+          // Add all cropped images
+          for (let i = 0; i < files.length; i++) {
+            const file = files[i];
+            const cropData = newCroppedData[i];
+            
+            formData.append('files', file);
+            formData.append(`cropData_${i}`, JSON.stringify(cropData));
           }
-          return prev + 10;
-        });
-      }, 200);
 
-      const formData = new FormData();
-      files.forEach((file) => {
-        formData.append("files", file);
-      });
-      formData.append("operation", "crop");
-      formData.append("x", cropX || "0");
-      formData.append("y", cropY || "0");
-      formData.append("width", cropWidth);
-      formData.append("height", cropHeight);
+          const response = await axios.post("http://localhost:3001/api/image/crop", formData, {
+            responseType: 'blob',
+            headers: {
+              'Content-Type': 'multipart/form-data',
+            },
+          });
 
-      fetch("http://localhost:3001/api/image/crop", {
-        method: "POST",
-        body: formData,
-      })
-        .then((response) => {
-          if (!response.ok) {
-            throw new Error("Crop failed");
-          }
-          return response.blob();
-        })
-        .then((blob) => {
-          clearInterval(progressInterval);
-          setProcessingProgress(100);
-
+          const blob = response.data;
           const url = window.URL.createObjectURL(blob);
           const filename = files.length === 1 
             ? `cropped_${files[0].name}` 
@@ -150,38 +159,70 @@ function ImageCrop() {
           setDownloadUrl(url);
           setDownloadFilename(filename);
 
+          clearInterval(progressInterval);
+          setProcessingProgress(100);
+
+          const elapsedTime = Date.now() - startTime;
+          const remainingTime = Math.max(0, minProcessingTime - elapsedTime);
+
           setTimeout(() => {
-            setIsProcessing(false);
             setFadeIn(false);
             setTimeout(() => {
               setPage(5);
               setFadeIn(true);
             }, 300);
-          }, 500);
-        })
-        .catch((error) => {
+          }, remainingTime + 500);
+
+        } catch (error) {
           console.error("Crop error:", error);
           clearInterval(progressInterval);
-          setError(error.message || "Failed to crop images");
-          setIsProcessing(false);
+          setProcessingProgress(0);
+          setError(error.response?.data?.error || "Failed to crop images");
           setFadeIn(false);
           setTimeout(() => {
             setPage(3);
             setFadeIn(true);
           }, 300);
-        });
-    }, 300);
+        }
+      }, 300);
+    }
+  };
+
+  const handleBackToCrop = () => {
+    if (currentFileIndex > 0) {
+      setCurrentFileIndex(currentFileIndex - 1);
+    }
   };
 
   const handleDownload = () => {
     if (downloadUrl && downloadFilename) {
-      const link = document.createElement("a");
-      link.href = downloadUrl;
-      link.download = downloadFilename;
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
-      setHasDownloaded(true);
+      setIsDownloading(true);
+      setDownloadProgress(0);
+
+      // Simulate download progress
+      const interval = setInterval(() => {
+        setDownloadProgress((prev) => {
+          if (prev >= 100) {
+            clearInterval(interval);
+            
+            // Actual download
+            const link = document.createElement("a");
+            link.href = downloadUrl;
+            link.download = downloadFilename;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            
+            setTimeout(() => {
+              setIsDownloading(false);
+              setHasDownloaded(true);
+            }, 500);
+            
+            return 100;
+          }
+          return prev + 20;
+        });
+      }, 100);
     }
   };
 
@@ -190,13 +231,12 @@ function ImageCrop() {
     setTimeout(() => {
       setPage(1);
       setFiles([]);
-      setCropX("");
-      setCropY("");
-      setCropWidth("");
-      setCropHeight("");
+      setCurrentFileIndex(0);
+      setCroppedData([]);
       setUploadProgress(0);
-      setIsProcessing(false);
       setProcessingProgress(0);
+      setDownloadProgress(0);
+      setIsDownloading(false);
       setHasDownloaded(false);
       setDownloadUrl(null);
       setDownloadFilename("");
@@ -205,155 +245,65 @@ function ImageCrop() {
     }, 300);
   };
 
+  const handleBackToUpload = () => {
+    setFadeIn(false);
+    setTimeout(() => {
+      setPage(1);
+      setFadeIn(true);
+    }, 300);
+  };
+
   return (
     <div className={styles.imageCropPage}>
       <div className={styles.imageCropMain}>
         <div className={styles.imageCropContent}>
-          <div className={`${styles.pageContainer} ${fadeIn ? styles.fadeIn : styles.fadeOut}`}>
-            <h1 className={styles.mainTitle}>Crop Images</h1>
+          {page === 1 && (
+            <UploadPage
+              fadeIn={fadeIn}
+              isDragging={isDragging}
+              onDragEnter={handleDragEnter}
+              onDragOver={handleDragOver}
+              onDragLeave={handleDragLeave}
+              onDrop={handleDrop}
+              onFileSelect={handleFileSelect}
+            />
+          )}
 
-            {page === 1 && (
-              <div
-                className={`${styles.uploadBox} ${isDragging ? styles.dragging : ""}`}
-                onDragEnter={handleDragEnter}
-                onDragOver={handleDragOver}
-                onDragLeave={handleDragLeave}
-                onDrop={handleDrop}
-              >
-                <div className={styles.uploadIcon}>📁</div>
-                <p className={styles.uploadText}>Drag & drop files here</p>
-                <label className={styles.browseBtn}>
-                  Browse Files
-                  <input
-                    type="file"
-                    accept="image/*"
-                    multiple
-                    onChange={handleFileSelect}
-                    style={{ display: "none" }}
-                  />
-                </label>
-                {error && <p className={styles.errorMessage}>{error}</p>}
-              </div>
-            )}
+          {page === 2 && (
+            <UploadingPage
+              fadeIn={fadeIn}
+              uploadProgress={uploadProgress}
+            />
+          )}
 
-            {page === 2 && (
-              <div className={styles.uploadingContainer}>
-                <div className={styles.uploadingBox}>
-                  <div className={styles.spinner}></div>
-                  <h2 className={styles.uploadingTitle}>Uploading...</h2>
-                  <p className={styles.uploadingText}>{files.length} image(s)</p>
-                  <div className={styles.progressBar}>
-                    <div
-                      className={styles.progressFill}
-                      style={{ width: `${uploadProgress}%` }}
-                    ></div>
-                  </div>
-                  <p className={styles.progressText}>{uploadProgress}%</p>
-                </div>
-              </div>
-            )}
+          {page === 3 && (
+            <InteractiveCropPage
+              fadeIn={fadeIn}
+              file={files[currentFileIndex]}
+              onCropComplete={handleCropComplete}
+              onBack={handleBackToCrop}
+              onBackToUpload={handleBackToUpload}
+            />
+          )}
 
-            {page === 3 && (
-              <div className={styles.optionsContainer}>
-                <div className={styles.optionsBox}>
-                  <h2 className={styles.optionsTitle}>Crop Options</h2>
-                  <p className={styles.fileCount}>{files.length} image(s) uploaded</p>
-                  
-                  <div className={styles.dimensionsGrid}>
-                    <div className={styles.inputGroup}>
-                      <label className={styles.label}>X Position (px)</label>
-                      <input
-                        type="number"
-                        className={styles.input}
-                        placeholder="0"
-                        value={cropX}
-                        onChange={(e) => setCropX(e.target.value)}
-                        min="0"
-                      />
-                    </div>
-                    <div className={styles.inputGroup}>
-                      <label className={styles.label}>Y Position (px)</label>
-                      <input
-                        type="number"
-                        className={styles.input}
-                        placeholder="0"
-                        value={cropY}
-                        onChange={(e) => setCropY(e.target.value)}
-                        min="0"
-                      />
-                    </div>
-                    <div className={styles.inputGroup}>
-                      <label className={styles.label}>Width (px)</label>
-                      <input
-                        type="number"
-                        className={styles.input}
-                        placeholder="Required"
-                        value={cropWidth}
-                        onChange={(e) => setCropWidth(e.target.value)}
-                        min="1"
-                      />
-                    </div>
-                    <div className={styles.inputGroup}>
-                      <label className={styles.label}>Height (px)</label>
-                      <input
-                        type="number"
-                        className={styles.input}
-                        placeholder="Required"
-                        value={cropHeight}
-                        onChange={(e) => setCropHeight(e.target.value)}
-                        min="1"
-                      />
-                    </div>
-                  </div>
+          {page === 4 && (
+            <ProcessingPage
+              fadeIn={fadeIn}
+              processingProgress={processingProgress}
+            />
+          )}
 
-                  <div className={styles.helpText}>
-                    <p>💡 Tip: X and Y define the top-left corner of the crop area</p>
-                  </div>
-
-                  {error && <p className={styles.errorMessage}>{error}</p>}
-
-                  <button className={styles.cropButton} onClick={handleCrop}>
-                    Crop Images
-                  </button>
-                </div>
-              </div>
-            )}
-
-            {page === 4 && (
-              <div className={styles.processingContainer}>
-                <div className={styles.processingBox}>
-                  <div className={styles.spinner}></div>
-                  <h2 className={styles.processingTitle}>Cropping...</h2>
-                  <p className={styles.processingText}>Processing your images</p>
-                  <div className={styles.progressBar}>
-                    <div
-                      className={styles.progressFill}
-                      style={{ width: `${processingProgress}%` }}
-                    ></div>
-                  </div>
-                  <p className={styles.progressText}>{processingProgress}%</p>
-                </div>
-              </div>
-            )}
-
-            {page === 5 && (
-              <div className={styles.completeContainer}>
-                <div className={styles.completeBox}>
-                  <div className={styles.checkmark}>✓</div>
-                  <h2 className={styles.completeTitle}>Crop Complete!</h2>
-                  <p className={styles.completeText}>Your images are ready</p>
-                  <div className={styles.buttonGroup}>
-                    <button className={`${styles.actionButton} ${styles.downloadBtn}`} onClick={handleDownload}>
-                      {hasDownloaded ? "Download Again" : "Download Images"}
-                    </button>
-                    <button className={`${styles.actionButton} ${styles.resetBtn}`} onClick={handleReset}>
-                      Crop More Images
-                    </button>
-                  </div>
-                </div>
-              </div>
-            )}
-          </div>
+          {page === 5 && (
+            <CompletePage
+              fadeIn={fadeIn}
+              isDownloading={isDownloading}
+              downloadProgress={downloadProgress}
+              hasDownloaded={hasDownloaded}
+              downloadFilename={downloadFilename}
+              onDownload={handleDownload}
+              onNewCrop={handleReset}
+            />
+          )}
         </div>
       </div>
       <Footer />

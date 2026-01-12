@@ -67,10 +67,10 @@
 /* PAGE 1: Upload */
 .mainTitle {
   color: #ffffff;
-  font-size: 42px;
+  font-size: 36px;
   font-weight: 700;
   text-align: center;
-  margin-bottom: 60px;
+  margin-bottom: 40px;
   letter-spacing: -0.5px;
 }
 
@@ -208,17 +208,19 @@
   background: rgba(255, 255, 255, 0.05);
   border: 3px dashed rgba(94, 200, 255, 0.4);
   border-radius: 24px;
-  padding: 50px 40px;
+  padding: 30px 40px;
   backdrop-filter: blur(10px);
   transition: all 0.3s ease;
+  max-height: calc(100vh - 240px);
+  overflow-y: auto;
 }
 
 .conversionTitle {
   color: #ffffff;
-  font-size: 40px;
+  font-size: 32px;
   font-weight: 700;
   text-align: center;
-  margin-bottom: 40px;
+  margin-bottom: 20px;
 }
 
 /* Conversion Loading Overlay */
@@ -279,16 +281,16 @@
 .filesDisplay {
   background: rgba(255, 255, 255, 0.05);
   border-radius: 16px;
-  padding: 24px;
-  margin-bottom: 30px;
+  padding: 16px;
+  margin-bottom: 20px;
   backdrop-filter: blur(10px);
 }
 
 .filesHeader {
   color: #ffffff;
-  font-size: 18px;
+  font-size: 16px;
   font-weight: 600;
-  margin-bottom: 16px;
+  margin-bottom: 12px;
 }
 
 .fileTypeSection {
@@ -322,33 +324,33 @@
 }
 
 .formatOptions {
-  margin-bottom: 30px;
+  margin-bottom: 20px;
 }
 
 .formatLabel {
   color: #ffffff;
-  font-size: 18px;
+  font-size: 16px;
   font-weight: 600;
-  margin-bottom: 16px;
+  margin-bottom: 12px;
   text-align: center;
 }
 
 .formatButtons {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
-  gap: 16px;
-  margin-bottom: 20px;
+  gap: 12px;
+  margin-bottom: 16px;
 }
 
 .formatOption {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 8px;
+  gap: 6px;
   background: rgba(255, 255, 255, 0.05);
   border: 2px solid rgba(94, 200, 255, 0.3);
   border-radius: 16px;
-  padding: 20px 16px;
+  padding: 16px 12px;
   cursor: pointer;
   transition: all 0.3s ease;
   color: #ffffff;
@@ -371,16 +373,16 @@
 }
 
 .formatIcon {
-  font-size: 32px;
+  font-size: 28px;
 }
 
 .formatName {
-  font-size: 24px;
+  font-size: 20px;
   font-weight: 700;
 }
 
 .formatDescription {
-  font-size: 14px;
+  font-size: 13px;
   font-weight: 400;
   color: rgba(255, 255, 255, 0.7);
   margin-top: 4px;
@@ -756,14 +758,14 @@
 .dimensionsGrid {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
-  gap: 20px;
-  margin-bottom: 30px;
+  gap: 16px;
+  margin-bottom: 20px;
 }
 
 .inputGroup {
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 6px;
 }
 
 .label {
@@ -776,7 +778,7 @@
   background: rgba(255, 255, 255, 0.1);
   border: 2px solid rgba(255, 255, 255, 0.2);
   border-radius: 12px;
-  padding: 14px 18px;
+  padding: 12px 16px;
   font-size: 16px;
   color: #ffffff;
   outline: none;
@@ -793,7 +795,7 @@
 }
 
 .checkboxGroup {
-  margin-bottom: 30px;
+  margin-bottom: 20px;
 }
 
 .checkboxLabel {
@@ -868,79 +870,164 @@
 }
 
 .completeBox {
-  background: rgba(255, 255, 255, 0.05);
-  border: 2px solid rgba(255, 255, 255, 0.1);
-  border-radius: 20px;
-  padding: 60px;
   text-align: center;
-  max-width: 600px;
-  width: 100%;
+  padding: 80px 60px;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 24px;
   backdrop-filter: blur(10px);
+  max-width: 600px;
+  margin: 0 auto;
 }
 
-.checkmark {
-  width: 80px;
-  height: 80px;
-  background: linear-gradient(135deg, #4a9fd8 0%, #3d8bc4 100%);
-  border-radius: 50%;
+.successIcon {
+  font-size: 70px;
+  color: #4caf50;
+  margin-bottom: 30px;
+  animation: scaleIn 0.6s ease-out;
+}
+
+@keyframes scaleIn {
+  from {
+    transform: scale(0);
+    opacity: 0;
+  }
+  to {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+.successText {
+  color: rgba(255, 255, 255, 0.7);
+  font-size: 18px;
+  margin-bottom: 40px;
+  font-weight: 500;
+}
+
+.downloadFileInfo {
+  background: linear-gradient(
+    135deg,
+    rgba(94, 200, 255, 0.15) 0%,
+    rgba(74, 159, 216, 0.1) 100%
+  );
+  border: 2px solid rgba(94, 200, 255, 0.4);
+  border-radius: 16px;
+  padding: 24px 28px;
+  margin-bottom: 40px;
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  transition: all 0.3s ease;
+  animation: slideUp 0.5s ease-out 0.3s both;
+}
+
+.downloadFileInfo:hover {
+  transform: translateY(-2px);
+  border-color: rgba(94, 200, 255, 0.6);
+  box-shadow: 0 8px 25px rgba(94, 200, 255, 0.2);
+}
+
+.fileInfoIcon {
+  font-size: 48px;
+  filter: drop-shadow(0 4px 8px rgba(94, 200, 255, 0.3));
+}
+
+.fileInfoText {
+  flex: 1;
+  text-align: left;
+}
+
+.fileName {
+  color: #ffffff;
+  font-size: 18px;
+  font-weight: 700;
+  margin-bottom: 6px;
+  word-break: break-word;
+}
+
+.fileFormat {
+  color: #5ec8ff;
+  font-size: 14px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.downloadButton {
+  width: 100%;
+  max-width: 450px;
+  background: linear-gradient(135deg, #4caf50 0%, #388e3c 100%);
+  color: #ffffff;
+  border: none;
+  border-radius: 16px;
+  padding: 22px 48px;
+  font-size: 22px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 8px 30px rgba(76, 175, 80, 0.4);
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 48px;
-  color: white;
-  margin: 0 auto 30px;
-  animation: scaleIn 0.5s ease;
+  gap: 14px;
+  margin: 0 auto 40px;
+  animation: slideUp 0.5s ease-out 0.4s both;
 }
 
-.completeTitle {
+.downloadButton:hover:not(:disabled) {
+  transform: translateY(-4px) scale(1.02);
+  box-shadow: 0 12px 45px rgba(76, 175, 80, 0.6);
+  background: linear-gradient(135deg, #66bb6a 0%, #43a047 100%);
+}
+
+.downloadButton:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.downloadIcon {
+  font-size: 26px;
+  animation: bounce 2s infinite;
+}
+
+@keyframes bounce {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-4px);
+  }
+}
+
+.newConversionBtn {
+  background: rgba(255, 255, 255, 0.08);
+  border: 2px solid rgba(255, 255, 255, 0.25);
+  border-radius: 12px;
   color: #ffffff;
-  font-size: 28px;
-  font-weight: 700;
-  margin-bottom: 12px;
-}
-
-.completeText {
-  color: rgba(255, 255, 255, 0.7);
-  font-size: 16px;
-  margin-bottom: 40px;
-}
-
-.buttonGroup {
-  display: flex;
-  gap: 15px;
-  justify-content: center;
-  flex-wrap: wrap;
-}
-
-.actionButton {
-  padding: 14px 32px;
+  padding: 20px 36px;
   font-size: 16px;
   font-weight: 600;
-  border-radius: 12px;
-  border: none;
   cursor: pointer;
   transition: all 0.3s ease;
+  animation: slideUp 0.5s ease-out 0.5s both;
 }
 
-.downloadBtn {
-  background: linear-gradient(135deg, #4a9fd8 0%, #3d8bc4 100%);
-  color: white;
-  box-shadow: 0 4px 15px rgba(74, 159, 216, 0.3);
-}
-
-.downloadBtn:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 6px 20px rgba(74, 159, 216, 0.4);
-}
-
-.resetBtn {
-  background: rgba(255, 255, 255, 0.1);
-  color: white;
-  border: 2px solid rgba(255, 255, 255, 0.2);
-}
-
-.resetBtn:hover {
+.newConversionBtn:hover {
   background: rgba(255, 255, 255, 0.15);
-  border-color: rgba(255, 255, 255, 0.3);
+  border-color: rgba(255, 255, 255, 0.4);
   transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(255, 255, 255, 0.1);
 }

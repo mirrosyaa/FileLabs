@@ -1,0 +1,66 @@
+import React from "react";
+import styles from "../../CSS/Pages/imageCrop.module.css";
+
+function CompletePage({ fadeIn, isDownloading, downloadProgress, hasDownloaded, downloadFilename, onDownload, onNewCrop }) {
+  return (
+    <div className={`${styles.pageContainer} ${fadeIn ? styles.fadeIn : styles.fadeOut}`}>
+      {/* Download Loading Overlay */}
+      {isDownloading && (
+        <div className={styles.downloadingOverlay}>
+          <div className={styles.spinner}></div>
+          <p className={styles.uploadingText}>Downloading file...</p>
+          <div className={styles.progressBar}>
+            <div
+              className={styles.progressFill}
+              style={{ width: `${downloadProgress}%` }}
+            ></div>
+          </div>
+          <p className={styles.progressText}>{downloadProgress}%</p>
+        </div>
+      )}
+
+      <div className={styles.successContainer}>
+        <div className={styles.successIconWrapper}>
+          <div className={styles.successIconCircle}>
+            <div className={styles.successIcon}>✓</div>
+          </div>
+        </div>
+        {!hasDownloaded ? (
+          <>
+            <h2 className={styles.successTitle}>Crop Complete!</h2>
+            <p className={styles.successMessage}>
+              Your images have been successfully cropped
+            </p>
+          </>
+        ) : (
+          <h2 className={styles.successTitle}>File Downloaded Successfully!</h2>
+        )}
+
+        {!hasDownloaded && (
+          <button
+            className={styles.downloadButton}
+            onClick={onDownload}
+            disabled={isDownloading}
+          >
+            {isDownloading ? (
+              <>
+                <span className={styles.buttonSpinner}></span>
+                Downloading...
+              </>
+            ) : (
+              <>
+                <span className={styles.downloadIcon}>⬇</span>
+                Download File
+              </>
+            )}
+          </button>
+        )}
+        <button className={styles.newConversionBtn} onClick={onNewCrop}>
+          Crop More Images
+        </button>
+      </div>
+    </div>
+  );
+}
+
+export default CompletePage;
