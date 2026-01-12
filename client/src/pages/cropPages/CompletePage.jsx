@@ -6,7 +6,7 @@ function CompletePage({ fadeIn, isDownloading, downloadProgress, hasDownloaded, 
     <div className={`${styles.pageContainer} ${fadeIn ? styles.fadeIn : styles.fadeOut}`}>
       {/* Download Loading Overlay */}
       {isDownloading && (
-        <div className={styles.downloadingOverlay}>
+        <div className={`${styles.uploadingContainer} ${fadeIn ? styles.fadeIn : styles.fadeOut}`}>
           <div className={styles.spinner}></div>
           <p className={styles.uploadingText}>Downloading file...</p>
           <div className={styles.progressBar}>
@@ -19,7 +19,8 @@ function CompletePage({ fadeIn, isDownloading, downloadProgress, hasDownloaded, 
         </div>
       )}
 
-      <div className={styles.successContainer}>
+      {!isDownloading && (
+        <div className={styles.successContainer}>
         <div className={styles.successIconWrapper}>
           <div className={styles.successIconCircle}>
             <div className={styles.successIcon}>✓</div>
@@ -59,6 +60,7 @@ function CompletePage({ fadeIn, isDownloading, downloadProgress, hasDownloaded, 
           Crop More Images
         </button>
       </div>
+      )}
     </div>
   );
 }

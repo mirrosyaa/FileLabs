@@ -180,65 +180,6 @@ function ResizeOptionsPage({ fadeIn, files, onResize, onBack }) {
           </div>
         )}
 
-        {/* Aspect Ratio Method */}
-        {resizeMethod === "aspectRatio" && (
-          <>
-            <div className={styles.formatOptions} style={{ marginBottom: '16px' }}>
-              <p className={styles.formatLabel}>Select Aspect Ratio</p>
-              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '8px', marginBottom: '12px' }}>
-                {aspectRatios.map((ar) => (
-                  <button
-                    key={ar.value}
-                    className={`${styles.compactFormatOption} ${aspectRatio === ar.value ? styles.selectedFormat : ""}`}
-                    onClick={() => setAspectRatio(ar.value)}
-                    style={{
-                      padding: '10px 8px',
-                      fontSize: '14px',
-                      borderRadius: '12px',
-                      background: aspectRatio === ar.value ? 'rgba(94, 200, 255, 0.15)' : 'rgba(255, 255, 255, 0.05)',
-                      border: aspectRatio === ar.value ? '2px solid #5ec8ff' : '2px solid rgba(94, 200, 255, 0.3)',
-                      color: '#ffffff',
-                      cursor: 'pointer',
-                      transition: 'all 0.3s ease',
-                      fontWeight: '600'
-                    }}
-                  >
-                    {ar.label}
-                  </button>
-                ))}
-              </div>
-            </div>
-            
-            <div className={styles.dimensionsGrid} style={{ marginBottom: '12px' }}>
-              <div className={styles.inputGroup}>
-                <label className={styles.label}>Width (px)</label>
-                <input
-                  type="number"
-                  className={styles.input}
-                  placeholder="Auto"
-                  value={width}
-                  onChange={(e) => setWidth(e.target.value)}
-                  min="1"
-                />
-              </div>
-              <div className={styles.inputGroup}>
-                <label className={styles.label}>Height (px)</label>
-                <input
-                  type="number"
-                  className={styles.input}
-                  placeholder="Auto"
-                  value={height}
-                  onChange={(e) => setHeight(e.target.value)}
-                  min="1"
-                />
-              </div>
-            </div>
-            <p style={{ color: 'rgba(255,255,255,0.6)', fontSize: '13px', marginBottom: '16px', textAlign: 'center' }}>
-              Enter one dimension, the other will be calculated
-            </p>
-          </>
-        )}
-
         <button
           className={styles.convertButton}
           onClick={handleSubmit}
