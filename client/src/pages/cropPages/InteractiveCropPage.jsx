@@ -19,12 +19,31 @@ function InteractiveCropPage({
   const [rotation, setRotation] = useState(0);
   const [aspectRatio, setAspectRatio] = useState(NaN); // NaN = Free
   const [exportFormat, setExportFormat] = useState('image/png');
+  
+  // New states for custom dimensions
+  const [originalWidth, setOriginalWidth] = useState(0);
+  const [originalHeight, setOriginalHeight] = useState(0);
+  const [customWidth, setCustomWidth] = useState(0);
+  const [customHeight, setCustomHeight] = useState(0);
+  const [aspectRatioLocked, setAspectRatioLocked] = useState(true);
+  const [upscaleError, setUpscaleError] = useState(false);
 
   // Load image when component mounts or file changes
   useEffect(() => {
     const reader = new FileReader();
     reader.addEventListener("load", () => {
-      setImageSrc(reader.result);
+      const imageUrl = reader.result;
+      setImageSrc(imageUrl);
+      
+      // Create an image element to get natural dimensions
+      const img = new Image();
+      img.onload = () => {
+        setOriginalWidth(img.naturalWidth);
+        setOriginalHeight(img.naturalHeight);
+        setCustomWidth(img.naturalWidth);
+        setCustomHeight(img.naturalHeight);
+      };
+      img.src = imageUrl;
     });
     reader.readAsDataURL(file);
   }, [file]);
@@ -86,15 +105,75 @@ function InteractiveCropPage({
     }
   };
 
+  // Custom dimension handlers
+  const handleWidthChange = (e) => {
+    const newWidth = parseInt(e.target.value) || 0;
+    
+    // Prevent upscaling
+    if (newWidth > originalWidth) {
+      setUpscaleError(true);
+      return;
+    }
+    
+    setUpscaleError(false);
+    setCustomWidth(newWidth);
+    
+    // If aspect ratio is locked, calculate and update height
+    if (aspectRatioLocked && originalWidth > 0 && originalHeight > 0) {
+      const ratio = originalHeight / originalWidth;
+      const newHeight = Math.round(newWidth * ratio);
+      setCustomHeight(newHeight);
+    }
+  };
+
+  const handleHeightChange = (e) => {
+    const newHeight = parseInt(e.target.value) || 0;
+    
+    // Prevent upscaling
+    if (newHeight > originalHeight) {
+      setUpscaleError(true);
+      return;
+    }
+    
+    setUpscaleError(false);
+    setCustomHeight(newHeight);
+    
+    // If aspect ratio is locked, calculate and update width
+    if (aspectRatioLocked && originalWidth > 0 && originalHeight > 0) {
+      const ratio = originalWidth / originalHeight;
+      const newWidth = Math.round(newHeight * ratio);
+      setCustomWidth(newWidth);
+    }
+  };
+
+  const handleAspectRatioLockToggle = () => {
+    setAspectRatioLocked(!aspectRatioLocked);
+  };
+
+  // Calculate display aspect ratio
+  const getAspectRatioDisplay = () => {
+    if (originalWidth === 0 || originalHeight === 0) return '';
+    
+    const ratio = originalWidth / originalHeight;
+    const gcd = (a, b) => b === 0 ? a : gcd(b, a % b);
+    const divisor = gcd(originalWidth, originalHeight);
+    const w = originalWidth / divisor;
+    const h = originalHeight / divisor;
+    
+    return `Aspect ratio: ${w}:${h} (${ratio.toFixed(2)})`;
+  };
+
   const handleApplyCrop = async () => {
     if (cropperRef.current && cropperRef.current.cropper) {
       try {
         const cropper = cropperRef.current.cropper;
         
-        // Get cropped canvas
+        // Get cropped canvas with custom dimensions
         const croppedCanvas = cropper.getCroppedCanvas({
-          maxWidth: 4096,
-          maxHeight: 4096,
+          width: customWidth,
+          height: customHeight,
+          maxWidth: originalWidth,
+          maxHeight: originalHeight,
           imageSmoothingEnabled: true,
           imageSmoothingQuality: 'high',
         });
@@ -140,13 +219,6 @@ function InteractiveCropPage({
       <div className={styles.cropContainer}>
         {/* Left side - 2/3 - Photo area */}
         <div className={styles.cropPhotoArea}>
-          <div className={styles.cropHeader}>
-            <h2 className={styles.cropTitle}>
-              Crop Image {currentIndex + 1} of {totalFiles}
-            </h2>
-            <p className={styles.cropFilename}>{file.name}</p>
-          </div>
-
           <div className={styles.cropperWrapper}>
             {imageSrc && (
               <Cropper
@@ -172,6 +244,7 @@ function InteractiveCropPage({
               />
             )}
           </div>
+          <p className={styles.previewCaption}>Ось так має виглядати твоє фото</p>
         </div>
 
         {/* Right side - 1/3 - Options panel */}
@@ -209,6 +282,55 @@ function InteractiveCropPage({
                   16:9
                 </button>
               </div>
+            </div>
+
+            {/* Custom Dimensions */}
+            <div className={styles.optionGroup}>
+              <label className={styles.optionLabel}>Output Dimensions</label>
+              <div className={styles.dimensionInputsGrid}>
+                <div className={styles.dimensionInputWrapper}>
+                  <label className={styles.optionLabel} style={{ fontSize: '14px' }}>Width</label>
+                  <input
+                    type="number"
+                    className={styles.dimensionInput}
+                    value={customWidth}
+                    onChange={handleWidthChange}
+                    min={1}
+                    max={originalWidth}
+                    placeholder="Width"
+                  />
+                </div>
+                <div className={styles.dimensionInputWrapper}>
+                  <label className={styles.optionLabel} style={{ fontSize: '14px' }}>Height</label>
+                  <input
+                    type="number"
+                    className={styles.dimensionInput}
+                    value={customHeight}
+                    onChange={handleHeightChange}
+                    min={1}
+                    max={originalHeight}
+                    placeholder="Height"
+                  />
+                </div>
+              </div>
+              
+              <div className={styles.lockToggle}>
+                <input
+                  type="checkbox"
+                  id="aspectRatioLock"
+                  checked={aspectRatioLocked}
+                  onChange={handleAspectRatioLockToggle}
+                />
+                <label htmlFor="aspectRatioLock">Lock aspect ratio</label>
+              </div>
+              
+              <p className={styles.aspectRatioInfo}>{getAspectRatioDisplay()}</p>
+              
+              {upscaleError && (
+                <div className={styles.errorMessage}>
+                  You cannot make the image larger than it is.
+                </div>
+              )}
             </div>
 
             {/* Zoom */}
@@ -294,7 +416,11 @@ function InteractiveCropPage({
             <button className={styles.skipBtn} onClick={onSkip}>
               Skip {currentIndex < totalFiles - 1 ? '& Next' : ''}
             </button>
-            <button className={styles.applyCropBtn} onClick={handleApplyCrop}>
+            <button 
+              className={styles.applyCropBtn} 
+              onClick={handleApplyCrop}
+              disabled={upscaleError || customWidth > originalWidth || customHeight > originalHeight}
+            >
               {currentIndex < totalFiles - 1 ? 'Crop & Next' : 'Crop & Finish'}
             </button>
           </div>
@@ -305,6 +431,8 @@ function InteractiveCropPage({
             <ul className={styles.instructionsList}>
               <li>Drag image to reposition</li>
               <li>Drag corners/edges to resize crop area</li>
+              <li>Set custom width/height (auto-filled from original)</li>
+              <li>Lock aspect ratio to maintain proportions</li>
               <li>Use mouse wheel or slider to zoom</li>
               <li>Select aspect ratio or use "Free" mode</li>
               <li>Rotate with buttons or slider</li>
