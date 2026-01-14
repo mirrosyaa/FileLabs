@@ -35,6 +35,10 @@ const upload = multer({
 // Crop images endpoint
 router.post('/', upload.array('files', 50), async (req, res) => {
   try {
+    console.log('Crop request received');
+    console.log('Files:', req.files?.length);
+    console.log('Body:', req.body);
+    
     const files = req.files;
 
     if (!files || files.length === 0) {
@@ -45,20 +49,13 @@ router.post('/', upload.array('files', 50), async (req, res) => {
 
     for (let i = 0; i < files.length; i++) {
       const file = files[i];
-      const cropDataKey = `cropData_${i}`;
-      const cropData = JSON.parse(req.body[cropDataKey]);
+      console.log(`Processing file ${i}:`, file.originalname);
 
       const outputFilename = `cropped_${Date.now()}_${path.parse(file.originalname).name}.jpg`;
       const outputPath = path.join(__dirname, '../uploads/crop', outputFilename);
 
-      // Use Sharp to crop the image
+      // The file is already cropped on the frontend, just optimize and save it
       await sharp(file.path)
-        .extract({
-          left: Math.round(cropData.x),
-          top: Math.round(cropData.y),
-          width: Math.round(cropData.width),
-          height: Math.round(cropData.height)
-        })
         .jpeg({ quality: 95 })
         .toFile(outputPath);
 
@@ -70,6 +67,8 @@ router.post('/', upload.array('files', 50), async (req, res) => {
       // Clean up original file
       fs.unlinkSync(file.path);
     }
+
+    console.log('Cropped files:', croppedFiles.length);
 
     // If single file, return it directly
     if (croppedFiles.length === 1) {

@@ -253,8 +253,9 @@ function InteractiveCropPage({
             <h3 className={styles.optionsTitle}>Crop Settings</h3>
 
             {/* Aspect Ratio */}
-            <div className={styles.optionGroup}>
+            <div className={`${styles.optionGroup} ${styles.hoverable}`}>
               <label className={styles.optionLabel}>Aspect Ratio</label>
+              <div className={styles.optionContent}>
               <div className={styles.aspectButtons}>
                 <button
                   className={`${styles.aspectBtn} ${isNaN(aspectRatio) ? styles.activeAspect : ''}`}
@@ -282,11 +283,13 @@ function InteractiveCropPage({
                   16:9
                 </button>
               </div>
+              </div>
             </div>
 
             {/* Custom Dimensions */}
-            <div className={styles.optionGroup}>
+            <div className={`${styles.optionGroup} ${styles.hoverable}`}>
               <label className={styles.optionLabel}>Output Dimensions</label>
+              <div className={styles.optionContent}>
               <div className={styles.dimensionInputsGrid}>
                 <div className={styles.dimensionInputWrapper}>
                   <label className={styles.optionLabel} style={{ fontSize: '14px' }}>Width</label>
@@ -331,13 +334,15 @@ function InteractiveCropPage({
                   You cannot make the image larger than it is.
                 </div>
               )}
+              </div>
             </div>
 
             {/* Zoom */}
-            <div className={styles.optionGroup}>
+            <div className={`${styles.optionGroup} ${styles.hoverable}`}>
               <label className={styles.optionLabel}>
                 Zoom
               </label>
+              <div className={styles.optionContent}>
               <div className={styles.zoomControls}>
                 <button className={styles.zoomBtn} onClick={handleZoomOut}>−</button>
                 <input
@@ -351,13 +356,15 @@ function InteractiveCropPage({
                 />
                 <button className={styles.zoomBtn} onClick={handleZoomIn}>+</button>
               </div>
+              </div>
             </div>
 
             {/* Rotation */}
-            <div className={styles.optionGroup}>
+            <div className={`${styles.optionGroup} ${styles.hoverable}`}>
               <label className={styles.optionLabel}>
                 Rotation: {rotation}°
               </label>
+              <div className={styles.optionContent}>
               <input
                 type="range"
                 min={0}
@@ -381,11 +388,13 @@ function InteractiveCropPage({
                   ↺ 90°
                 </button>
               </div>
+              </div>
             </div>
 
             {/* Export Format */}
-            <div className={styles.optionGroup}>
+            <div className={`${styles.optionGroup} ${styles.hoverable}`}>
               <label className={styles.optionLabel}>Export Format</label>
+              <div className={styles.optionContent}>
               <div className={styles.formatButtons}>
                 <button
                   className={`${styles.formatBtn} ${exportFormat === 'image/png' ? styles.activeFormat : ''}`}
@@ -400,6 +409,7 @@ function InteractiveCropPage({
                   JPEG
                 </button>
               </div>
+              </div>
             </div>
 
             {/* Reset Button */}
@@ -413,9 +423,6 @@ function InteractiveCropPage({
             <button className={styles.cancelBtn} onClick={onCancel}>
               Cancel All
             </button>
-            <button className={styles.skipBtn} onClick={onSkip}>
-              Skip {currentIndex < totalFiles - 1 ? '& Next' : ''}
-            </button>
             <button 
               className={styles.applyCropBtn} 
               onClick={handleApplyCrop}
@@ -423,20 +430,6 @@ function InteractiveCropPage({
             >
               {currentIndex < totalFiles - 1 ? 'Crop & Next' : 'Crop & Finish'}
             </button>
-          </div>
-
-          {/* Instructions */}
-          <div className={styles.instructionsBox}>
-            <p className={styles.instructionTitle}>💡 How to crop:</p>
-            <ul className={styles.instructionsList}>
-              <li>Drag image to reposition</li>
-              <li>Drag corners/edges to resize crop area</li>
-              <li>Set custom width/height (auto-filled from original)</li>
-              <li>Lock aspect ratio to maintain proportions</li>
-              <li>Use mouse wheel or slider to zoom</li>
-              <li>Select aspect ratio or use "Free" mode</li>
-              <li>Rotate with buttons or slider</li>
-            </ul>
           </div>
         </div>
       </div>
