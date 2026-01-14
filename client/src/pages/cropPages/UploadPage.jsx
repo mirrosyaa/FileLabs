@@ -1,9 +1,11 @@
 import React from "react";
-import styles from "../../CSS/Pages/imageCrop.module.css";
+import commonStyles from "../../CSS/Pages/CropPages/common.module.css";
+import styles from "../../CSS/Pages/CropPages/upload.module.css";
 
 function UploadPage({ 
   fadeIn, 
-  isDragging, 
+  isDragging,
+  error,
   onDragEnter, 
   onDragOver, 
   onDragLeave, 
@@ -11,8 +13,14 @@ function UploadPage({
   onFileSelect 
 }) {
   return (
-    <div className={`${styles.pageContainer} ${fadeIn ? styles.fadeIn : styles.fadeOut}`}>
-      <h1 className={styles.mainTitle}>Crop Images</h1>
+    <div className={`${commonStyles.pageContainer} ${fadeIn ? commonStyles.fadeIn : commonStyles.fadeOut}`}>
+      <h1 className={commonStyles.mainTitle}>Crop Images</h1>
+      
+      {error && (
+        <div className={commonStyles.errorBox}>
+          {error}
+        </div>
+      )}
       
       <div 
         className={`${styles.uploadBox} ${isDragging ? styles.dragging : ''}`}

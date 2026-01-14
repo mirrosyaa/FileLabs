@@ -1,3 +1,9 @@
+/* 
+ * Image Resize Styles - Simplified
+ * You can further split this into modular files in /CSS/Pages/ResizePages/
+ * following the same pattern as CropPages if needed
+ */
+
 /* Main image resize page */
 .imageResizePage {
   display: flex;
@@ -27,44 +33,26 @@
   flex-direction: column;
 }
 
-/* Page transitions */
+/* Common styles - can be extracted to ResizePages/common.module.css */
 .pageContainer {
   animation-duration: 0.3s;
   animation-fill-mode: both;
   animation-timing-function: ease-in-out;
 }
 
-.fadeIn {
-  animation-name: fadeIn;
-}
-
-.fadeOut {
-  animation-name: fadeOut;
-}
+.fadeIn { animation-name: fadeIn; }
+.fadeOut { animation-name: fadeOut; }
 
 @keyframes fadeIn {
-  from {
-    opacity: 0;
-    transform: translateY(20px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
 }
 
 @keyframes fadeOut {
-  from {
-    opacity: 1;
-    transform: translateY(0);
-  }
-  to {
-    opacity: 0;
-    transform: translateY(-20px);
-  }
+  from { opacity: 1; transform: translateY(0); }
+  to { opacity: 0; transform: translateY(-20px); }
 }
 
-/* PAGE 1: Upload */
 .mainTitle {
   color: #ffffff;
   font-size: 36px;
@@ -74,6 +62,7 @@
   letter-spacing: -0.5px;
 }
 
+/* Upload page */
 .uploadBox {
   background: rgba(255, 255, 255, 0.05);
   border: 3px dashed rgba(94, 200, 255, 0.4);
@@ -106,13 +95,8 @@
 }
 
 @keyframes float {
-  0%,
-  100% {
-    transform: translateY(0px);
-  }
-  50% {
-    transform: translateY(-10px);
-  }
+  0%, 100% { transform: translateY(0px); }
+  50% { transform: translateY(-10px); }
 }
 
 .uploadText {
@@ -120,12 +104,6 @@
   font-size: 24px;
   font-weight: 600;
   margin: 0 0 16px 0;
-}
-
-.uploadOr {
-  color: rgba(255, 255, 255, 0.5);
-  font-size: 16px;
-  margin: 20px 0;
 }
 
 .browseBtn {
@@ -147,7 +125,7 @@
   background: linear-gradient(135deg, #6dd4ff 0%, #5aabdf 100%);
 }
 
-/* PAGE 2: Uploading */
+/* Progress pages */
 .uploadingContainer {
   text-align: center;
   padding: 80px 40px;
@@ -167,9 +145,7 @@
 }
 
 @keyframes spin {
-  to {
-    transform: rotate(360deg);
-  }
+  to { transform: rotate(360deg); }
 }
 
 .uploadingText {
@@ -203,261 +179,202 @@
   font-weight: 500;
 }
 
-/* PAGE 3: Conversion */
-.conversionBox {
+/* Resize options page */
+.resizeBox {
   background: rgba(255, 255, 255, 0.05);
-  border: 3px dashed rgba(94, 200, 255, 0.4);
   border-radius: 24px;
-  padding: 30px 40px;
+  padding: 40px;
   backdrop-filter: blur(10px);
-  transition: all 0.3s ease;
   max-height: calc(100vh - 240px);
   overflow-y: auto;
 }
 
-.conversionTitle {
+.resizeTitle {
   color: #ffffff;
   font-size: 32px;
   font-weight: 700;
   text-align: center;
-  margin-bottom: 20px;
-}
-
-/* Conversion Loading Overlay */
-.convertingOverlay {
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: #0a1628;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  z-index: 1000;
-  backdrop-filter: blur(10px);
-  animation: fadeIn 0.3s ease-in-out;
-}
-
-/* Download Loading Overlay */
-.downloadingOverlay {
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: #0a1628;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  z-index: 1000;
-  backdrop-filter: blur(10px);
-}
-
-.warningBox {
-  background: rgba(255, 193, 7, 0.15);
-  border: 2px solid rgba(255, 193, 7, 0.5);
-  border-radius: 12px;
-  padding: 16px 20px;
-  color: #ffc107;
-  text-align: center;
   margin-bottom: 30px;
-  font-weight: 500;
-}
-
-.errorBox {
-  background: rgba(255, 82, 82, 0.15);
-  border: 2px solid rgba(255, 82, 82, 0.5);
-  border-radius: 12px;
-  padding: 16px 20px;
-  color: #ff5252;
-  text-align: center;
-  margin-top: 20px;
-  font-weight: 500;
 }
 
 .filesDisplay {
   background: rgba(255, 255, 255, 0.05);
   border-radius: 16px;
-  padding: 16px;
-  margin-bottom: 20px;
-  backdrop-filter: blur(10px);
+  padding: 20px;
+  margin-bottom: 30px;
 }
 
 .filesHeader {
   color: #ffffff;
-  font-size: 16px;
-  font-weight: 600;
-  margin-bottom: 12px;
-}
-
-.fileTypeSection {
-  margin-bottom: 20px;
-}
-
-.fileTypeSection:last-child {
-  margin-bottom: 0;
-}
-
-.fileTypeLabel {
-  color: rgba(255, 255, 255, 0.8);
   font-size: 18px;
   font-weight: 600;
-  margin-bottom: 8px;
+  margin-bottom: 12px;
 }
 
 .fileNames {
   display: flex;
   flex-direction: column;
-  gap: 6px;
+  gap: 8px;
 }
 
 .fileName {
-  color: rgba(255, 255, 255, 0.6);
+  color: rgba(255, 255, 255, 0.7);
   font-size: 16px;
   padding: 8px 12px;
   background: rgba(255, 255, 255, 0.05);
   border-radius: 8px;
-  word-break: break-all;
 }
 
-.formatOptions {
-  margin-bottom: 20px;
+.resizeOptions {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  margin-bottom: 30px;
 }
 
-.formatLabel {
+.optionGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.optionLabel {
+  color: rgba(255, 255, 255, 0.9);
+  font-size: 16px;
+  font-weight: 600;
+}
+
+.dimensionInputs {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+
+.inputGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.inputLabel {
+  color: rgba(255, 255, 255, 0.8);
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.dimensionInput {
+  background: rgba(255, 255, 255, 0.08);
+  border: 2px solid rgba(94, 200, 255, 0.3);
+  border-radius: 10px;
+  padding: 12px 16px;
   color: #ffffff;
   font-size: 16px;
   font-weight: 600;
-  margin-bottom: 12px;
+  transition: all 0.3s ease;
+}
+
+.dimensionInput:focus {
+  outline: none;
+  border-color: #5ec8ff;
+  background: rgba(255, 255, 255, 0.12);
+  box-shadow: 0 0 20px rgba(94, 200, 255, 0.3);
+}
+
+.lockRatioBtn {
+  background: rgba(255, 255, 255, 0.05);
+  border: 2px solid rgba(94, 200, 255, 0.3);
+  border-radius: 10px;
+  color: #ffffff;
+  padding: 12px;
+  font-size: 24px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  grid-column: 1 / -1;
+  margin-top: 8px;
+}
+
+.lockRatioBtn:hover {
+  border-color: rgba(94, 200, 255, 0.6);
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.lockRatioBtn.locked {
+  border-color: #5ec8ff;
+  background: rgba(94, 200, 255, 0.15);
+  box-shadow: 0 0 20px rgba(94, 200, 255, 0.3);
+}
+
+.presetButtons {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: 12px;
+}
+
+.presetBtn {
+  background: rgba(255, 255, 255, 0.05);
+  border: 2px solid rgba(94, 200, 255, 0.3);
+  border-radius: 12px;
+  color: #ffffff;
+  padding: 14px 16px;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
   text-align: center;
 }
 
-.formatButtons {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
-  gap: 12px;
-  margin-bottom: 16px;
-}
-
-.formatOption {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 6px;
-  background: rgba(255, 255, 255, 0.05);
-  border: 2px solid rgba(94, 200, 255, 0.3);
-  border-radius: 16px;
-  padding: 16px 12px;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  color: #ffffff;
-  font-size: 16px;
-  font-weight: 600;
-}
-
-.formatOption:hover {
+.presetBtn:hover {
   border-color: rgba(94, 200, 255, 0.6);
   background: rgba(255, 255, 255, 0.08);
   transform: translateY(-2px);
-  box-shadow: 0 6px 20px rgba(94, 200, 255, 0.15);
 }
 
-.selectedFormat {
-  border-color: #5ec8ff !important;
-  background: rgba(94, 200, 255, 0.15) !important;
-  box-shadow: 0 0 30px rgba(94, 200, 255, 0.4) !important;
-  transform: scale(1.05);
+.actionButtons {
+  display: flex;
+  gap: 16px;
+  margin-top: 30px;
 }
 
-.formatIcon {
-  font-size: 28px;
-}
-
-.formatName {
-  font-size: 20px;
-  font-weight: 700;
-}
-
-.formatDescription {
-  font-size: 13px;
-  font-weight: 400;
-  color: rgba(255, 255, 255, 0.7);
-  margin-top: 4px;
-}
-
-.convertButton {
-  width: 100%;
-  background: linear-gradient(135deg, #5ec8ff 0%, #4a9fd8 100%);
+.backBtn {
+  flex: 1;
+  background: rgba(255, 255, 255, 0.08);
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  border-radius: 12px;
   color: #ffffff;
+  padding: 16px 32px;
+  font-size: 18px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.backBtn:hover {
+  background: rgba(255, 255, 255, 0.12);
+  border-color: rgba(255, 255, 255, 0.5);
+  transform: translateY(-2px);
+}
+
+.resizeBtn {
+  flex: 2;
+  background: linear-gradient(135deg, #5ec8ff 0%, #4a9fd8 100%);
   border: none;
-  border-radius: 16px;
-  padding: 20px 40px;
-  font-size: 20px;
+  border-radius: 12px;
+  color: #ffffff;
+  padding: 16px 32px;
+  font-size: 18px;
   font-weight: 700;
   cursor: pointer;
   transition: all 0.3s ease;
-  box-shadow: 0 6px 30px rgba(94, 200, 255, 0.4);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 12px;
+  box-shadow: 0 4px 20px rgba(94, 200, 255, 0.3);
 }
 
-.convertButton:hover:not(:disabled) {
-  transform: translateY(-3px);
-  box-shadow: 0 10px 40px rgba(94, 200, 255, 0.6);
+.resizeBtn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 30px rgba(94, 200, 255, 0.5);
   background: linear-gradient(135deg, #6dd4ff 0%, #5aabdf 100%);
 }
 
-.convertButton:disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
-}
-
-.slideIn {
-  animation: slideIn 0.4s ease-out;
-}
-
-@keyframes slideIn {
-  from {
-    opacity: 0;
-    transform: translateY(20px) scale(0.95);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0) scale(1);
-  }
-}
-
-.buttonSpinner {
-  width: 20px;
-  height: 20px;
-  border: 3px solid rgba(255, 255, 255, 0.3);
-  border-top-color: #ffffff;
-  border-radius: 50%;
-  animation: spin 0.8s linear infinite;
-}
-
-.backLink {
-  display: inline-block;
-  background: transparent;
-  border: none;
-  color: rgba(255, 255, 255, 0.6);
-  font-size: 16px;
-  cursor: pointer;
-  border-radius: 8px;
-  transition: all 0.3s ease;
-}
-
-.backLink:hover {
-  color: #ffffff;
-  background: rgba(255, 255, 255, 0.05);
-}
-
-/* PAGE 4: Download/Success */
+/* Complete page */
 .successContainer {
   text-align: center;
   padding: 80px 60px;
@@ -490,544 +407,71 @@
   font-size: 70px;
   color: #ffffff;
   font-weight: bold;
-  animation: checkmark 0.8s ease-out 0.2s both;
-}
-
-@keyframes checkmark {
-  0% {
-    transform: scale(0) rotate(-45deg);
-    opacity: 0;
-  }
-  50% {
-    transform: scale(1.2) rotate(0deg);
-    opacity: 1;
-  }
-  100% {
-    transform: scale(1) rotate(0deg);
-    opacity: 1;
-  }
 }
 
 @keyframes scaleIn {
-  from {
-    transform: scale(0);
-    opacity: 0;
-  }
-  to {
-    transform: scale(1);
-    opacity: 1;
-  }
+  from { transform: scale(0); opacity: 0; }
+  to { transform: scale(1); opacity: 1; }
 }
 
 .successTitle {
   color: #ffffff;
-  font-size: 38px;
+  font-size: 36px;
   font-weight: 700;
-  margin-bottom: 12px;
-  letter-spacing: -0.5px;
+  margin-bottom: 16px;
 }
 
 .successMessage {
   color: rgba(255, 255, 255, 0.7);
   font-size: 18px;
   margin-bottom: 40px;
-  font-weight: 500;
-}
-
-.downloadFileInfo {
-  background: linear-gradient(
-    135deg,
-    rgba(94, 200, 255, 0.15) 0%,
-    rgba(74, 159, 216, 0.1) 100%
-  );
-  border: 2px solid rgba(94, 200, 255, 0.4);
-  border-radius: 16px;
-  padding: 24px 28px;
-  margin-bottom: 40px;
-  display: flex;
-  align-items: center;
-  gap: 20px;
-  transition: all 0.3s ease;
-  animation: slideUp 0.5s ease-out 0.3s both;
-}
-
-.downloadFileInfo:hover {
-  transform: translateY(-2px);
-  border-color: rgba(94, 200, 255, 0.6);
-  box-shadow: 0 8px 25px rgba(94, 200, 255, 0.2);
-}
-
-.fileInfoIcon {
-  font-size: 48px;
-  filter: drop-shadow(0 4px 8px rgba(94, 200, 255, 0.3));
-}
-
-.fileInfoText {
-  flex: 1;
-  text-align: left;
-}
-
-.fileName {
-  color: #ffffff;
-  font-size: 18px;
-  font-weight: 700;
-  margin-bottom: 6px;
-  word-break: break-word;
-}
-
-.fileFormat {
-  color: #5ec8ff;
-  font-size: 14px;
-  font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-}
-
-@keyframes slideUp {
-  from {
-    opacity: 0;
-    transform: translateY(20px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
 }
 
 .downloadButton {
   width: 100%;
   max-width: 450px;
   background: linear-gradient(135deg, #4caf50 0%, #388e3c 100%);
-  color: #ffffff;
   border: none;
-  border-radius: 16px;
-  padding: 22px 48px;
-  font-size: 22px;
+  border-radius: 12px;
+  color: #ffffff;
+  padding: 18px 40px;
+  font-size: 18px;
   font-weight: 700;
   cursor: pointer;
   transition: all 0.3s ease;
-  box-shadow: 0 8px 30px rgba(76, 175, 80, 0.4);
+  box-shadow: 0 6px 30px rgba(76, 175, 80, 0.4);
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 14px;
-  margin: 0 auto 40px;
-  animation: slideUp 0.5s ease-out 0.4s both;
-}
-
-.downloadButton:hover:not(:disabled) {
-  transform: translateY(-4px) scale(1.02);
-  box-shadow: 0 12px 45px rgba(76, 175, 80, 0.6);
-  background: linear-gradient(135deg, #66bb6a 0%, #43a047 100%);
-}
-
-.downloadButton:disabled {
-  opacity: 0.7;
-  cursor: not-allowed;
-  transform: none;
-}
-
-.downloadIcon {
-  font-size: 26px;
-  animation: bounce 2s infinite;
-}
-
-@keyframes bounce {
-  0%,
-  100% {
-    transform: translateY(0);
-  }
-  50% {
-    transform: translateY(-4px);
-  }
-}
-
-.newConversionBtn {
-  background: rgba(255, 255, 255, 0.08);
-  border: 2px solid rgba(255, 255, 255, 0.25);
-  border-radius: 12px;
-  color: #ffffff;
-  padding: 20px 36px;
-  font-size: 16px;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  animation: slideUp 0.5s ease-out 0.5s both;
-}
-
-.newConversionBtn:hover {
-  background: rgba(255, 255, 255, 0.15);
-  border-color: rgba(255, 255, 255, 0.4);
-  transform: translateY(-2px);
-  box-shadow: 0 6px 20px rgba(255, 255, 255, 0.1);
-}
-
-/* Responsive design */
-@media (max-width: 768px) {
-  .converterMain {
-    padding: 30px 15px;
-    padding-top: 80px;
-  }
-
-  .mainTitle {
-    font-size: 32px;
-    margin-bottom: 40px;
-  }
-
-  .uploadBox {
-    padding: 60px 30px;
-  }
-
-  .uploadIcon {
-    font-size: 56px;
-  }
-
-  .uploadText {
-    font-size: 20px;
-  }
-
-  .browseBtn {
-    padding: 14px 32px;
-    font-size: 16px;
-  }
-
-  .conversionTitle {
-    font-size: 26px;
-  }
-
-  .formatButtons {
-    grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
-    gap: 12px;
-  }
-
-  .formatOption {
-    padding: 16px 12px;
-  }
-
-  .formatIcon {
-    font-size: 28px;
-  }
-
-  .convertButton {
-    font-size: 18px;
-    padding: 18px 32px;
-  }
-
-  .successTitle {
-    font-size: 28px;
-  }
-
-  .downloadButton {
-    font-size: 20px;
-    padding: 20px 40px;
-  }
-}
-
-/* Options Page Specific Styles */
-.optionsContainer {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  min-height: 400px;
-}
-
-.optionsBox {
-  background: rgba(255, 255, 255, 0.05);
-  border: 3px dashed rgba(94, 200, 255, 0.4);
-  border-radius: 24px;
-  padding: 50px 40px;
-  backdrop-filter: blur(10px);
-  transition: all 0.3s ease;
-}
-
-.optionsTitle {
-  color: #ffffff;
-  font-size: 40px;
-  font-weight: 700;
-  text-align: center;
-  margin-bottom: 40px;
-}
-
-.fileCount {
-  color: rgba(255, 255, 255, 0.7);
-  font-size: 16px;
-  text-align: center;
-  margin-bottom: 40px;
-}
-
-.dimensionsGrid {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 16px;
-  margin-bottom: 20px;
-}
-
-.inputGroup {
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-}
-
-.label {
-  color: rgba(255, 255, 255, 0.9);
-  font-size: 14px;
-  font-weight: 600;
-}
-
-.input {
-  background: rgba(255, 255, 255, 0.1);
-  border: 2px solid rgba(255, 255, 255, 0.2);
-  border-radius: 12px;
-  padding: 12px 16px;
-  font-size: 16px;
-  color: #ffffff;
-  outline: none;
-  transition: all 0.3s ease;
-}
-
-.input::placeholder {
-  color: rgba(255, 255, 255, 0.4);
-}
-
-.input:focus {
-  border-color: #4a9fd8;
-  background: rgba(255, 255, 255, 0.15);
-}
-
-.checkboxGroup {
-  margin-bottom: 20px;
-}
-
-.checkboxLabel {
-  display: flex;
-  align-items: center;
   gap: 12px;
-  color: rgba(255, 255, 255, 0.9);
-  font-size: 16px;
-  cursor: pointer;
-  user-select: none;
+  margin: 0 auto 20px;
 }
 
-.checkbox {
-  width: 20px;
-  height: 20px;
-  cursor: pointer;
+.downloadButton:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 10px 40px rgba(76, 175, 80, 0.6);
+  background: linear-gradient(135deg, #5cb85c 0%, #449d44 100%);
 }
 
-.resizeButton {
-  width: 100%;
-  background: linear-gradient(135deg, #4a9fd8 0%, #3d8bc4 100%);
-  color: white;
+.newResizeBtn {
+  background: linear-gradient(135deg, #5ec8ff 0%, #4a9fd8 100%);
   border: none;
   border-radius: 12px;
-  padding: 16px;
-  font-size: 18px;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  box-shadow: 0 4px 15px rgba(74, 159, 216, 0.3);
-}
-
-.resizeButton:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 6px 20px rgba(74, 159, 216, 0.4);
-}
-
-.processingContainer {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  min-height: 400px;
-}
-
-.processingBox {
-  background: rgba(255, 255, 255, 0.05);
-  border: 3px dashed rgba(94, 200, 255, 0.4);
-  border-radius: 24px;
-  padding: 50px 40px;
-  text-align: center;
-  backdrop-filter: blur(10px);
-}
-
-.processingTitle {
   color: #ffffff;
-  font-size: 28px;
-  font-weight: 700;
-  margin-bottom: 12px;
-}
-
-.processingText {
-  color: rgba(255, 255, 255, 0.7);
-  font-size: 16px;
-  margin-bottom: 30px;
-}
-
-.completeContainer {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  min-height: 400px;
-}
-
-.completeBox {
-  text-align: center;
-  padding: 80px 60px;
-  background: rgba(255, 255, 255, 0.05);
-  border-radius: 24px;
-  backdrop-filter: blur(10px);
-  max-width: 600px;
-  margin: 0 auto;
-}
-
-.successIcon {
-  font-size: 70px;
-  color: #4caf50;
-  margin-bottom: 30px;
-  animation: scaleIn 0.6s ease-out;
-}
-
-@keyframes scaleIn {
-  from {
-    transform: scale(0);
-    opacity: 0;
-  }
-  to {
-    transform: scale(1);
-    opacity: 1;
-  }
-}
-
-.successText {
-  color: rgba(255, 255, 255, 0.7);
+  padding: 16px 40px;
   font-size: 18px;
-  margin-bottom: 40px;
-  font-weight: 500;
-}
-
-.downloadFileInfo {
-  background: linear-gradient(
-    135deg,
-    rgba(94, 200, 255, 0.15) 0%,
-    rgba(74, 159, 216, 0.1) 100%
-  );
-  border: 2px solid rgba(94, 200, 255, 0.4);
-  border-radius: 16px;
-  padding: 24px 28px;
-  margin-bottom: 40px;
-  display: flex;
-  align-items: center;
-  gap: 20px;
-  transition: all 0.3s ease;
-  animation: slideUp 0.5s ease-out 0.3s both;
-}
-
-.downloadFileInfo:hover {
-  transform: translateY(-2px);
-  border-color: rgba(94, 200, 255, 0.6);
-  box-shadow: 0 8px 25px rgba(94, 200, 255, 0.2);
-}
-
-.fileInfoIcon {
-  font-size: 48px;
-  filter: drop-shadow(0 4px 8px rgba(94, 200, 255, 0.3));
-}
-
-.fileInfoText {
-  flex: 1;
-  text-align: left;
-}
-
-.fileName {
-  color: #ffffff;
-  font-size: 18px;
-  font-weight: 700;
-  margin-bottom: 6px;
-  word-break: break-word;
-}
-
-.fileFormat {
-  color: #5ec8ff;
-  font-size: 14px;
-  font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-}
-
-@keyframes slideUp {
-  from {
-    opacity: 0;
-    transform: translateY(20px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-.downloadButton {
-  width: 100%;
-  max-width: 450px;
-  background: linear-gradient(135deg, #4caf50 0%, #388e3c 100%);
-  color: #ffffff;
-  border: none;
-  border-radius: 16px;
-  padding: 22px 48px;
-  font-size: 22px;
   font-weight: 700;
   cursor: pointer;
   transition: all 0.3s ease;
-  box-shadow: 0 8px 30px rgba(76, 175, 80, 0.4);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 14px;
-  margin: 0 auto 40px;
-  animation: slideUp 0.5s ease-out 0.4s both;
+  box-shadow: 0 4px 20px rgba(94, 200, 255, 0.3);
 }
 
-.downloadButton:hover:not(:disabled) {
-  transform: translateY(-4px) scale(1.02);
-  box-shadow: 0 12px 45px rgba(76, 175, 80, 0.6);
-  background: linear-gradient(135deg, #66bb6a 0%, #43a047 100%);
-}
-
-.downloadButton:disabled {
-  opacity: 0.7;
-  cursor: not-allowed;
-  transform: none;
+.newResizeBtn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 30px rgba(94, 200, 255, 0.5);
+  background: linear-gradient(135deg, #6dd4ff 0%, #5aabdf 100%);
 }
 
 .downloadIcon {
-  font-size: 26px;
-  animation: bounce 2s infinite;
-}
-
-@keyframes bounce {
-  0%,
-  100% {
-    transform: translateY(0);
-  }
-  50% {
-    transform: translateY(-4px);
-  }
-}
-
-.newConversionBtn {
-  background: rgba(255, 255, 255, 0.08);
-  border: 2px solid rgba(255, 255, 255, 0.25);
-  border-radius: 12px;
-  color: #ffffff;
-  padding: 20px 36px;
-  font-size: 16px;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  animation: slideUp 0.5s ease-out 0.5s both;
-}
-
-.newConversionBtn:hover {
-  background: rgba(255, 255, 255, 0.15);
-  border-color: rgba(255, 255, 255, 0.4);
-  transform: translateY(-2px);
-  box-shadow: 0 6px 20px rgba(255, 255, 255, 0.1);
+  font-size: 24px;
 }
