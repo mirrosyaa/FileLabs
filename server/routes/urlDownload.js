@@ -57,11 +57,18 @@ router.post("/url-info", async (req, res) => {
       const info = await ytdl.getInfo(url);
       const videoDetails = info.videoDetails;
 
+      // Get a low-quality video URL for preview
+      const previewFormat = info.formats.find(format => 
+        format.hasVideo && format.hasAudio && 
+        (format.qualityLabel === '360p' || format.qualityLabel === '240p' || format.qualityLabel === '144p')
+      ) || info.formats.find(format => format.hasVideo && format.hasAudio);
+
       const videoInfo = {
         title: videoDetails.title || "Unknown Title",
         duration: formatDuration(parseInt(videoDetails.lengthSeconds)),
         durationSeconds: parseInt(videoDetails.lengthSeconds) || 0,
         thumbnail: videoDetails.thumbnails?.[videoDetails.thumbnails.length - 1]?.url || null,
+        previewUrl: previewFormat?.url || null,
         uploader: videoDetails.author?.name || videoDetails.ownerChannelName || "Unknown",
         formats: {
           hasVideo: true,
@@ -110,6 +117,7 @@ router.post("/url-info", async (req, res) => {
           duration: formatDuration(data.duration || 0),
           durationSeconds: data.duration || 0,
           thumbnail: data.cover || data.dynamic_cover || data.origin_cover || data.author?.avatar || null,
+          previewUrl: data.videoSD || data.videoWatermark || data.videoHD || null,
           uploader: data.author?.nickname || data.author?.unique_id || "TikTok User",
           formats: {
             hasVideo: true,
@@ -138,6 +146,7 @@ router.post("/url-info", async (req, res) => {
         duration: "Unknown",
         durationSeconds: 0,
         thumbnail: links.thumb || null,
+        previewUrl: (links.url_list && links.url_list.length > 0) ? links.url_list[0] : null,
         uploader: "Instagram",
         formats: {
           hasVideo: true,
@@ -168,6 +177,7 @@ router.post("/url-info", async (req, res) => {
             duration: "Unknown",
             durationSeconds: 0,
             thumbnail: null,
+            previewUrl: fbData.sd || fbData.hd || null,
             uploader: "Facebook",
             formats: {
               hasVideo: true,

@@ -85,13 +85,26 @@ function FormatSelectionPage({
       <div className={styles.urlSplitLayout}>
         {/* Video Preview - Left */}
         <div className={styles.urlVideoSection}>
-          {mediaInfo.thumbnail ? (
+          {(mediaInfo.previewUrl || mediaInfo.thumbnail) ? (
             <div className={styles.urlVideoPreviewBox}>
-              <img
-                src={mediaInfo.thumbnail}
-                alt="Thumbnail"
-                className={styles.urlVideoThumbnail}
-              />
+              {mediaInfo.previewUrl ? (
+                <video
+                  src={mediaInfo.previewUrl}
+                  className={styles.urlVideoThumbnail}
+                  autoPlay
+                  loop
+                  muted
+                  playsInline
+                  controls
+                  poster={mediaInfo.thumbnail}
+                />
+              ) : (
+                <img
+                  src={mediaInfo.thumbnail}
+                  alt="Thumbnail"
+                  className={styles.urlVideoThumbnail}
+                />
+              )}
               <div className={styles.urlVideoDetails}>
                 <h3 className={styles.urlVideoTitle}>{mediaInfo.title}</h3>
                 <div className={styles.urlVideoMetadata}>
