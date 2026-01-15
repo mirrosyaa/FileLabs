@@ -125,9 +125,10 @@ function InteractiveCropPage({
   const handleWidthChange = (e) => {
     const newWidth = parseInt(e.target.value) || 0;
 
-    // Prevent upscaling
+    // Prevent upscaling - clamp to original width
     if (newWidth > originalWidth) {
       setUpscaleError(true);
+      setCustomWidth(originalWidth);
       return;
     }
 
@@ -145,9 +146,10 @@ function InteractiveCropPage({
   const handleHeightChange = (e) => {
     const newHeight = parseInt(e.target.value) || 0;
 
-    // Prevent upscaling
+    // Prevent upscaling - clamp to original height
     if (newHeight > originalHeight) {
       setUpscaleError(true);
+      setCustomHeight(originalHeight);
       return;
     }
 
@@ -261,9 +263,11 @@ function InteractiveCropPage({
                 cropBoxResizable={true}
                 toggleDragModeOnDblclick={false}
                 checkOrientation={true}
-                zoomOnWheel={false}
+                zoomable={true}
+                zoomOnWheel={true}
                 zoomOnTouch={false}
-                wheelZoomRatio={0}
+                wheelZoomRatio={0.1}
+                scalable={false}
               />
             )}
           </div>
@@ -453,40 +457,54 @@ function InteractiveCropPage({
             </div>
 
             {/* Export Format */}
-            <div className={`${styles.optionGroup} ${styles.hoverable}`}>
+            <div className={styles.optionGroup}>
               <label className={styles.optionLabel}>Export Format</label>
-              <div className={styles.optionContent}>
-                <div className={styles.formatButtons}>
-                  <button
-                    className={`${styles.formatBtn} ${
-                      exportFormat === "image/png" ? styles.activeFormat : ""
-                    }`}
-                    onClick={() => setExportFormat("image/png")}
-                  >
-                    PNG
-                  </button>
-                  <button
-                    className={`${styles.formatBtn} ${
-                      exportFormat === "image/jpeg" ? styles.activeFormat : ""
-                    }`}
-                    onClick={() => setExportFormat("image/jpeg")}
-                  >
-                    JPEG
-                  </button>
-                </div>
+              <div className={styles.formatButtons}>
+                <button
+                  className={`${styles.formatBtn} ${
+                    exportFormat === "image/png" ? styles.activeFormat : ""
+                  }`}
+                  onClick={() => setExportFormat("image/png")}
+                >
+                  PNG
+                </button>
+                <button
+                  className={`${styles.formatBtn} ${
+                    exportFormat === "image/jpeg" ? styles.activeFormat : ""
+                  }`}
+                  onClick={() => setExportFormat("image/jpeg")}
+                >
+                  JPEG
+                </button>
+                <button
+                  className={`${styles.formatBtn} ${
+                    exportFormat === "image/webp" ? styles.activeFormat : ""
+                  }`}
+                  onClick={() => setExportFormat("image/webp")}
+                >
+                  WEBP
+                </button>
+                <button
+                  className={`${styles.formatBtn} ${
+                    exportFormat === "image/bmp" ? styles.activeFormat : ""
+                  }`}
+                  onClick={() => setExportFormat("image/bmp")}
+                >
+                  BMP
+                </button>
               </div>
             </div>
 
             {/* Reset Button */}
             <button className={styles.resetCropBtn} onClick={handleResetCrop}>
-              Reset Crop
+              Reset
             </button>
           </div>
 
           {/* Action Buttons */}
           <div className={styles.cropActions}>
             <button className={styles.cancelBtn} onClick={onCancel}>
-              Cancel All
+              Back
             </button>
             <button
               className={styles.applyCropBtn}

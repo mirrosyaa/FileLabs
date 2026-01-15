@@ -473,10 +473,14 @@
   background: rgba(255, 255, 255, 0.08);
 }
 
-.formatBtn.active {
-  border-color: #5ec8ff;
-  background: rgba(94, 200, 255, 0.15);
-  box-shadow: 0 0 15px rgba(94, 200, 255, 0.3);
+.activeFormat {
+  border-color: #5ec8ff !important;
+  background: rgba(94, 200, 255, 0.25) !important;
+  box-shadow: 0 0 25px rgba(94, 200, 255, 0.5),
+    inset 0 0 20px rgba(94, 200, 255, 0.2);
+  transform: translateY(-2px);
+  color: #ffffff !important;
+  font-weight: 700;
 }
 
 /* Instructions Box */
