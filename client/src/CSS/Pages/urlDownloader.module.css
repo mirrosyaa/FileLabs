@@ -196,6 +196,195 @@
   color: #5ec8ff;
 }
 
+/* New URL Download Layout */
+.urlSplitLayout {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  gap: 40px;
+  align-items: flex-start;
+}
+
+/* Video Section - Left (Video Preview) */
+.urlVideoSection {
+  flex: 1.5;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.urlVideoPreviewBox {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.urlVideoThumbnail {
+  width: 100%;
+  height: auto;
+  max-height: 400px;
+  object-fit: contain;
+  border-radius: 16px;
+  box-shadow: 0 8px 40px rgba(0, 0, 0, 0.3);
+  background: rgba(0, 0, 0, 0.3);
+}
+
+.urlNoThumbnail {
+  width: 100%;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 16px;
+  padding: 60px 40px;
+  text-align: center;
+  border: 2px dashed rgba(94, 200, 255, 0.3);
+}
+
+.urlVideoDetails {
+  background: rgba(255, 255, 255, 0.05);
+  padding: 16px 20px;
+  border-radius: 12px;
+  backdrop-filter: blur(10px);
+}
+
+.urlVideoTitle {
+  color: #ffffff;
+  font-size: 18px;
+  font-weight: 600;
+  margin-bottom: 10px;
+  line-height: 1.4;
+}
+
+.urlVideoMetadata {
+  display: flex;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.urlMetaText {
+  color: rgba(255, 255, 255, 0.7);
+  font-size: 13px;
+}
+
+.urlVideoUploader {
+  color: rgba(255, 255, 255, 0.6);
+  font-size: 13px;
+  margin-top: 8px;
+}
+
+/* Options Section - Right */
+.urlOptionsSection {
+  flex: 1;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 20px;
+  padding: 30px 24px;
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(94, 200, 255, 0.2);
+  display: flex;
+  flex-direction: column;
+  height: fit-content;
+}
+
+.urlSectionTitle {
+  color: #ffffff;
+  font-size: 20px;
+  font-weight: 600;
+  margin-bottom: 20px;
+  text-align: center;
+}
+
+.urlOptionsList {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-bottom: 20px;
+}
+
+.urlOptionButton {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: rgba(255, 255, 255, 0.05);
+  border: 2px solid rgba(94, 200, 255, 0.3);
+  border-radius: 12px;
+  padding: 14px 18px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  text-align: left;
+}
+
+.urlOptionButton:hover:not(.urlOptionInactive) {
+  border-color: rgba(94, 200, 255, 0.6);
+  background: rgba(255, 255, 255, 0.1);
+  transform: translateX(4px);
+}
+
+.urlOptionActive {
+  border-color: #5ec8ff !important;
+  background: rgba(94, 200, 255, 0.2) !important;
+  box-shadow: 0 4px 16px rgba(94, 200, 255, 0.3);
+}
+
+.urlOptionInactive {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.urlOptionContent {
+  flex: 1;
+}
+
+.urlOptionName {
+  color: #ffffff;
+  font-size: 16px;
+  font-weight: 600;
+  margin-bottom: 4px;
+}
+
+.urlOptionDescription {
+  color: rgba(255, 255, 255, 0.6);
+  font-size: 13px;
+}
+
+.urlNotAvailable {
+  background: rgba(255, 255, 255, 0.1);
+  color: rgba(255, 255, 255, 0.5);
+  padding: 6px 12px;
+  border-radius: 6px;
+  font-size: 12px;
+}
+
+.urlError {
+  background: rgba(255, 82, 82, 0.15);
+  border: 1px solid rgba(255, 82, 82, 0.5);
+  border-radius: 8px;
+  padding: 12px;
+  color: #ff5252;
+  text-align: center;
+  margin-bottom: 16px;
+  font-size: 13px;
+}
+
+.urlDownloadButton {
+  width: 100%;
+  background: linear-gradient(135deg, #5ec8ff 0%, #4a9fd8 100%);
+  color: #ffffff;
+  padding: 15px 24px;
+  border: none;
+  border-radius: 12px;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 16px rgba(94, 200, 255, 0.3);
+  animation: slideIn 0.3s ease-out;
+}
+
+.urlDownloadButton:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 24px rgba(94, 200, 255, 0.5);
+  background: linear-gradient(135deg, #6dd4ff 0%, #5aabdf 100%);
+}
+
 .selectionTitle {
   color: #ffffff;
   font-size: 36px;
@@ -206,38 +395,33 @@
 
 .mediaPreview {
   display: flex;
-  gap: 24px;
+  flex-direction: column;   
+  align-items: center;
+  gap: 18px;
   background: rgba(255, 255, 255, 0.05);
   border-radius: 16px;
-  padding: 24px;
-  margin-bottom: 40px;
-  align-items: center;
+  padding: 20px;
+  margin-bottom: 24px;
 }
 
 .thumbnail {
-  width: 180px;
-  height: 101px;
+  width: min(900px, 100%);  
+  height: auto;
+  aspect-ratio: 16 / 9;
   object-fit: cover;
-  border-radius: 12px;
+  border-radius: 14px;
   flex-shrink: 0;
 }
 
 .mediaDetails {
-  flex: 1;
+  width: min(900px, 100%);
 }
 
 .mediaTitle {
-  color: #ffffff;
-  font-size: 20px;
-  font-weight: 600;
-  margin: 0 0 12px 0;
-  line-height: 1.4;
+  text-align: center;
 }
-
 .mediaMetadata {
-  display: flex;
-  gap: 24px;
-  flex-wrap: wrap;
+  justify-content: center;
 }
 
 .metadataItem {
@@ -269,7 +453,7 @@
 .formatButtons {
   display: flex;
   flex-direction: column;
-  gap: 16px;
+  gap: 10px;
 }
 
 .formatOption {
@@ -280,7 +464,7 @@
   background: rgba(255, 255, 255, 0.05);
   border: 2px solid rgba(94, 200, 255, 0.3);
   border-radius: 16px;
-  padding: 24px 30px;
+  padding: 14px 18px;
   cursor: pointer;
   transition: all 0.3s ease;
   text-align: left;
