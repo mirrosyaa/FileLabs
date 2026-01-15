@@ -1,19 +1,17 @@
 import React from "react";
-import styles from "../../CSS/Pages/urlDownloader.module.css";
+import commonStyles from "../../CSS/Pages/UrlDownloaderPages/common.module.css";
+import styles from "../../CSS/Pages/UrlDownloaderPages/complete.module.css";
 
 function DownloadingPage({ fadeIn, downloadProgress }) {
   return (
     <div
-      className={`${styles.pageContainer} ${
-        fadeIn ? styles.fadeIn : styles.fadeOut
+      className={`${commonStyles.pageContainer} ${
+        fadeIn ? commonStyles.fadeIn : commonStyles.fadeOut
       }`}
     >
       <div className={styles.downloadingContainer}>
-        <div className={styles.spinner}></div>
-        <h2 className={styles.downloadingTitle}>Downloading...</h2>
-        <p className={styles.downloadingText}>
-          Please wait while we prepare your file
-        </p>
+        <div className={commonStyles.spinner}></div>
+        <p className={styles.downloadingText}>Preparing your download...</p>
         <div className={styles.progressBar}>
           <div
             className={styles.progressFill}

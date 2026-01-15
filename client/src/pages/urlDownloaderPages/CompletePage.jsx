@@ -1,5 +1,6 @@
 import React from "react";
-import styles from "../../CSS/Pages/urlDownloader.module.css";
+import commonStyles from "../../CSS/Pages/UrlDownloaderPages/common.module.css";
+import styles from "../../CSS/Pages/UrlDownloaderPages/complete.module.css";
 
 function CompletePage({
   fadeIn,
@@ -13,18 +14,14 @@ function CompletePage({
 }) {
   return (
     <div
-      className={`${styles.pageContainer} ${
-        fadeIn ? styles.fadeIn : styles.fadeOut
+      className={`${commonStyles.pageContainer} ${
+        fadeIn ? commonStyles.fadeIn : commonStyles.fadeOut
       }`}
     >
       {/* Download Loading Overlay */}
       {isDownloadingFile && (
-        <div
-          className={`${styles.downloadingContainer} ${
-            fadeIn ? styles.fadeIn : styles.fadeOut
-          }`}
-        >
-          <div className={styles.spinner}></div>
+        <div className={`${styles.downloadingContainer} ${commonStyles.fadeIn}`}>
+          <div className={commonStyles.spinner}></div>
           <p className={styles.downloadingText}>Downloading file...</p>
           <div className={styles.progressBar}>
             <div
@@ -37,7 +34,7 @@ function CompletePage({
       )}
 
       {!isDownloadingFile && (
-        <div className={styles.successContainer}>
+        <div className={`${styles.completeContainer} ${commonStyles.fadeIn}`}>
           <div className={styles.successIconWrapper}>
             <div className={styles.successIconCircle}>
               <div className={styles.successIcon}>✓</div>
@@ -46,14 +43,13 @@ function CompletePage({
 
           {!hasDownloaded ? (
             <>
-              <h2 className={styles.successTitle}>Ready to Download!</h2>
-              <p className={styles.successMessage}>
-                Your {selectedFormat === "audio" ? "audio" : "video"} file is
-                ready
+              <h2 className={styles.completeTitle}>Ready to Download!</h2>
+              <p className={styles.completeMessage}>
+                Your {selectedFormat === "audio" ? "audio" : "video"} file is ready
               </p>
             </>
           ) : (
-            <h2 className={styles.successTitle}>
+            <h2 className={styles.completeTitle}>
               File Downloaded Successfully!
             </h2>
           )}
