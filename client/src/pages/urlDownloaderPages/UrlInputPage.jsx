@@ -14,10 +14,9 @@ function UrlInputPage({ fadeIn, url, setUrl, error, handleFetchInfo }) {
         fadeIn ? styles.fadeIn : styles.fadeOut
       }`}
     >
-      <h1 className={styles.mainTitle}>Download from URL</h1>
 
       <div className={styles.urlBox}>
-        <p className={styles.urlBoxText}>Paste video or file URL</p>
+        <h1 className={styles.mainTitle}>Download from URL</h1>
         <input
           type="text"
           className={styles.urlInput}
