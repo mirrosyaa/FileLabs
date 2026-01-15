@@ -6,6 +6,7 @@ const convertRoutes = require("./routes/convert");
 const compressRoutes = require("./routes/compress");
 const resizeRoutes = require("./routes/resize");
 const cropRoutes = require("./routes/crop");
+const urlDownloadRoutes = require("./routes/urlDownload");
 
 const app = express();
 const PORT = 3001;
@@ -24,6 +25,7 @@ app.use("/api", convertRoutes);
 app.use("/api", compressRoutes);
 app.use("/api/image/resize", resizeRoutes);
 app.use("/api/image/crop", cropRoutes);
+app.use("/api", urlDownloadRoutes);
 
 // Download from URL endpoint
 app.post("/api/download-url", async (req, res) => {

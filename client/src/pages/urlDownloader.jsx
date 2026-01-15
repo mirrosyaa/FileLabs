@@ -1,22 +1,27 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import Footer from "../components/Layout/footer";
+import UrlInputPage from "./urlDownloaderPages/UrlInputPage";
+import FetchingPage from "./urlDownloaderPages/FetchingPage";
+import FormatSelectionPage from "./urlDownloaderPages/FormatSelectionPage";
+import DownloadingPage from "./urlDownloaderPages/DownloadingPage";
+import CompletePage from "./urlDownloaderPages/CompletePage";
 import styles from "../CSS/Pages/urlDownloader.module.css";
 
 function UrlDownloader() {
-  const [page, setPage] = useState(1); // 1 = input, 2 = downloading, 3 = complete
+  // 1 = input, 2 = fetching, 3 = format selection, 4 = downloading, 5 = complete
+  const [page, setPage] = useState(1);
   const [url, setUrl] = useState("");
+  const [mediaInfo, setMediaInfo] = useState(null);
+  const [selectedFormat, setSelectedFormat] = useState("");
+  const [fetchProgress, setFetchProgress] = useState(0);
   const [downloadProgress, setDownloadProgress] = useState(0);
-  const [isDownloading, setIsDownloading] = useState(false);
+  const [isDownloadingFile, setIsDownloadingFile] = useState(false);
+  const [downloadFileProgress, setDownloadFileProgress] = useState(0);
   const [hasDownloaded, setHasDownloaded] = useState(false);
   const [downloadUrl, setDownloadUrl] = useState(null);
   const [downloadFilename, setDownloadFilename] = useState("");
   const [error, setError] = useState(null);
   const [fadeIn, setFadeIn] = useState(true);
-
-  const handleUrlChange = (e) => {
-    setUrl(e.target.value);
-    setError(null);
-  };
 
   const isValidUrl = (string) => {
     try {
@@ -27,7 +32,7 @@ function UrlDownloader() {
     }
   };
 
-  const handleDownload = async () => {
+  const handleFetchInfo = async () => {
     if (!url.trim()) {
       setError("Please enter a URL");
       return;
@@ -40,15 +45,83 @@ function UrlDownloader() {
 
     setError(null);
     setFadeIn(false);
+
     setTimeout(() => {
       setPage(2);
+      setFadeIn(true);
+      fetchMediaInfo();
+    }, 300);
+  };
+
+  const fetchMediaInfo = async () => {
+    setFetchProgress(0);
+
+    try {
+      // Simulate progress
+      const progressInterval = setInterval(() => {
+        setFetchProgress((prev) => {
+          if (prev >= 90) {
+            clearInterval(progressInterval);
+            return 90;
+          }
+          return prev + 10;
+        });
+      }, 200);
+
+      const response = await fetch("http://localhost:3001/api/url-info", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ url }),
+      });
+
+      clearInterval(progressInterval);
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || "Failed to fetch media info");
+      }
+
+      const data = await response.json();
+      setMediaInfo(data);
+      setFetchProgress(100);
+
+      setTimeout(() => {
+        setFadeIn(false);
+        setTimeout(() => {
+          setPage(3);
+          setFadeIn(true);
+        }, 300);
+      }, 500);
+    } catch (error) {
+      console.error("Fetch error:", error);
+      setError(error.message || "Failed to fetch media information");
+      setFadeIn(false);
+      setTimeout(() => {
+        setPage(1);
+        setFadeIn(true);
+      }, 300);
+    }
+  };
+
+  const handleDownload = async () => {
+    if (!selectedFormat) {
+      setError("Please select a format");
+      return;
+    }
+
+    setError(null);
+    setFadeIn(false);
+
+    setTimeout(() => {
+      setPage(4);
       setFadeIn(true);
       startDownload();
     }, 300);
   };
 
   const startDownload = async () => {
-    setIsDownloading(true);
     setDownloadProgress(0);
 
     try {
@@ -61,21 +134,24 @@ function UrlDownloader() {
           }
           return prev + 10;
         });
-      }, 200);
+      }, 300);
 
-      const response = await fetch("http://localhost:3001/api/download-url", {
+      const response = await fetch("http://localhost:3001/api/download-media", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ url }),
+        body: JSON.stringify({ 
+          url: mediaInfo.originalUrl,
+          format: selectedFormat 
+        }),
       });
 
       clearInterval(progressInterval);
 
       if (!response.ok) {
         const errorData = await response.json();
-        throw new Error(errorData.message || "Download failed");
+        throw new Error(errorData.error || "Download failed");
       }
 
       const blob = await response.blob();
@@ -85,18 +161,7 @@ function UrlDownloader() {
       if (contentDisposition) {
         const filenameMatch = contentDisposition.match(/filename="?(.+)"?/);
         if (filenameMatch) {
-          filename = filenameMatch[1];
-        }
-      } else {
-        // Extract filename from URL
-        try {
-          const urlPath = new URL(url).pathname;
-          const urlFilename = urlPath.split("/").pop();
-          if (urlFilename) {
-            filename = urlFilename;
-          }
-        } catch (e) {
-          console.error("Error extracting filename:", e);
+          filename = filenameMatch[1].replace(/"/g, '');
         }
       }
 
@@ -106,34 +171,66 @@ function UrlDownloader() {
       setDownloadProgress(100);
 
       setTimeout(() => {
-        setIsDownloading(false);
         setFadeIn(false);
         setTimeout(() => {
-          setPage(3);
+          setPage(5);
           setFadeIn(true);
         }, 300);
       }, 500);
     } catch (error) {
       console.error("Download error:", error);
-      setError(error.message || "Failed to download file");
-      setIsDownloading(false);
+      setError(error.message || "Failed to download media");
       setFadeIn(false);
       setTimeout(() => {
-        setPage(1);
+        setPage(3);
         setFadeIn(true);
       }, 300);
     }
   };
 
-  const handleDownloadFile = () => {
-    if (downloadUrl && downloadFilename) {
-      const link = document.createElement("a");
-      link.href = downloadUrl;
-      link.download = downloadFilename;
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
-      setHasDownloaded(true);
+  const handleDownloadFile = async () => {
+    if (!downloadUrl) return;
+
+    setIsDownloadingFile(true);
+    setDownloadFileProgress(0);
+
+    // Simulate download progress for better UX
+    const progressInterval = setInterval(() => {
+      setDownloadFileProgress((prev) => {
+        if (prev >= 100) {
+          clearInterval(progressInterval);
+          return 100;
+        }
+        return prev + 20;
+      });
+    }, 100);
+
+    try {
+      // Small delay to show progress
+      await new Promise((resolve) => setTimeout(resolve, 600));
+
+      const a = document.createElement("a");
+      a.href = downloadUrl;
+      a.download = downloadFilename;
+      document.body.appendChild(a);
+      a.click();
+      window.URL.revokeObjectURL(downloadUrl);
+      document.body.removeChild(a);
+
+      clearInterval(progressInterval);
+      setDownloadFileProgress(100);
+
+      // Reset after download
+      setTimeout(() => {
+        setIsDownloadingFile(false);
+        setDownloadFileProgress(0);
+        setHasDownloaded(true);
+      }, 800);
+    } catch (err) {
+      clearInterval(progressInterval);
+      setIsDownloadingFile(false);
+      setDownloadFileProgress(0);
+      setError("Download failed. Please try again.");
     }
   };
 
@@ -142,8 +239,12 @@ function UrlDownloader() {
     setTimeout(() => {
       setPage(1);
       setUrl("");
+      setMediaInfo(null);
+      setSelectedFormat("");
+      setFetchProgress(0);
       setDownloadProgress(0);
-      setIsDownloading(false);
+      setIsDownloadingFile(false);
+      setDownloadFileProgress(0);
       setHasDownloaded(false);
       setDownloadUrl(null);
       setDownloadFilename("");
@@ -152,87 +253,63 @@ function UrlDownloader() {
     }, 300);
   };
 
-  const handleKeyPress = (e) => {
-    if (e.key === "Enter" && url.trim()) {
-      handleDownload();
-    }
-  };
-
   return (
     <div className={styles.urlDownloaderPage}>
-      <div className={styles.urlDownloaderMain}>
+      <main className={styles.urlDownloaderMain}>
         <div className={styles.urlDownloaderContent}>
-          <div className={`${styles.pageContainer} ${fadeIn ? styles.fadeIn : styles.fadeOut}`}>
-            <h1 className={styles.mainTitle}>Download from URL</h1>
+          {/* PAGE 1: URL Input */}
+          {page === 1 && (
+            <UrlInputPage
+              fadeIn={fadeIn}
+              url={url}
+              setUrl={setUrl}
+              error={error}
+              handleFetchInfo={handleFetchInfo}
+            />
+          )}
 
-            {page === 1 && (
-              <div className={styles.inputContainer}>
-                <div className={styles.urlInputBox}>
-                  <input
-                    type="text"
-                    className={styles.urlInput}
-                    placeholder="Enter file URL (e.g., https://example.com/file.pdf)"
-                    value={url}
-                    onChange={handleUrlChange}
-                    onKeyPress={handleKeyPress}
-                  />
-                  {error && <p className={styles.errorMessage}>{error}</p>}
-                </div>
-                {url.trim() && !error && (
-                  <button
-                    className={styles.downloadButton}
-                    onClick={handleDownload}
-                  >
-                    Download File
-                  </button>
-                )}
-              </div>
-            )}
+          {/* PAGE 2: Fetching Info */}
+          {page === 2 && (
+            <FetchingPage fadeIn={fadeIn} fetchProgress={fetchProgress} />
+          )}
 
-            {page === 2 && (
-              <div className={styles.downloadingContainer}>
-                <div className={styles.downloadingBox}>
-                  <div className={styles.spinner}></div>
-                  <h2 className={styles.downloadingTitle}>Downloading...</h2>
-                  <p className={styles.downloadingText}>Please wait while we fetch your file</p>
-                  <div className={styles.progressBar}>
-                    <div
-                      className={styles.progressFill}
-                      style={{ width: `${downloadProgress}%` }}
-                    ></div>
-                  </div>
-                  <p className={styles.progressText}>{downloadProgress}%</p>
-                </div>
-              </div>
-            )}
+          {/* PAGE 3: Format Selection */}
+          {page === 3 && (
+            <FormatSelectionPage
+              fadeIn={fadeIn}
+              mediaInfo={mediaInfo}
+              selectedFormat={selectedFormat}
+              setSelectedFormat={setSelectedFormat}
+              handleDownload={handleDownload}
+              handleReset={handleReset}
+              error={error}
+            />
+          )}
 
-            {page === 3 && (
-              <div className={styles.completeContainer}>
-                <div className={styles.completeBox}>
-                  <div className={styles.checkmark}>✓</div>
-                  <h2 className={styles.completeTitle}>Download Complete!</h2>
-                  <p className={styles.completeText}>Your file is ready</p>
-                  <p className={styles.filename}>{downloadFilename}</p>
-                  <div className={styles.buttonGroup}>
-                    <button
-                      className={`${styles.actionButton} ${styles.downloadBtn}`}
-                      onClick={handleDownloadFile}
-                    >
-                      {hasDownloaded ? "Download Again" : "Download File"}
-                    </button>
-                    <button
-                      className={`${styles.actionButton} ${styles.resetBtn}`}
-                      onClick={handleReset}
-                    >
-                      Download Another File
-                    </button>
-                  </div>
-                </div>
-              </div>
-            )}
-          </div>
+          {/* PAGE 4: Downloading */}
+          {page === 4 && (
+            <DownloadingPage
+              fadeIn={fadeIn}
+              downloadProgress={downloadProgress}
+            />
+          )}
+
+          {/* PAGE 5: Complete */}
+          {page === 5 && (
+            <CompletePage
+              fadeIn={fadeIn}
+              isDownloadingFile={isDownloadingFile}
+              downloadFileProgress={downloadFileProgress}
+              hasDownloaded={hasDownloaded}
+              downloadFilename={downloadFilename}
+              selectedFormat={selectedFormat}
+              handleDownloadFile={handleDownloadFile}
+              handleReset={handleReset}
+            />
+          )}
         </div>
-      </div>
+      </main>
+
       <Footer />
     </div>
   );
