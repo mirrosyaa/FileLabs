@@ -2,9 +2,12 @@
 .cropContainer {
   display: flex;
   width: 100%;
-  min-height: 600px;
+  height: calc(100vh - 200px);
+  max-height: calc(100vh - 200px);
   gap: 0;
   background: #0a1628;
+  margin-top: 20px;
+  margin-bottom: 20px;
 }
 
 /* Left side - 2/3 - Photo area */
@@ -15,6 +18,7 @@
   background: #0a1628;
   padding: 20px;
   min-width: 0;
+  height: 100%;
 }
 
 .cropHeader {
@@ -44,15 +48,7 @@
   background: transparent;
   border-radius: 16px;
   overflow: hidden;
-  min-height: 400px;
-}
-
-.previewCaption {
-  color: rgba(255, 255, 255, 0.7);
-  font-size: 14px;
-  text-align: center;
-  margin-top: 12px;
-  font-style: italic;
+  max-height: 100%;
 }
 
 /* Right side - 1/3 - Options panel */
@@ -67,6 +63,7 @@
   overflow-y: auto;
   min-width: 280px;
   max-width: 400px;
+  height: 100%;
 }
 
 .optionsSection {
@@ -148,7 +145,6 @@
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 12px;
-  margin-bottom: 8px;
 }
 
 .dimensionInputWrapper {
@@ -157,15 +153,36 @@
   gap: 6px;
 }
 
+.inputWithUnit {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.inputWithUnit .dimensionInput {
+  padding-right: 35px;
+}
+
+.unitLabel {
+  position: absolute;
+  right: 10px;
+  color: rgba(255, 255, 255, 0.5);
+  font-size: 13px;
+  font-weight: 500;
+  pointer-events: none;
+}
+
 .dimensionInput {
   background: rgba(255, 255, 255, 0.05);
   border: 1px solid rgba(94, 200, 255, 0.3);
   border-radius: 8px;
-  padding: 10px 12px;
+  padding: 10px 8px;
   color: #ffffff;
   font-size: 14px;
   outline: none;
   transition: all 0.2s;
+  width: 100%;
+  box-sizing: border-box;
 }
 
 .dimensionInput:focus {
@@ -253,6 +270,21 @@
   box-shadow: 0 0 20px rgba(94, 200, 255, 0.3);
 }
 
+.customAspectInputs {
+  margin-top: 16px;
+
+  .customAspectInputs .dimensionInputsGrid {
+    gap: 8px;
+  }
+
+  .customAspectInputs .dimensionInput {
+    padding: 8px 6px;
+    font-size: 13px;
+  }
+  padding-top: 16px;
+  border-top: 1px solid rgba(94, 200, 255, 0.2);
+}
+
 /* Sliders */
 .slider {
   width: 100%;
@@ -289,40 +321,6 @@
   cursor: pointer;
   border: none;
   box-shadow: 0 0 10px rgba(94, 200, 255, 0.5);
-}
-
-/* Zoom Controls */
-.zoomControls {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-}
-
-.zoomBtn {
-  width: 36px;
-  height: 36px;
-  background: rgba(255, 255, 255, 0.05);
-  border: 2px solid rgba(94, 200, 255, 0.3);
-  border-radius: 8px;
-  color: #ffffff;
-  font-size: 20px;
-  font-weight: 700;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-shrink: 0;
-}
-
-.zoomBtn:hover {
-  border-color: rgba(94, 200, 255, 0.6);
-  background: rgba(255, 255, 255, 0.08);
-  transform: scale(1.05);
-}
-
-.zoomBtn:active {
-  transform: scale(0.95);
 }
 
 /* Rotation Quick Buttons */
@@ -415,7 +413,8 @@
   transform: translateY(-2px);
 }
 
-.applyCropBtn, .downloadBtn {
+.applyCropBtn,
+.downloadBtn {
   background: linear-gradient(135deg, #5ec8ff 0%, #4a9fd8 100%);
   border: none;
   border-radius: 12px;
@@ -428,20 +427,23 @@
   box-shadow: 0 4px 20px rgba(94, 200, 255, 0.3);
 }
 
-.applyCropBtn:hover, .downloadBtn:hover {
+.applyCropBtn:hover,
+.downloadBtn:hover {
   transform: translateY(-2px);
   box-shadow: 0 8px 30px rgba(94, 200, 255, 0.5);
   background: linear-gradient(135deg, #6dd4ff 0%, #5aabdf 100%);
 }
 
-.applyCropBtn:disabled, .downloadBtn:disabled {
+.applyCropBtn:disabled,
+.downloadBtn:disabled {
   opacity: 0.5;
   cursor: not-allowed;
   transform: none;
   box-shadow: none;
 }
 
-.applyCropBtn:disabled:hover, .downloadBtn:disabled:hover {
+.applyCropBtn:disabled:hover,
+.downloadBtn:disabled:hover {
   transform: none;
   box-shadow: none;
   background: linear-gradient(135deg, #5ec8ff 0%, #4a9fd8 100%);
