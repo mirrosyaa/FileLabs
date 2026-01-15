@@ -71,7 +71,6 @@ function CompletePage({
                 </>
               ) : (
                 <>
-                  <span className={styles.downloadIcon}>⬇</span>
                   Download File
                 </>
               )}

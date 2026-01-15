@@ -70,46 +70,50 @@
   font-size: 42px;
   font-weight: 700;
   text-align: center;
-  margin-bottom: 16px;
+  margin-bottom: 60px;
   letter-spacing: -0.5px;
 }
 
-.subtitle {
-  color: rgba(255, 255, 255, 0.6);
-  font-size: 18px;
-  text-align: center;
-  margin-bottom: 60px;
-}
-
-.inputContainer {
-  text-align: center;
-  margin-bottom: 60px;
-}
-
-.urlInputBox {
+.urlBox {
   background: rgba(255, 255, 255, 0.05);
-  border: 3px solid rgba(94, 200, 255, 0.4);
-  border-radius: 16px;
-  padding: 8px;
+  border: 3px dashed rgba(94, 200, 255, 0.4);
+  border-radius: 24px;
+  padding: 60px 80px;
+  text-align: center;
   transition: all 0.3s ease;
   backdrop-filter: blur(10px);
-  margin-bottom: 30px;
 }
 
-.urlInputBox:focus-within {
+.urlBox:focus-within {
   border-color: rgba(94, 200, 255, 0.7);
   background: rgba(255, 255, 255, 0.08);
-  box-shadow: 0 8px 30px rgba(94, 200, 255, 0.15);
+  transform: translateY(-4px);
+  box-shadow: 0 12px 40px rgba(94, 200, 255, 0.15);
+}
+
+.urlBoxText {
+  color: #ffffff;
+  font-size: 24px;
+  font-weight: 600;
+  margin: 0 0 30px 0;
 }
 
 .urlInput {
   width: 100%;
-  background: transparent;
-  border: none;
+  background: rgba(255, 255, 255, 0.1);
+  border: 2px solid rgba(94, 200, 255, 0.3);
+  border-radius: 12px;
   color: #ffffff;
   font-size: 18px;
-  padding: 20px;
+  padding: 18px 24px;
   outline: none;
+  transition: all 0.3s ease;
+  margin-bottom: 20px;
+}
+
+.urlInput:focus {
+  border-color: #5ec8ff;
+  background: rgba(255, 255, 255, 0.15);
 }
 
 .urlInput::placeholder {
@@ -119,17 +123,15 @@
 .errorMessage {
   color: #ff5252;
   font-size: 14px;
-  margin-top: 12px;
-  margin-bottom: 0;
-  text-align: left;
-  padding-left: 20px;
+  margin: 12px 0 20px 0;
+  text-align: center;
 }
 
-.fetchButton {
+.continueButton {
   display: inline-block;
   background: linear-gradient(135deg, #5ec8ff 0%, #4a9fd8 100%);
   color: #ffffff;
-  padding: 18px 60px;
+  padding: 16px 50px;
   border: none;
   border-radius: 12px;
   font-size: 18px;
@@ -138,56 +140,13 @@
   transition: all 0.3s ease;
   box-shadow: 0 4px 20px rgba(94, 200, 255, 0.3);
   animation: slideIn 0.3s ease-out;
+  margin-top: 10px;
 }
 
-.fetchButton:hover {
+.continueButton:hover {
   transform: translateY(-2px);
   box-shadow: 0 8px 30px rgba(94, 200, 255, 0.5);
   background: linear-gradient(135deg, #6dd4ff 0%, #5aabdf 100%);
-}
-
-.infoBoxes {
-  display: flex;
-  justify-content: center;
-  gap: 40px;
-  margin-top: 40px;
-}
-
-.infoBox {
-  text-align: center;
-}
-
-.infoIcon {
-  font-size: 48px;
-  margin-bottom: 12px;
-  animation: float 3s ease-in-out infinite;
-}
-
-.infoBox:nth-child(1) .infoIcon {
-  animation-delay: 0s;
-}
-
-.infoBox:nth-child(2) .infoIcon {
-  animation-delay: 0.5s;
-}
-
-.infoBox:nth-child(3) .infoIcon {
-  animation-delay: 1s;
-}
-
-@keyframes float {
-  0%, 100% {
-    transform: translateY(0px);
-  }
-  50% {
-    transform: translateY(-10px);
-  }
-}
-
-.infoText {
-  color: rgba(255, 255, 255, 0.7);
-  font-size: 16px;
-  font-weight: 500;
 }
 
 /* PAGE 2: Fetching Info */
@@ -289,6 +248,20 @@
   gap: 6px;
 }
 
+.fileInfo {
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 16px;
+  padding: 30px;
+  margin-bottom: 40px;
+  text-align: center;
+}
+
+.fileSource {
+  color: rgba(255, 255, 255, 0.6);
+  font-size: 14px;
+  margin-top: 12px;
+}
+
 .formatOptions {
   margin-bottom: 30px;
 }
@@ -302,11 +275,12 @@
 .formatOption {
   display: flex;
   align-items: center;
+  justify-content: space-between;
   gap: 20px;
   background: rgba(255, 255, 255, 0.05);
   border: 2px solid rgba(94, 200, 255, 0.3);
   border-radius: 16px;
-  padding: 24px;
+  padding: 24px 30px;
   cursor: pointer;
   transition: all 0.3s ease;
   text-align: left;
@@ -327,11 +301,6 @@
 .disabledFormat {
   opacity: 0.4;
   cursor: not-allowed;
-}
-
-.formatIcon {
-  font-size: 36px;
-  flex-shrink: 0;
 }
 
 .formatDetails {
