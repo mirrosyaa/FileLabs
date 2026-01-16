@@ -219,13 +219,13 @@
   width: 100%;
   display: flex;
   flex-direction: column;
-  gap: 16px;
+  gap: 12px;
   align-items: center;
 }
 
 .urlVideoThumbnail {
   max-width: 100%;
-  max-height: 90vh;
+  max-height: 65vh;
   width: auto;
   height: auto;
   object-fit: contain;
@@ -253,15 +253,15 @@
 
 .urlVideoTitle {
   color: #ffffff;
-  font-size: 18px;
-  font-weight: 600;
-  margin-bottom: 10px;
-  line-height: 1.4;
+  font-size: 14px;
+  font-weight: 400;
+  margin-bottom: 6px;
+  line-height: 1.3;
 }
 
 .urlVideoMetadata {
   display: flex;
-  gap: 16px;
+  gap: 10px;
   flex-wrap: wrap;
 }
 
@@ -272,7 +272,7 @@
 
 .urlVideoUploader {
   color: rgba(255, 255, 255, 0.6);
-  font-size: 13px;
+  font-size: 12px;
   margin-top: 8px;
 }
 
@@ -395,7 +395,7 @@
   font-size: 36px;
   font-weight: 700;
   text-align: center;
-  margin-bottom: 40px;
+  margin-bottom: 16px;
 }
 
 .mediaPreview {
