@@ -1,0 +1,35 @@
+/* Make the video section take more space for YouTube */
+.youtubeVideoSection {
+  flex: 4 1 0%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+/* YouTube-specific styles for URL Downloader */
+.youtubeVideoPreviewBox {
+  width: 100%;
+  min-width: 600px;
+  min-height: 400px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  align-items: center;
+  flex: 3 1 0%;
+  justify-content: center;
+}
+.youtubeVideoThumbnail {
+  max-width: 96vw;
+  max-height: 90vh;
+  width: auto;
+  height: auto;
+  object-fit: contain;
+  border-radius: 16px;
+  box-shadow: 0 8px 40px rgba(0, 0, 0, 0.3);
+  background: rgba(0, 0, 0, 0.3);
+  display: block;
+}
+@media (min-width: 1200px) {
+  .youtubeVideoThumbnail {
+    max-width: 1200px;
+  }
+}

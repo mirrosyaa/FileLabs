@@ -1,4 +1,4 @@
-const instagramGetUrl = require("instagram-url-direct");
+const { instagramGetUrl } = require("instagram-url-direct");
 
 async function getInstagramInfo(url) {
   const links = await instagramGetUrl(url);

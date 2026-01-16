@@ -1,6 +1,7 @@
 import React from "react";
 import styles from "../../CSS/Pages/urlDownloader.module.css";
 
+
 function FormatSelectionPage({
   fadeIn,
   mediaInfo,
@@ -10,6 +11,25 @@ function FormatSelectionPage({
   handleReset,
   error,
 }) {
+  // Defensive: handle error or missing formats
+  if (!mediaInfo || mediaInfo.error || !mediaInfo.formats) {
+    return (
+      <div className={`${styles.pageContainer} ${fadeIn ? styles.fadeIn : styles.fadeOut}`}>
+        <div className={styles.selectionBox}>
+          <button className={styles.backLink} onClick={handleReset}>
+            ← Back
+          </button>
+          <h2 className={styles.selectionTitle}>Error</h2>
+          <div className={styles.errorBox}>
+            {mediaInfo && mediaInfo.error
+              ? mediaInfo.error + (mediaInfo.details ? `: ${mediaInfo.details}` : "")
+              : "Media information could not be loaded. Please try another URL."}
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   const formatOptions = [
     {
       value: "video+audio",
