@@ -32,14 +32,14 @@ async function extractDirectUrlWithYtDlp(url) {
 }
 
 
+const fs = require("fs");
+const os = require("os");
+const { v4: uuidv4 } = require("uuid");
+
 async function downloadMedia(url, format, downloadUrls, res) {
   const platform = detectPlatform(url);
   console.log("Platform:", platform);
   try {
-    // Use yt-dlp to extract direct video URL
-    const directUrl = await extractDirectUrlWithYtDlp(url);
-    if (!directUrl) throw new Error('Failed to extract direct video URL.');
-
     let filename = `${platform}-video.mp4`;
     let contentType = 'video/mp4';
     if (format === 'audio') {
@@ -50,29 +50,58 @@ async function downloadMedia(url, format, downloadUrls, res) {
     res.setHeader('Content-Disposition', `attachment; filename="${filename}"`);
     res.setHeader('Content-Type', contentType);
 
-    if (format === 'audio') {
-      // Use ffmpeg to extract audio from video URL
-      ffmpeg(directUrl)
-        .format('mp3')
-        .audioCodec('libmp3lame')
-        .on('error', (err) => {
-          console.error('ffmpeg error:', err);
-          if (!res.headersSent) {
-            res.status(500).json({ error: 'Error extracting audio' });
+    // For Instagram, TikTok, Facebook, Twitter, use yt-dlp to download to temp file, then stream
+    if (["instagram", "tiktok", "facebook", "twitter"].includes(platform)) {
+      const tmpDir = os.tmpdir();
+      const tmpFile = path.join(tmpDir, uuidv4() + (format === 'audio' ? '.mp3' : '.mp4'));
+      let ytDlpArgs = [url, "-o", tmpFile];
+      if (format === 'audio') {
+        ytDlpArgs = [url, "-x", "--audio-format", "mp3", "-o", tmpFile];
+      }
+      await new Promise((resolve, reject) => {
+        const ytDlp = spawn("yt-dlp", ytDlpArgs);
+        ytDlp.stderr.on("data", (data) => {
+          process.stderr.write(data);
+        });
+        ytDlp.on("close", (code) => {
+          if (code === 0 && fs.existsSync(tmpFile)) {
+            resolve();
+          } else {
+            reject(new Error("yt-dlp failed to download file"));
           }
-        })
-        .pipe(res, { end: true });
+        });
+      });
+      const readStream = fs.createReadStream(tmpFile);
+      readStream.pipe(res);
+      readStream.on('close', () => {
+        fs.unlink(tmpFile, () => {});
+      });
     } else {
-      // Use ffmpeg to download/process video (can also just stream directUrl if you want raw video)
-      ffmpeg(directUrl)
-        .format('mp4')
-        .on('error', (err) => {
-          console.error('ffmpeg error:', err);
-          if (!res.headersSent) {
-            res.status(500).json({ error: 'Error downloading video' });
-          }
-        })
-        .pipe(res, { end: true });
+      // For YouTube or direct, use previous ffmpeg logic
+      const directUrl = await extractDirectUrlWithYtDlp(url);
+      if (!directUrl) throw new Error('Failed to extract direct video URL.');
+      if (format === 'audio') {
+        ffmpeg(directUrl)
+          .format('mp3')
+          .audioCodec('libmp3lame')
+          .on('error', (err) => {
+            console.error('ffmpeg error:', err);
+            if (!res.headersSent) {
+              res.status(500).json({ error: 'Error extracting audio' });
+            }
+          })
+          .pipe(res, { end: true });
+      } else {
+        ffmpeg(directUrl)
+          .format('mp4')
+          .on('error', (err) => {
+            console.error('ffmpeg error:', err);
+            if (!res.headersSent) {
+              res.status(500).json({ error: 'Error downloading video' });
+            }
+          })
+          .pipe(res, { end: true });
+      }
     }
   } catch (error) {
     console.error('Download error:', error);

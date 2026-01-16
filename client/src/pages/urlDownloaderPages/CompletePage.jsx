@@ -43,15 +43,16 @@ function CompletePage({
 
           {!hasDownloaded ? (
             <>
-              <h2 className={styles.completeTitle}>Ready to Download!</h2>
-              <p className={styles.completeMessage}>
-                Your {selectedFormat === "audio" ? "audio" : "video"} file is ready
-              </p>
+              <h2 className={styles.successTitle}>Download your file</h2>
+              <div style={{ height: 32 }} />
             </>
           ) : (
-            <h2 className={styles.completeTitle}>
-              File Downloaded Successfully!
-            </h2>
+            <>
+              <h2 className={styles.successTitle}>
+                File Downloaded Successfully!
+              </h2>
+              <div style={{ height: 32 }} />
+            </>
           )}
 
           {!hasDownloaded && (
@@ -67,6 +68,7 @@ function CompletePage({
                 </>
               ) : (
                 <>
+                  <span className={styles.downloadIcon}>⬇</span>
                   Download File
                 </>
               )}
