@@ -157,6 +157,20 @@ function UrlDownloader() {
         requestBody.audioBitrate = audioBitrate || selectedAudioBitrate || '192';
       }
 
+      // Add direct download URL if available (for TikTok, Instagram, Facebook)
+      if (mediaInfo.downloadUrls) {
+        if (selectedFormat === 'video' || selectedFormat === 'video+audio') {
+          if (mediaInfo.downloadUrls.video && mediaInfo.downloadUrls.video.length > 0) {
+            // Use the best quality video URL (first in array is usually highest quality)
+            requestBody.directUrl = mediaInfo.downloadUrls.video[0];
+          }
+        } else if (selectedFormat === 'audio') {
+          if (mediaInfo.downloadUrls.music && mediaInfo.downloadUrls.music.length > 0) {
+            requestBody.directUrl = mediaInfo.downloadUrls.music[0];
+          }
+        }
+      }
+
       const response = await fetch("http://localhost:3001/api/download-media", {
         method: "POST",
         headers: {

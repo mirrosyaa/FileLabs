@@ -138,6 +138,14 @@ function FormatSelectionPage({
                 src={mediaInfo.thumbnail}
                 alt="Thumbnail"
                 className={styles.urlVideoThumbnail}
+                onError={(e) => {
+                  console.error("Failed to load thumbnail:", mediaInfo.thumbnail);
+                  e.target.style.display = 'none';
+                  const noThumbDiv = document.createElement('div');
+                  noThumbDiv.className = styles.urlNoThumbnail;
+                  noThumbDiv.innerHTML = `<h3 class="${styles.urlVideoTitle}">${mediaInfo.title}</h3><p class="${styles.urlVideoUploader}">Source: ${mediaInfo.uploader}</p>`;
+                  e.target.parentElement.insertBefore(noThumbDiv, e.target);
+                }}
               />
               <div className={styles.urlVideoDetails}>
                 <h3 className={styles.urlVideoTitle}>{mediaInfo.title}</h3>

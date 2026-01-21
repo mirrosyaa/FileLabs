@@ -114,12 +114,65 @@ async function downloadWithYtDlp(url, format, quality, audioBitrate) {
   });
 }
 
+// Utility: Download from direct URL (for TikTok, Instagram, Facebook)
+async function downloadFromDirectUrl(directUrl, format) {
+  const https = require('https');
+  const http = require('http');
+  const tmpDir = os.tmpdir();
+  const tmpFile = path.join(tmpDir, uuidv4() + (format === 'audio' ? '.mp3' : '.mp4'));
+  
+  return new Promise((resolve, reject) => {
+    const protocol = directUrl.startsWith('https') ? https : http;
+    
+    const file = fs.createWriteStream(tmpFile);
+    
+    protocol.get(directUrl, (response) => {
+      if (response.statusCode === 302 || response.statusCode === 301) {
+        // Follow redirect
+        file.close();
+        fs.unlinkSync(tmpFile);
+        return downloadFromDirectUrl(response.headers.location, format)
+          .then(resolve)
+          .catch(reject);
+      }
+      
+      if (response.statusCode !== 200) {
+        file.close();
+        fs.unlinkSync(tmpFile);
+        return reject(new Error(`Failed to download: ${response.statusCode}`));
+      }
+      
+      response.pipe(file);
+      
+      file.on('finish', () => {
+        file.close(() => {
+          const stats = fs.statSync(tmpFile);
+          if (stats.size > 0) {
+            console.log(`Direct download successful: ${tmpFile} (${stats.size} bytes)`);
+            resolve(tmpFile);
+          } else {
+            fs.unlinkSync(tmpFile);
+            reject(new Error("Downloaded file is empty"));
+          }
+        });
+      });
+    }).on('error', (err) => {
+      file.close();
+      if (fs.existsSync(tmpFile)) {
+        fs.unlinkSync(tmpFile);
+      }
+      reject(err);
+    });
+  });
+}
+
 async function downloadMedia(url, format, options, res) {
   const platform = detectPlatform(url);
-  const { quality, audioBitrate } = options || {};
+  const { quality, audioBitrate, directUrl } = options || {};
   
   console.log("Platform:", platform);
   console.log("Format:", format, "Quality:", quality, "Audio Bitrate:", audioBitrate);
+  console.log("Direct URL:", directUrl);
   
   let tmpFile = null;
   
@@ -131,11 +184,17 @@ async function downloadMedia(url, format, options, res) {
     res.setHeader('Content-Disposition', `attachment; filename="${filename}"`);
     res.setHeader('Content-Type', contentType);
     
-    // Download with yt-dlp
-    const videoQuality = quality || '1080';
-    const audioBitrateValue = audioBitrate || '192';
-    
-    tmpFile = await downloadWithYtDlp(url, format, videoQuality, audioBitrateValue);
+    // Use direct URL if available (for TikTok, Instagram, Facebook)
+    if (directUrl) {
+      console.log("Using direct download from:", directUrl);
+      tmpFile = await downloadFromDirectUrl(directUrl, format);
+    } else {
+      // Download with yt-dlp (for YouTube, Twitter, etc.)
+      const videoQuality = quality || '1080';
+      const audioBitrateValue = audioBitrate || '192';
+      
+      tmpFile = await downloadWithYtDlp(url, format, videoQuality, audioBitrateValue);
+    }
     
     console.log("Downloaded to:", tmpFile);
     

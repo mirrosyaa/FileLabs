@@ -6,14 +6,32 @@ async function getFacebookInfo(url) {
     
     const fbData = await getFbVideoInfo(url);
     
-    console.log("Facebook API response:", fbData);
+    console.log("Facebook API Response:", JSON.stringify(fbData, null, 2));
     
     if (fbData && (fbData.hd || fbData.sd)) {
+      // Try to extract thumbnail from various possible properties
+      let thumbnail = null;
+      const possibleThumbProps = ['thumbnail', 'thumb', 'picture', 'image', 'cover'];
+      
+      for (const prop of possibleThumbProps) {
+        if (fbData[prop] && typeof fbData[prop] === 'string' && fbData[prop].startsWith('http')) {
+          thumbnail = fbData[prop];
+          break;
+        }
+      }
+      
+      // Fallback to video URL if no thumbnail found
+      if (!thumbnail && (fbData.hd || fbData.sd)) {
+        thumbnail = fbData.hd || fbData.sd;
+      }
+      
+      console.log("Facebook thumbnail:", thumbnail);
+      
       return {
         title: fbData.title || "Facebook Video",
         duration: "Unknown",
         durationSeconds: 0,
-        thumbnail: null,
+        thumbnail: thumbnail,
         uploader: "Facebook",
         formats: {
           hasVideo: true,
