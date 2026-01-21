@@ -1,29 +1,33 @@
 const { spawn } = require("child_process");
-const axios = require("axios");
 const path = require("path");
+const fs = require("fs");
+const os = require("os");
+const { v4: uuidv4 } = require("uuid");
 const { detectPlatform } = require("./utils");
-const ffmpeg = require("fluent-ffmpeg");
 
-
-// Utility: Extract direct video URL using yt-dlp
-async function extractDirectUrlWithYtDlp(url) {
+// Utility: Get video info using yt-dlp
+async function getVideoFormats(url) {
   return new Promise((resolve, reject) => {
-    const ytDlp = spawn("yt-dlp", [
-      "-f", "best[ext=mp4]/best",
-      "-g", // get direct URL
-      url
-    ]);
+    const ytDlp = spawn("yt-dlp", ["-J", url]);
     let output = "";
     let error = "";
+    
     ytDlp.stdout.on("data", (data) => {
       output += data.toString();
     });
+    
     ytDlp.stderr.on("data", (data) => {
       error += data.toString();
     });
+    
     ytDlp.on("close", (code) => {
       if (code === 0 && output.trim()) {
-        resolve(output.trim().split("\n")[0]);
+        try {
+          const info = JSON.parse(output);
+          resolve(info);
+        } catch (e) {
+          reject(new Error("Failed to parse yt-dlp output"));
+        }
       } else {
         reject(new Error(`yt-dlp failed: ${error || 'No output'}`));
       }
@@ -31,85 +35,155 @@ async function extractDirectUrlWithYtDlp(url) {
   });
 }
 
-
-const fs = require("fs");
-const os = require("os");
-const { v4: uuidv4 } = require("uuid");
-
-async function downloadMedia(url, format, downloadUrls, res) {
-  const platform = detectPlatform(url);
-  console.log("Platform:", platform);
-  try {
-    let filename = `${platform}-video.mp4`;
-    let contentType = 'video/mp4';
+// Utility: Download using yt-dlp and get file path
+async function downloadWithYtDlp(url, format, quality, audioBitrate) {
+  const tmpDir = os.tmpdir();
+  const tmpFile = path.join(tmpDir, uuidv4());
+  
+  return new Promise((resolve, reject) => {
+    let ytDlpArgs = [];
+    let expectedExt = '';
+    
     if (format === 'audio') {
-      filename = `${platform}-audio.mp3`;
-      contentType = 'audio/mpeg';
+      // Audio only - download best audio and convert to MP3 with specified bitrate
+      const bitrate = audioBitrate || '192';
+      expectedExt = '.mp3';
+      ytDlpArgs = [
+        url,
+        "-f", "bestaudio/best",
+        "-x",
+        "--audio-format", "mp3",
+        "--audio-quality", bitrate + "K",
+        "--no-playlist",
+        "-o", tmpFile + expectedExt
+      ];
+    } else if (format === 'video') {
+      // Video only - no audio
+      expectedExt = '.mp4';
+      ytDlpArgs = [
+        url,
+        "-f", `bestvideo[height<=${quality}][ext=mp4]/bestvideo[height<=${quality}]/bestvideo/best`,
+        "--no-playlist",
+        "-o", tmpFile + expectedExt
+      ];
+    } else {
+      // Video + Audio - merge best video and audio
+      expectedExt = '.mp4';
+      ytDlpArgs = [
+        url,
+        "-f", `bestvideo[height<=${quality}]+bestaudio/best[height<=${quality}]/best`,
+        "--merge-output-format", "mp4",
+        "--no-playlist",
+        "-o", tmpFile + expectedExt
+      ];
     }
+    
+    console.log("Running yt-dlp:", "yt-dlp", ytDlpArgs.join(" "));
+    
+    const ytDlp = spawn("yt-dlp", ytDlpArgs);
+    let stderrOutput = "";
+    
+    ytDlp.stdout.on("data", (data) => {
+      process.stdout.write(data);
+    });
+    
+    ytDlp.stderr.on("data", (data) => {
+      stderrOutput += data.toString();
+      process.stderr.write(data);
+    });
+    
+    ytDlp.on("close", (code) => {
+      const finalPath = tmpFile + expectedExt;
+      
+      if (code === 0 && fs.existsSync(finalPath)) {
+        const stats = fs.statSync(finalPath);
+        if (stats.size > 0) {
+          console.log(`Download successful: ${finalPath} (${stats.size} bytes)`);
+          resolve(finalPath);
+        } else {
+          reject(new Error("Downloaded file is empty"));
+        }
+      } else {
+        reject(new Error(`yt-dlp failed with code ${code}: ${stderrOutput || 'Unknown error'}`));
+      }
+    });
+    
+    ytDlp.on("error", (err) => {
+      reject(new Error(`Failed to spawn yt-dlp: ${err.message}`));
+    });
+  });
+}
 
+async function downloadMedia(url, format, options, res) {
+  const platform = detectPlatform(url);
+  const { quality, audioBitrate } = options || {};
+  
+  console.log("Platform:", platform);
+  console.log("Format:", format, "Quality:", quality, "Audio Bitrate:", audioBitrate);
+  
+  let tmpFile = null;
+  
+  try {
+    const fileExt = format === 'audio' ? '.mp3' : '.mp4';
+    const filename = `${platform}-${format}${fileExt}`;
+    const contentType = format === 'audio' ? 'audio/mpeg' : 'video/mp4';
+    
     res.setHeader('Content-Disposition', `attachment; filename="${filename}"`);
     res.setHeader('Content-Type', contentType);
-
-    // For Instagram, TikTok, Facebook, Twitter, use yt-dlp to download to temp file, then stream
-    if (["instagram", "tiktok", "facebook", "twitter"].includes(platform)) {
-      const tmpDir = os.tmpdir();
-      const tmpFile = path.join(tmpDir, uuidv4() + (format === 'audio' ? '.mp3' : '.mp4'));
-      let ytDlpArgs = [url, "-o", tmpFile];
-      if (format === 'audio') {
-        ytDlpArgs = [url, "-x", "--audio-format", "mp3", "-o", tmpFile];
-      }
-      await new Promise((resolve, reject) => {
-        const ytDlp = spawn("yt-dlp", ytDlpArgs);
-        ytDlp.stderr.on("data", (data) => {
-          process.stderr.write(data);
-        });
-        ytDlp.on("close", (code) => {
-          if (code === 0 && fs.existsSync(tmpFile)) {
-            resolve();
-          } else {
-            reject(new Error("yt-dlp failed to download file"));
-          }
-        });
-      });
-      const readStream = fs.createReadStream(tmpFile);
-      readStream.pipe(res);
-      readStream.on('close', () => {
-        fs.unlink(tmpFile, () => {});
-      });
-    } else {
-      // For YouTube or direct, use previous ffmpeg logic
-      const directUrl = await extractDirectUrlWithYtDlp(url);
-      if (!directUrl) throw new Error('Failed to extract direct video URL.');
-      if (format === 'audio') {
-        ffmpeg(directUrl)
-          .format('mp3')
-          .audioCodec('libmp3lame')
-          .on('error', (err) => {
-            console.error('ffmpeg error:', err);
-            if (!res.headersSent) {
-              res.status(500).json({ error: 'Error extracting audio' });
-            }
-          })
-          .pipe(res, { end: true });
-      } else {
-        ffmpeg(directUrl)
-          .format('mp4')
-          .on('error', (err) => {
-            console.error('ffmpeg error:', err);
-            if (!res.headersSent) {
-              res.status(500).json({ error: 'Error downloading video' });
-            }
-          })
-          .pipe(res, { end: true });
-      }
+    
+    // Download with yt-dlp
+    const videoQuality = quality || '1080';
+    const audioBitrateValue = audioBitrate || '192';
+    
+    tmpFile = await downloadWithYtDlp(url, format, videoQuality, audioBitrateValue);
+    
+    console.log("Downloaded to:", tmpFile);
+    
+    // Check file size
+    const stat = fs.statSync(tmpFile);
+    console.log("File size:", stat.size, "bytes");
+    
+    if (stat.size === 0) {
+      throw new Error("Downloaded file is empty");
     }
+    
+    // Stream the downloaded file directly without re-encoding
+    // Re-encoding causes streaming issues
+    res.setHeader('Content-Length', stat.size);
+    
+    const readStream = fs.createReadStream(tmpFile);
+    
+    readStream.on('end', () => {
+      console.log("Stream ended, cleaning up");
+      if (tmpFile && fs.existsSync(tmpFile)) {
+        fs.unlinkSync(tmpFile);
+      }
+    });
+    
+    readStream.on('error', (err) => {
+      console.error('Stream error:', err);
+      if (tmpFile && fs.existsSync(tmpFile)) {
+        fs.unlinkSync(tmpFile);
+      }
+    });
+    
+    readStream.pipe(res);
+    
   } catch (error) {
     console.error('Download error:', error);
+    
+    // Cleanup on error
+    if (tmpFile && fs.existsSync(tmpFile)) {
+      fs.unlinkSync(tmpFile);
+    }
+    
     if (!res.headersSent) {
-      res.status(500).json({ error: 'Failed to download media', details: error.message });
+      res.status(500).json({ 
+        error: 'Failed to download media', 
+        details: error.message 
+      });
     }
   }
 }
 
-module.exports = { downloadMedia };
-module.exports = { downloadMedia };
+module.exports = { downloadMedia, getVideoFormats };

@@ -46,6 +46,10 @@ async function getMediaInfo(url) {
             hasVideo: true,
             hasAudio: true,
           },
+          qualityOptions: {
+            videoResolutions: [1080, 720, 480],
+            audioBitrates: [128, 160, 192, 256]
+          },
           originalUrl: url,
           platform: 'twitter',
           downloadUrls: {

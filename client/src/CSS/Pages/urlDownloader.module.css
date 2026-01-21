@@ -369,6 +369,48 @@
   font-size: 13px;
 }
 
+/* Quality Selection */
+.urlQualitySection {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-bottom: 16px;
+  margin-top: 16px;
+}
+
+.urlQualityLabel {
+  color: rgba(255, 255, 255, 0.8);
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.urlQualitySelect {
+  background: rgba(255, 255, 255, 0.05);
+  border: 2px solid rgba(94, 200, 255, 0.3);
+  border-radius: 8px;
+  padding: 10px 14px;
+  color: #ffffff;
+  font-size: 14px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.urlQualitySelect:hover {
+  border-color: rgba(94, 200, 255, 0.6);
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.urlQualitySelect:focus {
+  outline: none;
+  border-color: #5ec8ff;
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.urlQualitySelect option {
+  background: #1a2942;
+  color: #ffffff;
+}
+
 .urlDownloadButton {
   width: 100%;
   background: linear-gradient(135deg, #5ec8ff 0%, #4a9fd8 100%);

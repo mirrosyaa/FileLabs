@@ -36,7 +36,7 @@ router.post("/url-info", async (req, res) => {
 // Download video/audio with format selection
 router.post("/download-media", async (req, res) => {
   try {
-    const { url, format, downloadUrls } = req.body;
+    const { url, format, quality, audioBitrate } = req.body;
 
     if (!url) {
       return res.status(400).json({ error: "URL is required" });
@@ -46,9 +46,14 @@ router.post("/download-media", async (req, res) => {
       return res.status(400).json({ error: "Format is required" });
     }
 
-    console.log(`Downloading media from ${url} with format: ${format}`);
+    console.log(`Downloading media from ${url} with format: ${format}, quality: ${quality}, audioBitrate: ${audioBitrate}`);
 
-    await downloadMedia(url, format, downloadUrls, res);
+    const options = {
+      quality: quality || '1080',
+      audioBitrate: audioBitrate || '192'
+    };
+
+    await downloadMedia(url, format, options, res);
 
   } catch (error) {
     console.error("Error downloading media:", error);

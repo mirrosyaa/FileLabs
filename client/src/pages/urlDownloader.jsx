@@ -22,6 +22,8 @@ function UrlDownloader() {
   const [downloadFilename, setDownloadFilename] = useState("");
   const [error, setError] = useState(null);
   const [fadeIn, setFadeIn] = useState(true);
+  const [selectedQuality, setSelectedQuality] = useState("");
+  const [selectedAudioBitrate, setSelectedAudioBitrate] = useState("");
 
   const isValidUrl = (string) => {
     try {
@@ -105,11 +107,15 @@ function UrlDownloader() {
     }
   };
 
-  const handleDownload = async () => {
+  const handleDownload = async (quality, audioBitrate) => {
     if (!selectedFormat) {
       setError("Please select a format");
       return;
     }
+
+    // Store quality settings
+    setSelectedQuality(quality || '1080');
+    setSelectedAudioBitrate(audioBitrate || '192');
 
     setError(null);
     setFadeIn(false);
@@ -117,11 +123,11 @@ function UrlDownloader() {
     setTimeout(() => {
       setPage(4);
       setFadeIn(true);
-      startDownload();
+      startDownload(quality, audioBitrate);
     }, 300);
   };
 
-  const startDownload = async () => {
+  const startDownload = async (quality, audioBitrate) => {
     setDownloadProgress(0);
 
     try {
@@ -136,15 +142,27 @@ function UrlDownloader() {
         });
       }, 300);
 
+      const requestBody = { 
+        url: mediaInfo.originalUrl,
+        format: selectedFormat
+      };
+
+      // Add quality for video formats
+      if (selectedFormat === 'video' || selectedFormat === 'video+audio') {
+        requestBody.quality = quality || selectedQuality || '1080';
+      }
+
+      // Add audio bitrate for audio formats
+      if (selectedFormat === 'audio' || selectedFormat === 'video+audio') {
+        requestBody.audioBitrate = audioBitrate || selectedAudioBitrate || '192';
+      }
+
       const response = await fetch("http://localhost:3001/api/download-media", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ 
-          url: mediaInfo.originalUrl,
-          format: selectedFormat 
-        }),
+        body: JSON.stringify(requestBody),
       });
 
       clearInterval(progressInterval);

@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import styles from "../../CSS/Pages/urlDownloader.module.css";
 
 
@@ -11,6 +11,31 @@ function FormatSelectionPage({
   handleReset,
   error,
 }) {
+  const [selectedQuality, setSelectedQuality] = useState("");
+  const [selectedAudioBitrate, setSelectedAudioBitrate] = useState("");
+
+  // Set default quality and bitrate when format changes
+  useEffect(() => {
+    if (mediaInfo?.qualityOptions) {
+      const { videoResolutions, audioBitrates } = mediaInfo.qualityOptions;
+      
+      if (selectedFormat === 'video' || selectedFormat === 'video+audio') {
+        // Default to highest resolution
+        if (videoResolutions && videoResolutions.length > 0) {
+          setSelectedQuality(videoResolutions[0].toString());
+        }
+      }
+      
+      if (selectedFormat === 'audio' || selectedFormat === 'video+audio') {
+        // Default to 192kbps for audio
+        if (audioBitrates && audioBitrates.length > 0) {
+          const defaultBitrate = audioBitrates.includes(192) ? '192' : audioBitrates[0].toString();
+          setSelectedAudioBitrate(defaultBitrate);
+        }
+      }
+    }
+  }, [selectedFormat, mediaInfo]);
+
   // Defensive: handle error or missing formats
   if (!mediaInfo || mediaInfo.error || !mediaInfo.formats) {
     return (
@@ -53,7 +78,6 @@ function FormatSelectionPage({
 
   // For non-YouTube URLs or platforms without format options, show direct download option
   const isDirectDownload = !mediaInfo.formats.hasVideo && !mediaInfo.formats.hasAudio;
-  const isSimplePlatform = mediaInfo.platform && ['instagram', 'tiktok', 'facebook', 'twitter'].includes(mediaInfo.platform);
 
   if (isDirectDownload) {
     return (
@@ -81,8 +105,8 @@ function FormatSelectionPage({
           <button
             className={`${styles.downloadButton} ${styles.slideIn}`}
             onClick={() => {
-              setSelectedFormat('video+audio'); // Set a default
-              handleDownload();
+              setSelectedFormat('video+audio');
+              handleDownload(selectedQuality, selectedAudioBitrate);
             }}
           >
             Download File
@@ -91,6 +115,9 @@ function FormatSelectionPage({
       </div>
     );
   }
+
+  const videoResolutions = mediaInfo.qualityOptions?.videoResolutions || [2160, 1440, 1080, 720, 480, 360];
+  const audioBitrates = mediaInfo.qualityOptions?.audioBitrates || [128, 160, 192, 256, 320];
 
   return (
     <div
@@ -105,26 +132,13 @@ function FormatSelectionPage({
       <div className={styles.urlSplitLayout}>
         {/* Video Preview - Left */}
         <div className={styles.urlVideoSection}>
-          {(mediaInfo.previewUrl || mediaInfo.thumbnail) ? (
+          {mediaInfo.thumbnail ? (
             <div className={styles.urlVideoPreviewBox}>
-              {mediaInfo.previewUrl ? (
-                <video
-                  src={mediaInfo.previewUrl}
-                  className={styles.urlVideoThumbnail}
-                  autoPlay
-                  loop
-                  muted
-                  playsInline
-                  controls
-                  poster={mediaInfo.thumbnail}
-                />
-              ) : (
-                <img
-                  src={mediaInfo.thumbnail}
-                  alt="Thumbnail"
-                  className={styles.urlVideoThumbnail}
-                />
-              )}
+              <img
+                src={mediaInfo.thumbnail}
+                alt="Thumbnail"
+                className={styles.urlVideoThumbnail}
+              />
               <div className={styles.urlVideoDetails}>
                 <h3 className={styles.urlVideoTitle}>{mediaInfo.title}</h3>
                 <div className={styles.urlVideoMetadata}>
@@ -180,12 +194,44 @@ function FormatSelectionPage({
             ))}
           </div>
 
+          {/* Quality Selection for Video */}
+          {selectedFormat && (selectedFormat === 'video' || selectedFormat === 'video+audio') && (
+            <div className={styles.urlQualitySection}>
+              <label className={styles.urlQualityLabel}>Video Quality:</label>
+              <select 
+                className={styles.urlQualitySelect}
+                value={selectedQuality}
+                onChange={(e) => setSelectedQuality(e.target.value)}
+              >
+                {videoResolutions.map(res => (
+                  <option key={res} value={res}>{res}p</option>
+                ))}
+              </select>
+            </div>
+          )}
+
+          {/* Audio Bitrate Selection */}
+          {selectedFormat && (selectedFormat === 'audio' || selectedFormat === 'video+audio') && (
+            <div className={styles.urlQualitySection}>
+              <label className={styles.urlQualityLabel}>Audio Bitrate:</label>
+              <select 
+                className={styles.urlQualitySelect}
+                value={selectedAudioBitrate}
+                onChange={(e) => setSelectedAudioBitrate(e.target.value)}
+              >
+                {audioBitrates.map(bitrate => (
+                  <option key={bitrate} value={bitrate}>{bitrate}kbps</option>
+                ))}
+              </select>
+            </div>
+          )}
+
           {error && <div className={styles.urlError}>{error}</div>}
 
           {selectedFormat && (
             <button
               className={styles.urlDownloadButton}
-              onClick={handleDownload}
+              onClick={() => handleDownload(selectedQuality, selectedAudioBitrate)}
             >
               Download {selectedFormat === "audio" ? "Audio" : "Video"}
             </button>

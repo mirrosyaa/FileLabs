@@ -14,11 +14,14 @@ async function getFacebookInfo(url) {
         duration: "Unknown",
         durationSeconds: 0,
         thumbnail: null,
-        previewUrl: fbData.sd || fbData.hd || null,
         uploader: "Facebook",
         formats: {
           hasVideo: true,
           hasAudio: true,
+        },
+        qualityOptions: {
+          videoResolutions: [1080, 720, 480],
+          audioBitrates: [128, 160, 192, 256]
         },
         originalUrl: url,
         platform: 'facebook',
@@ -41,6 +44,10 @@ async function getFacebookInfo(url) {
     formats: {
       hasVideo: true,
       hasAudio: true,
+    },
+    qualityOptions: {
+      videoResolutions: [1080, 720, 480],
+      audioBitrates: [128, 160, 192, 256]
     },
     originalUrl: url,
     platform: 'facebook',

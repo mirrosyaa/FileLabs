@@ -8,11 +8,14 @@ async function getInstagramInfo(url) {
     duration: "Unknown",
     durationSeconds: 0,
     thumbnail: links.thumb || null,
-    previewUrl: (links.url_list && links.url_list.length > 0) ? links.url_list[0] : null,
     uploader: "Instagram",
     formats: {
       hasVideo: true,
       hasAudio: true,
+    },
+    qualityOptions: {
+      videoResolutions: [1080, 720, 480],
+      audioBitrates: [128, 160, 192, 256]
     },
     originalUrl: url,
     platform: 'instagram',

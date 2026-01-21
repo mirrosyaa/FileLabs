@@ -36,11 +36,14 @@ async function getTikTokInfo(url) {
       duration: formatDuration(data.duration || 0),
       durationSeconds: data.duration || 0,
       thumbnail: data.cover || data.dynamic_cover || data.origin_cover || data.author?.avatar || null,
-      previewUrl: data.videoSD || data.videoWatermark || data.videoHD || null,
       uploader: data.author?.nickname || data.author?.unique_id || "TikTok User",
       formats: {
         hasVideo: true,
         hasAudio: true,
+      },
+      qualityOptions: {
+        videoResolutions: [1080, 720, 480],
+        audioBitrates: [128, 160, 192, 256]
       },
       originalUrl: url,
       platform: 'tiktok',
