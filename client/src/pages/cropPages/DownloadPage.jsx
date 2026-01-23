@@ -38,9 +38,9 @@ function DownloadPage({
           </div>
           {!hasDownloaded ? (
             <>
-              <h2 className={styles.completeTitle}>Cropping Complete!</h2>
+              <h2 className={styles.completeTitle}>Processing Complete!</h2>
               <p className={styles.completeMessage}>
-                Your image has been successfully cropped
+                Your image has been successfully processed
               </p>
             </>
           ) : (
@@ -67,7 +67,7 @@ function DownloadPage({
             </button>
           )}
           <button className={styles.cropAnotherBtn} onClick={handleReset}>
-            Crop Another Image
+            Edit Another Image
           </button>
         </div>
       )}

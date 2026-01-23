@@ -14,7 +14,7 @@ function UploadPage({
 }) {
   return (
     <div className={`${commonStyles.pageContainer} ${fadeIn ? commonStyles.fadeIn : commonStyles.fadeOut}`}>
-      <h1 className={commonStyles.mainTitle}>Crop Images</h1>
+      <h1 className={commonStyles.mainTitle}>Image Editor</h1>
       
       {error && (
         <div className={commonStyles.errorBox}>

@@ -12,7 +12,7 @@ function CommonActions() {
     { name: "Compress", icon: "" },
     { name: "Merge", icon: "" },
     { name: "Cut", icon: "" },
-    { name: "Resize", icon: "" },
+    { name: "Image Editor", icon: "" },
   ];
 
   const fileTypeOptions = [

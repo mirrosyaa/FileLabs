@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from "react";
+import React, { useState, useRef, useEffect, useMemo } from "react";
 import Cropper from "react-cropper";
 import commonStyles from "../../CSS/Pages/CropPages/common.module.css";
 import styles from "../../CSS/Pages/CropPages/interactive.module.css";
@@ -29,8 +29,26 @@ function InteractiveCropPage({
   const [originalHeight, setOriginalHeight] = useState(0);
   const [customWidth, setCustomWidth] = useState(0);
   const [customHeight, setCustomHeight] = useState(0);
-  const [aspectRatioLocked, setAspectRatioLocked] = useState(true);
+  const aspectRatioLocked = true;
   const [upscaleError, setUpscaleError] = useState(false);
+
+  // Resize states
+  const [resizeMethod, setResizeMethod] = useState('none'); // 'none', 'preset', 'custom', 'percentage'
+  const [resizePreset, setResizePreset] = useState('');
+  const [resizeWidth, setResizeWidth] = useState('');
+  const [resizeHeight, setResizeHeight] = useState('');
+  const [resizePercentage, setResizePercentage] = useState(100);
+
+  const resizePresets = useMemo(() => [
+    { label: 'Instagram Square', width: 1080, height: 1080 },
+    { label: 'Instagram Portrait', width: 1080, height: 1350 },
+    { label: 'Instagram Landscape', width: 1080, height: 566 },
+    { label: 'Facebook Post', width: 1200, height: 630 },
+    { label: 'Twitter Post', width: 1200, height: 675 },
+    { label: 'YouTube Thumbnail', width: 1280, height: 720 },
+    { label: 'Full HD', width: 1920, height: 1080 },
+    { label: '4K', width: 3840, height: 2160 },
+  ], []);
 
   // Load image when component mounts or file changes
   useEffect(() => {
@@ -51,6 +69,53 @@ function InteractiveCropPage({
     });
     reader.readAsDataURL(file);
   }, [file]);
+
+  // Handle resize preset changes to show live preview
+  useEffect(() => {
+    if (resizeMethod === 'preset' && resizePreset && cropperRef.current && cropperRef.current.cropper) {
+      const selectedPreset = resizePresets.find(p => p.label === resizePreset);
+      if (selectedPreset) {
+        // Update the crop dimensions to match the preset aspect ratio
+        const presetRatio = selectedPreset.width / selectedPreset.height;
+        cropperRef.current.cropper.setAspectRatio(presetRatio);
+        setAspectRatio(presetRatio);
+        setIsCustomAspect(false);
+      }
+    }
+  }, [resizeMethod, resizePreset, resizePresets]);
+
+  // Handle custom resize dimensions for live preview
+  useEffect(() => {
+    if (resizeMethod === 'custom' && (resizeWidth || resizeHeight) && cropperRef.current && cropperRef.current.cropper) {
+      const width = parseInt(resizeWidth) || 0;
+      const height = parseInt(resizeHeight) || 0;
+      
+      if (width > 0 && height > 0) {
+        const customRatio = width / height;
+        cropperRef.current.cropper.setAspectRatio(customRatio);
+        setAspectRatio(customRatio);
+        setIsCustomAspect(false);
+      } else if (width > 0 || height > 0) {
+        // If only one dimension is set, use free aspect ratio
+        cropperRef.current.cropper.setAspectRatio(NaN);
+        setAspectRatio(NaN);
+        setIsCustomAspect(false);
+      }
+    }
+  }, [resizeMethod, resizeWidth, resizeHeight]);
+
+  // Handle percentage resize for live preview
+  useEffect(() => {
+    if (resizeMethod === 'percentage' && cropperRef.current && cropperRef.current.cropper) {
+      // For percentage scaling, maintain the original aspect ratio
+      if (originalWidth > 0 && originalHeight > 0) {
+        const originalRatio = originalWidth / originalHeight;
+        cropperRef.current.cropper.setAspectRatio(originalRatio);
+        setAspectRatio(originalRatio);
+        setIsCustomAspect(false);
+      }
+    }
+  }, [resizeMethod, resizePercentage, originalWidth, originalHeight]);
 
   const handleRotationChange = (e) => {
     const rotationValue = Number(e.target.value);
@@ -164,25 +229,9 @@ function InteractiveCropPage({
     }
   };
 
-  const handleAspectRatioLockToggle = () => {
-    setAspectRatioLocked(!aspectRatioLocked);
-  };
-
-  // Calculate display aspect ratio
-  const getAspectRatioDisplay = () => {
-    if (originalWidth === 0 || originalHeight === 0) return "";
-
-    const ratio = originalWidth / originalHeight;
-    const gcd = (a, b) => (b === 0 ? a : gcd(b, a % b));
-    const divisor = gcd(originalWidth, originalHeight);
-    const w = originalWidth / divisor;
-    const h = originalHeight / divisor;
-
-    return `Aspect ratio: ${w}:${h} (${ratio.toFixed(2)})`;
-  };
-
-  const handleApplyCrop = async () => {
-    if (cropperRef.current && cropperRef.current.cropper) {
+  // Apply crop/resize and proceed
+  const handleApplyCrop = () => {
+    if (cropperRef.current?.cropper) {
       try {
         const cropper = cropperRef.current.cropper;
 
@@ -276,7 +325,7 @@ function InteractiveCropPage({
         {/* Right side - 1/3 - Options panel */}
         <div className={styles.cropOptionsPanel}>
           <div className={styles.optionsSection}>
-            <h3 className={styles.optionsTitle}>Crop Settings</h3>
+            <h3 className={styles.optionsTitle}>Image Settings</h3>
 
             {/* Aspect Ratio */}
             <div className={`${styles.optionGroup} ${styles.hoverable}`}>
@@ -456,6 +505,116 @@ function InteractiveCropPage({
               </div>
             </div>
 
+            {/* Resize Output */}
+            <div className={`${styles.optionGroup} ${styles.hoverable}`}>
+              <label className={styles.optionLabel}>Resize Output</label>
+              <div className={styles.optionContent}>
+                <div className={styles.resizeOptions}>
+                    <div className={styles.resizeMethodButtons}>
+                      <button
+                        className={`${styles.resizeMethodBtn} ${
+                          resizeMethod === 'preset' ? styles.activeResizeMethod : ''
+                        }`}
+                        onClick={() => setResizeMethod('preset')}
+                      >
+                        Preset
+                      </button>
+                      <button
+                        className={`${styles.resizeMethodBtn} ${
+                          resizeMethod === 'custom' ? styles.activeResizeMethod : ''
+                        }`}
+                        onClick={() => setResizeMethod('custom')}
+                      >
+                        Custom
+                      </button>
+                      <button
+                        className={`${styles.resizeMethodBtn} ${
+                          resizeMethod === 'percentage' ? styles.activeResizeMethod : ''
+                        }`}
+                        onClick={() => setResizeMethod('percentage')}
+                      >
+                        Scale
+                      </button>
+                    </div>
+
+                    {resizeMethod === 'preset' && (
+                      <select
+                        className={styles.resizeSelect}
+                        value={resizePreset}
+                        onChange={(e) => setResizePreset(e.target.value)}
+                      >
+                        <option value="">Choose preset size...</option>
+                        {resizePresets.map((preset) => (
+                          <option key={preset.label} value={preset.label}>
+                            {preset.label} ({preset.width} × {preset.height})
+                          </option>
+                        ))}
+                      </select>
+                    )}
+
+                    {resizeMethod === 'custom' && (
+                      <div className={styles.resizeCustomInputs}>
+                        <div className={styles.dimensionInputWrapper}>
+                          <label
+                            className={styles.optionLabel}
+                            style={{ fontSize: "14px" }}
+                          >
+                            Width
+                          </label>
+                          <div className={styles.inputWithUnit}>
+                            <input
+                              type="number"
+                              className={styles.dimensionInput}
+                              placeholder="Auto"
+                              value={resizeWidth}
+                              onChange={(e) => setResizeWidth(e.target.value)}
+                              min="1"
+                            />
+                            <span className={styles.unitLabel}>px</span>
+                          </div>
+                        </div>
+                        <div className={styles.dimensionInputWrapper}>
+                          <label
+                            className={styles.optionLabel}
+                            style={{ fontSize: "14px" }}
+                          >
+                            Height
+                          </label>
+                          <div className={styles.inputWithUnit}>
+                            <input
+                              type="number"
+                              className={styles.dimensionInput}
+                              placeholder="Auto"
+                              value={resizeHeight}
+                              onChange={(e) => setResizeHeight(e.target.value)}
+                              min="1"
+                            />
+                            <span className={styles.unitLabel}>px</span>
+                          </div>
+                        </div>
+                      </div>
+                    )}
+
+                    {resizeMethod === 'percentage' && (
+                      <div className={styles.resizePercentageWrapper}>
+                        <label style={{ fontSize: '12px', color: 'rgba(255,255,255,0.7)' }}>
+                          Scale: {resizePercentage}%
+                        </label>
+                        <input
+                          type="range"
+                          className={styles.slider}
+                          min="10"
+                          max="200"
+                          step="5"
+                          value={resizePercentage}
+                          onChange={(e) => setResizePercentage(Number(e.target.value))}
+                        />
+                      </div>
+                    )}
+                  </div>
+              </div>
+            </div>
+
             {/* Export Format */}
             <div className={styles.optionGroup}>
               <label className={styles.optionLabel}>Export Format</label>
@@ -515,7 +674,7 @@ function InteractiveCropPage({
                 customHeight > originalHeight
               }
             >
-              {currentIndex < totalFiles - 1 ? "Crop & Next" : "Crop & Finish"}
+              {currentIndex < totalFiles - 1 ? "Apply & Next" : "Apply & Finish"}
             </button>
           </div>
         </div>

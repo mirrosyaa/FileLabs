@@ -56,10 +56,10 @@
   flex: 1;
   background: rgba(255, 255, 255, 0.03);
   border-left: 1px solid rgba(94, 200, 255, 0.2);
-  padding: 30px 24px;
+  padding: 20px 20px;
   display: flex;
   flex-direction: column;
-  gap: 24px;
+  gap: 16px;
   overflow-y: auto;
   min-width: 280px;
   max-width: 400px;
@@ -70,22 +70,23 @@
   flex: 1;
   display: flex;
   flex-direction: column;
-  gap: 24px;
+  gap: 16px;
+  overflow-y: auto;
 }
 
 .optionsTitle {
   color: #ffffff;
-  font-size: 22px;
+  font-size: 20px;
   font-weight: 700;
-  margin: 0 0 8px 0;
+  margin: 0 0 6px 0;
   border-bottom: 2px solid rgba(94, 200, 255, 0.3);
-  padding-bottom: 12px;
+  padding-bottom: 10px;
 }
 
 .optionGroup {
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: 10px;
 }
 
 /* Hoverable option groups */
@@ -93,7 +94,7 @@
   position: relative;
   cursor: pointer;
   transition: all 0.3s ease;
-  padding: 16px;
+  padding: 12px;
   border-radius: 12px;
   background: rgba(255, 255, 255, 0.02);
   border: 1px solid rgba(94, 200, 255, 0.1);
@@ -481,6 +482,108 @@
   transform: translateY(-2px);
   color: #ffffff !important;
   font-weight: 700;
+}
+
+/* Resize Options Styles */
+.resizeToggle {
+  margin-bottom: 12px;
+}
+
+.toggleLabel {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: rgba(255, 255, 255, 0.9);
+  font-size: 14px;
+  cursor: pointer;
+}
+
+.toggleLabel input[type="checkbox"] {
+  width: 18px;
+  height: 18px;
+  cursor: pointer;
+}
+
+.resizeOptions {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-top: 10px;
+}
+
+.resizeMethodButtons {
+  display: flex;
+  gap: 8px;
+}
+
+.resizeMethodBtn {
+  flex: 1;
+  background: rgba(255, 255, 255, 0.05);
+  border: 2px solid rgba(94, 200, 255, 0.3);
+  border-radius: 10px;
+  color: #ffffff;
+  padding: 8px 12px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.resizeMethodBtn:hover {
+  border-color: rgba(94, 200, 255, 0.6);
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.activeResizeMethod {
+  border-color: #5ec8ff !important;
+  background: rgba(94, 200, 255, 0.25) !important;
+  box-shadow: 0 0 15px rgba(94, 200, 255, 0.4);
+  color: #ffffff !important;
+}
+
+.resizeSelect {
+  width: 100%;
+  background: rgba(255, 255, 255, 0.05);
+  border: 2px solid rgba(94, 200, 255, 0.3);
+  border-radius: 10px;
+  color: #ffffff;
+  padding: 10px;
+  font-size: 13px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.resizeSelect:focus {
+  outline: none;
+  border-color: #5ec8ff;
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.resizeSelect option {
+  background: #1a2942;
+  color: #ffffff;
+}
+
+.resizeCustomInputs {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+
+.resizeCustomInputs .dimensionInputWrapper label {
+  color: #ffffff;
+  font-size: 14px;
+}
+
+.resizePercentageWrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.resizePercentageWrapper label {
+  color: #ffffff;
+  font-size: 14px;
 }
 
 /* Instructions Box */

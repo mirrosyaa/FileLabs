@@ -7,7 +7,7 @@ function CroppingPage({ fadeIn, croppingProgress = 0 }) {
     <div className={`${commonStyles.pageContainer} ${fadeIn ? commonStyles.fadeIn : commonStyles.fadeOut}`}>
       <div className={styles.uploadingContainer}>
         <div className={commonStyles.spinner}></div>
-        <p className={styles.uploadingText}>Cropping image...</p>
+        <p className={styles.uploadingText}>Processing image...</p>
         <div className={styles.progressBar}>
           <div 
             className={styles.progressFill} 

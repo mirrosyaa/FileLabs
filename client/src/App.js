@@ -16,7 +16,6 @@ import FileConverter from "./pages/fileConverter";
 import Compressor from "./pages/compressor";
 import DocumentTools from "./pages/documentTools";
 import UrlDownloader from "./pages/urlDownloader";
-import ImageResize from "./pages/imageResize";
 import ImageCrop from "./pages/imageCrop";
 import LoadingScreen from "./pages/loadingScreen";
 import Navbar from "./components/Layout/navbar";
@@ -122,26 +121,18 @@ function AppContent() {
             }
           />
           <Route
-            path="/document-tools/download-url"
-            element={
-              <RouteProtector>
-                <UrlDownloader />
-              </RouteProtector>
-            }
-          />
-          <Route
-            path="/tools/images/resize"
-            element={
-              <RouteProtector>
-                <ImageResize />
-              </RouteProtector>
-            }
-          />
-          <Route
             path="/tools/images/crop"
             element={
               <RouteProtector>
                 <ImageCrop />
+              </RouteProtector>
+            }
+          />
+          <Route
+            path="/url-downloader"
+            element={
+              <RouteProtector>
+                <UrlDownloader />
               </RouteProtector>
             }
           />
