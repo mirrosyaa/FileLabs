@@ -1,0 +1,477 @@
+/* 
+ * Image Resize Styles - Simplified
+ * You can further split this into modular files in /CSS/Pages/ResizePages/
+ * following the same pattern as CropPages if needed
+ */
+
+/* Main image resize page */
+.imageResizePage {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  max-height: 100vh;
+  background: linear-gradient(135deg, #0a1628 0%, #1a2942 100%);
+  overflow: hidden;
+}
+
+.imageResizeMain {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding-top: 100px;
+  padding-bottom: 60px;
+}
+
+.imageResizeContent {
+  width: 100%;
+  height: 100%;
+  padding-left: 7%;
+  padding-right: 7%;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Common styles - can be extracted to ResizePages/common.module.css */
+.pageContainer {
+  animation-duration: 0.3s;
+  animation-fill-mode: both;
+  animation-timing-function: ease-in-out;
+}
+
+.fadeIn { animation-name: fadeIn; }
+.fadeOut { animation-name: fadeOut; }
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes fadeOut {
+  from { opacity: 1; transform: translateY(0); }
+  to { opacity: 0; transform: translateY(-20px); }
+}
+
+.mainTitle {
+  color: #ffffff;
+  font-size: 36px;
+  font-weight: 700;
+  text-align: center;
+  margin-bottom: 40px;
+  letter-spacing: -0.5px;
+}
+
+/* Upload page */
+.uploadBox {
+  background: rgba(255, 255, 255, 0.05);
+  border: 3px dashed rgba(94, 200, 255, 0.4);
+  border-radius: 24px;
+  padding: 11% 5%;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  backdrop-filter: blur(10px);
+}
+
+.uploadBox:hover {
+  border-color: rgba(94, 200, 255, 0.7);
+  background: rgba(255, 255, 255, 0.08);
+  transform: translateY(-4px);
+  box-shadow: 0 12px 40px rgba(94, 200, 255, 0.15);
+}
+
+.uploadBox.dragging {
+  border-color: #5ec8ff;
+  background: rgba(94, 200, 255, 0.1);
+  transform: scale(1.02);
+  box-shadow: 0 16px 50px rgba(94, 200, 255, 0.25);
+}
+
+.uploadIcon {
+  font-size: 72px;
+  margin-bottom: 24px;
+  animation: float 3s ease-in-out infinite;
+}
+
+@keyframes float {
+  0%, 100% { transform: translateY(0px); }
+  50% { transform: translateY(-10px); }
+}
+
+.uploadText {
+  color: #ffffff;
+  font-size: 24px;
+  font-weight: 600;
+  margin: 0 0 16px 0;
+}
+
+.browseBtn {
+  display: inline-block;
+  background: linear-gradient(135deg, #5ec8ff 0%, #4a9fd8 100%);
+  color: #ffffff;
+  padding: 16px 40px;
+  border-radius: 12px;
+  font-size: 18px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 20px rgba(94, 200, 255, 0.3);
+}
+
+.browseBtn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 30px rgba(94, 200, 255, 0.5);
+  background: linear-gradient(135deg, #6dd4ff 0%, #5aabdf 100%);
+}
+
+/* Progress pages */
+.uploadingContainer {
+  text-align: center;
+  padding: 80px 40px;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 24px;
+  backdrop-filter: blur(10px);
+}
+
+.spinner {
+  width: 80px;
+  height: 80px;
+  border: 6px solid rgba(94, 200, 255, 0.2);
+  border-top-color: #5ec8ff;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+  margin: 0 auto 30px;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+.uploadingText {
+  color: #ffffff;
+  font-size: 28px;
+  font-weight: 600;
+  margin-bottom: 30px;
+}
+
+.progressBar {
+  width: 100%;
+  max-width: 400px;
+  height: 8px;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 10px;
+  overflow: hidden;
+  margin: 0 auto 16px;
+}
+
+.progressFill {
+  height: 100%;
+  background: linear-gradient(90deg, #5ec8ff 0%, #4a9fd8 100%);
+  border-radius: 10px;
+  transition: width 0.3s ease;
+  box-shadow: 0 0 20px rgba(94, 200, 255, 0.6);
+}
+
+.progressText {
+  color: rgba(255, 255, 255, 0.7);
+  font-size: 18px;
+  font-weight: 500;
+}
+
+/* Resize options page */
+.resizeBox {
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 24px;
+  padding: 40px;
+  backdrop-filter: blur(10px);
+  max-height: calc(100vh - 240px);
+  overflow-y: auto;
+}
+
+.resizeTitle {
+  color: #ffffff;
+  font-size: 32px;
+  font-weight: 700;
+  text-align: center;
+  margin-bottom: 30px;
+}
+
+.filesDisplay {
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 16px;
+  padding: 20px;
+  margin-bottom: 30px;
+}
+
+.filesHeader {
+  color: #ffffff;
+  font-size: 18px;
+  font-weight: 600;
+  margin-bottom: 12px;
+}
+
+.fileNames {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.fileName {
+  color: rgba(255, 255, 255, 0.7);
+  font-size: 16px;
+  padding: 8px 12px;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 8px;
+}
+
+.resizeOptions {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  margin-bottom: 30px;
+}
+
+.optionGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.optionLabel {
+  color: rgba(255, 255, 255, 0.9);
+  font-size: 16px;
+  font-weight: 600;
+}
+
+.dimensionInputs {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+
+.inputGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.inputLabel {
+  color: rgba(255, 255, 255, 0.8);
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.dimensionInput {
+  background: rgba(255, 255, 255, 0.08);
+  border: 2px solid rgba(94, 200, 255, 0.3);
+  border-radius: 10px;
+  padding: 12px 16px;
+  color: #ffffff;
+  font-size: 16px;
+  font-weight: 600;
+  transition: all 0.3s ease;
+}
+
+.dimensionInput:focus {
+  outline: none;
+  border-color: #5ec8ff;
+  background: rgba(255, 255, 255, 0.12);
+  box-shadow: 0 0 20px rgba(94, 200, 255, 0.3);
+}
+
+.lockRatioBtn {
+  background: rgba(255, 255, 255, 0.05);
+  border: 2px solid rgba(94, 200, 255, 0.3);
+  border-radius: 10px;
+  color: #ffffff;
+  padding: 12px;
+  font-size: 24px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  grid-column: 1 / -1;
+  margin-top: 8px;
+}
+
+.lockRatioBtn:hover {
+  border-color: rgba(94, 200, 255, 0.6);
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.lockRatioBtn.locked {
+  border-color: #5ec8ff;
+  background: rgba(94, 200, 255, 0.15);
+  box-shadow: 0 0 20px rgba(94, 200, 255, 0.3);
+}
+
+.presetButtons {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: 12px;
+}
+
+.presetBtn {
+  background: rgba(255, 255, 255, 0.05);
+  border: 2px solid rgba(94, 200, 255, 0.3);
+  border-radius: 12px;
+  color: #ffffff;
+  padding: 14px 16px;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  text-align: center;
+}
+
+.presetBtn:hover {
+  border-color: rgba(94, 200, 255, 0.6);
+  background: rgba(255, 255, 255, 0.08);
+  transform: translateY(-2px);
+}
+
+.actionButtons {
+  display: flex;
+  gap: 16px;
+  margin-top: 30px;
+}
+
+.backBtn {
+  flex: 1;
+  background: rgba(255, 255, 255, 0.08);
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  border-radius: 12px;
+  color: #ffffff;
+  padding: 16px 32px;
+  font-size: 18px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.backBtn:hover {
+  background: rgba(255, 255, 255, 0.12);
+  border-color: rgba(255, 255, 255, 0.5);
+  transform: translateY(-2px);
+}
+
+.resizeBtn {
+  flex: 2;
+  background: linear-gradient(135deg, #5ec8ff 0%, #4a9fd8 100%);
+  border: none;
+  border-radius: 12px;
+  color: #ffffff;
+  padding: 16px 32px;
+  font-size: 18px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 20px rgba(94, 200, 255, 0.3);
+}
+
+.resizeBtn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 30px rgba(94, 200, 255, 0.5);
+  background: linear-gradient(135deg, #6dd4ff 0%, #5aabdf 100%);
+}
+
+/* Complete page */
+.successContainer {
+  text-align: center;
+  padding: 80px 60px;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 24px;
+  backdrop-filter: blur(10px);
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+.successIconWrapper {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 30px;
+}
+
+.successIconCircle {
+  width: 120px;
+  height: 120px;
+  background: linear-gradient(135deg, #4caf50 0%, #388e3c 100%);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 10px 40px rgba(76, 175, 80, 0.5);
+  animation: scaleIn 0.6s ease-out;
+}
+
+.successIcon {
+  font-size: 70px;
+  color: #ffffff;
+  font-weight: bold;
+}
+
+@keyframes scaleIn {
+  from { transform: scale(0); opacity: 0; }
+  to { transform: scale(1); opacity: 1; }
+}
+
+.successTitle {
+  color: #ffffff;
+  font-size: 36px;
+  font-weight: 700;
+  margin-bottom: 16px;
+}
+
+.successMessage {
+  color: rgba(255, 255, 255, 0.7);
+  font-size: 18px;
+  margin-bottom: 40px;
+}
+
+.downloadButton {
+  width: 100%;
+  max-width: 450px;
+  background: linear-gradient(135deg, #4caf50 0%, #388e3c 100%);
+  border: none;
+  border-radius: 12px;
+  color: #ffffff;
+  padding: 18px 40px;
+  font-size: 18px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 6px 30px rgba(76, 175, 80, 0.4);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  margin: 0 auto 20px;
+}
+
+.downloadButton:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 10px 40px rgba(76, 175, 80, 0.6);
+  background: linear-gradient(135deg, #5cb85c 0%, #449d44 100%);
+}
+
+.newResizeBtn {
+  background: linear-gradient(135deg, #5ec8ff 0%, #4a9fd8 100%);
+  border: none;
+  border-radius: 12px;
+  color: #ffffff;
+  padding: 16px 40px;
+  font-size: 18px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 20px rgba(94, 200, 255, 0.3);
+}
+
+.newResizeBtn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 30px rgba(94, 200, 255, 0.5);
+  background: linear-gradient(135deg, #6dd4ff 0%, #5aabdf 100%);
+}
+
+.downloadIcon {
+  font-size: 24px;
+}

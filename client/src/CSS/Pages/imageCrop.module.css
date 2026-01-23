@@ -1,0 +1,13 @@
+/* 
+ * Image Crop Styles - Modular Organization
+ * This file re-exports all crop-related styles from smaller, focused CSS modules
+ * Located in: /CSS/Pages/CropPages/
+ */
+
+/* Import and re-export all modular crop styles */
+@import './CropPages/common.module.css';
+@import './CropPages/upload.module.css';
+@import './CropPages/uploading.module.css';
+@import './CropPages/interactive.module.css';
+@import './CropPages/complete.module.css';
+@import './CropPages/cropper.module.css';

@@ -180,63 +180,60 @@ const compressFiles = async (req, res) => {
         compressedFiles.push({ path: outputPath, originalname: `compressed_${baseName}.${ext}` });
         tempFiles.push(outputPath);
       }
-      else if (['pdf', 'doc', 'docx', 'txt', 'rtf', 'html'].includes(ext)) {
-        // For documents, just copy (no compression available without quality loss)
-        // Or we could zip them
+      else if (['pdf', 'doc', 'docx', 'txt', 'rtf', 'html', 'csv', 'json', 'xml'].includes(ext)) {
+        // For documents, include in ZIP for compression
         compressedFiles.push({ path: inputPath, originalname: file.originalname });
       }
       else {
-        // Unknown file type - just include as is
+        // Unknown file type - include in ZIP for compression
         compressedFiles.push({ path: inputPath, originalname: file.originalname });
       }
 
       // Add input file to cleanup
-      tempFiles.push(inputPath);
-    }
-
-    // If single file, send it directly
-    if (compressedFiles.length === 1) {
-      const file = compressedFiles[0];
-      res.download(file.path, file.originalname, async (err) => {
-        if (err) {
-          console.error('Download error:', err);
-        }
-        // Cleanup after download
-        await cleanupFiles(tempFiles);
-      });
-    } else {
-      // Multiple files - create a zip
-      const zipPath = path.join(path.dirname(files[0].path), `compressed-${Date.now()}.zip`);
-      const output = fs.createWriteStream(zipPath);
-      const archive = archiver('zip', {
-        zlib: { level: compressionLevel === 'high' ? 9 : compressionLevel === 'medium' ? 6 : 3 }
-      });
-
-      output.on('close', async () => {
-        console.log(`Zip created: ${archive.pointer()} bytes`);
-        res.download(zipPath, 'compressed.zip', async (err) => {
-          if (err) {
-            console.error('Download error:', err);
-          }
-          // Cleanup after download
-          await cleanupFiles([...tempFiles, zipPath]);
-        });
-      });
-
-      archive.on('error', (err) => {
-        throw err;
-      });
-
-      archive.pipe(output);
-
-      // Add files to zip
-      for (const file of compressedFiles) {
-        archive.file(file.path, { name: file.originalname });
+      if (!tempFiles.includes(inputPath)) {
+        tempFiles.push(inputPath);
       }
-
-      await archive.finalize();
     }
 
+    // Always create a zip for proper compression
+    const zipPath = path.join(path.dirname(files[0].path), `compressed-${Date.now()}.zip`);
+    const output = fs.createWriteStream(zipPath);
+    const archive = archiver('zip', {
+      zlib: { level: 9 } // Maximum compression
+    });
+
+    output.on('close', async () => {
+      console.log(`Zip created: ${archive.pointer()} bytes`);
+      
+      // Send file as blob without triggering download - use octet-stream to prevent auto-download
+      res.setHeader('Content-Type', 'application/octet-stream');
+      
+      const fileStream = fs.createReadStream(zipPath);
+      fileStream.pipe(res);
+      
+      fileStream.on('end', async () => {
+        // Cleanup after sending
+        await cleanupFiles([...tempFiles, zipPath]);
+      });
+      
+      fileStream.on('error', async (err) => {
+        console.error('Stream error:', err);
+        await cleanupFiles([...tempFiles, zipPath]);
+      });
+    });
+
+    archive.on('error', (err) => {
+      throw err;
+    });
+
+    archive.pipe(output);
+
+    // Add files to zip
+    for (const file of compressedFiles) {
+      archive.file(file.path, { name: file.originalname });
+    }
+
+    await archive.finalize();
   } catch (error) {
     console.error('Compression error:', error);
     await cleanupFiles(tempFiles);

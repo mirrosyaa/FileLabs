@@ -11,7 +11,7 @@ function Compressor() {
   const [page, setPage] = useState(1);
   const [fadeIn, setFadeIn] = useState(true);
   const [files, setFiles] = useState([]);
-  const [compressionLevel, setCompressionLevel] = useState("medium");
+  const [compressionLevel, setCompressionLevel] = useState(0);
   const [isDragging, setIsDragging] = useState(false);
   const [isUploading, setIsUploading] = useState(false);
   const [uploadProgress, setUploadProgress] = useState(0);
@@ -66,6 +66,22 @@ function Compressor() {
   const handleFiles = (selectedFiles) => {
     if (selectedFiles.length === 0) return;
 
+    // Check if files are already compressed
+    const compressedExtensions = ['.zip', '.rar', '.7z', '.tar', '.gz', '.bz2', '.xz'];
+    const alreadyCompressed = selectedFiles.filter(file => 
+      compressedExtensions.some(ext => file.name.toLowerCase().endsWith(ext))
+    );
+
+    if (alreadyCompressed.length > 0) {
+      const fileNames = alreadyCompressed.map(f => f.name).join(', ');
+      setFadeIn(false);
+      setTimeout(() => {
+        setError(`Cannot compress already compressed files: ${fileNames}`);
+        setFadeIn(true);
+      }, 300);
+      return;
+    }
+
     setFiles(selectedFiles);
     setError("");
     
@@ -96,6 +112,8 @@ function Compressor() {
   };
 
   const handleCompress = async () => {
+    if (isCompressing) return; // Prevent double compression
+    
     setError("");
     setIsCompressing(true);
     setCompressionProgress(0);
@@ -105,7 +123,18 @@ function Compressor() {
       files.forEach((file) => {
         formData.append("files", file);
       });
-      formData.append("compressionLevel", compressionLevel);
+      
+      // Map 6 compression levels (0-5) to backend values (low, medium, high)
+      let backendLevel;
+      if (compressionLevel <= 1) {
+        backendLevel = "low";
+      } else if (compressionLevel <= 3) {
+        backendLevel = "medium";
+      } else {
+        backendLevel = "high";
+      }
+      
+      formData.append("compressionLevel", backendLevel);
 
       // Simulate progress
       const progressInterval = setInterval(() => {
@@ -133,7 +162,12 @@ function Compressor() {
       const blob = await response.blob();
       const url = window.URL.createObjectURL(blob);
       
-      setCompressedFiles([{ url, name: files.length > 1 ? "compressed.zip" : `compressed_${files[0].name}` }]);
+      // Generate filename: if single file use its name, otherwise use "files"
+      const baseName = files.length === 1 
+        ? files[0].name.replace(/\.[^/.]+$/, "") // Remove extension
+        : "files";
+      
+      setCompressedFiles([{ url, name: `${baseName}_compressed.zip` }]);
       setCompressionProgress(100);
       
       // Fade out compressing page before changing
@@ -154,31 +188,42 @@ function Compressor() {
   };
 
   const handleDownload = () => {
-    setIsDownloading(true);
-    setDownloadProgress(0);
+    if (hasDownloaded) return; // Prevent double downloads
+    
+    setFadeIn(false);
+    setTimeout(() => {
+      setFadeIn(true);
+      setIsDownloading(true);
+      setDownloadProgress(0);
 
-    const interval = setInterval(() => {
-      setDownloadProgress((prev) => {
-        if (prev >= 100) {
-          clearInterval(interval);
-          
-          // Trigger download
-          compressedFiles.forEach(file => {
-            const link = document.createElement("a");
-            link.href = file.url;
-            link.download = file.name;
-            document.body.appendChild(link);
-            link.click();
-            document.body.removeChild(link);
-          });
+      const interval = setInterval(() => {
+        setDownloadProgress((prev) => {
+          if (prev >= 100) {
+            clearInterval(interval);
+            
+            // Trigger download - only one file in array
+            if (compressedFiles.length > 0) {
+              const file = compressedFiles[0];
+              const link = document.createElement("a");
+              link.href = file.url;
+              link.download = file.name;
+              link.style.display = 'none';
+              document.body.appendChild(link);
+              link.click();
+              setTimeout(() => {
+                document.body.removeChild(link);
+                window.URL.revokeObjectURL(file.url);
+              }, 100);
+            }
 
-          setIsDownloading(false);
-          setHasDownloaded(true);
-          return 100;
-        }
-        return prev + 10;
-      });
-    }, 100);
+            setIsDownloading(false);
+            setHasDownloaded(true);
+            return 100;
+          }
+          return prev + 10;
+        });
+      }, 100);
+    }, 300);
   };
 
   const handleReset = () => {
@@ -186,7 +231,7 @@ function Compressor() {
     setTimeout(() => {
       setPage(1);
       setFiles([]);
-      setCompressionLevel("medium");
+      setCompressionLevel(0);
       setCompressedFiles([]);
       setError("");
       setUploadProgress(0);
@@ -219,6 +264,8 @@ function Compressor() {
               onDragLeave={handleDragLeave}
               onDrop={handleDrop}
               onFileSelect={handleFileSelect}
+              error={error}
+              onReset={handleReset}
             />
           )}
 

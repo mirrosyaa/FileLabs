@@ -366,6 +366,15 @@ const convertFormat = async (files, targetFormat) => {
             throw new Error('ffmpeg is not installed. Please install ffmpeg to convert video files.');
           }
 
+          // Validate the input video file first
+          try {
+            console.log(`Validating video file: ${inputPath}`);
+            await execPromise(`ffmpeg -v error -i "${inputPath}" -f null - 2>&1`);
+          } catch (validationErr) {
+            console.error('Video validation failed:', validationErr.message);
+            throw new Error('The uploaded video file is corrupted or incomplete. Please upload a valid video file.');
+          }
+
           // Build ffmpeg command based on target format
           let ffmpegCmd = `ffmpeg -i "${inputPath}" `;
           

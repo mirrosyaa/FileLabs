@@ -14,7 +14,7 @@ function FileTypeCards() {
         { name: "Convert", path: "/file-converter" },
         { name: "Compress PDF", path: "/tools/documents/compress-pdf" },
         { name: "Merge PDF", path: "/tools/documents/merge-pdf" },
-        { name: "Download from URL", path: "/tools/documents/download-url" },
+        { name: "Download from URL", path: "/document-tools/download-url" },
         { name: "Auto Rename", path: "/tools/documents/auto-rename" },
         { name: "Extract Images", path: "/tools/documents/extract-images" },
       ],
@@ -26,8 +26,7 @@ function FileTypeCards() {
       actions: [
         { name: "Convert", path: "/file-converter" },
         { name: "Compress/Optimize", path: "/tools/images/compress" },
-        { name: "Resize", path: "/tools/images/resize" },
-        { name: "Crop", path: "/tools/images/crop" },
+        { name: "Image Editor", path: "/tools/images/crop" },
         { name: "Add Metadata", path: "/tools/images/metadata" },
         { name: "Add Watermarks", path: "/tools/images/watermark" },
       ],

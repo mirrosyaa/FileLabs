@@ -1,0 +1,678 @@
+/* Interactive Crop Page - iPhone Style */
+.cropContainer {
+  display: flex;
+  width: 100%;
+  height: calc(100vh - 200px);
+  max-height: calc(100vh - 200px);
+  gap: 0;
+  background: #0a1628;
+  margin-top: 20px;
+  margin-bottom: 20px;
+}
+
+/* Left side - 2/3 - Photo area */
+.cropPhotoArea {
+  flex: 2;
+  display: flex;
+  flex-direction: column;
+  background: #0a1628;
+  padding: 20px;
+  min-width: 0;
+  height: 100%;
+}
+
+.cropHeader {
+  margin-bottom: 16px;
+  text-align: center;
+}
+
+.cropTitle {
+  color: #ffffff;
+  font-size: 28px;
+  font-weight: 700;
+  margin-bottom: 8px;
+}
+
+.cropFilename {
+  color: rgba(255, 255, 255, 0.6);
+  font-size: 16px;
+  margin: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.cropperWrapper {
+  flex: 1;
+  position: relative;
+  background: transparent;
+  border-radius: 16px;
+  overflow: hidden;
+  max-height: 100%;
+}
+
+/* Right side - 1/3 - Options panel */
+.cropOptionsPanel {
+  flex: 1;
+  background: rgba(255, 255, 255, 0.03);
+  border-left: 1px solid rgba(94, 200, 255, 0.2);
+  padding: 20px 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  overflow-y: auto;
+  min-width: 280px;
+  max-width: 400px;
+  height: 100%;
+}
+
+.optionsSection {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  overflow-y: auto;
+}
+
+.optionsTitle {
+  color: #ffffff;
+  font-size: 20px;
+  font-weight: 700;
+  margin: 0 0 6px 0;
+  border-bottom: 2px solid rgba(94, 200, 255, 0.3);
+  padding-bottom: 10px;
+}
+
+.optionGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+/* Hoverable option groups */
+.hoverable {
+  position: relative;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  padding: 12px;
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid rgba(94, 200, 255, 0.1);
+}
+
+.hoverable:hover {
+  background: rgba(255, 255, 255, 0.05);
+  border-color: rgba(94, 200, 255, 0.3);
+  box-shadow: 0 4px 20px rgba(94, 200, 255, 0.15);
+  z-index: 100;
+}
+
+.hoverable .optionLabel {
+  margin-bottom: 0;
+}
+
+.optionContent {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  background: rgba(10, 22, 40, 0.98);
+  border: 1px solid rgba(94, 200, 255, 0.3);
+  border-radius: 12px;
+  padding: 16px;
+  margin-top: 8px;
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(-10px);
+  transition: opacity 0.3s ease, visibility 0.3s ease, transform 0.3s ease;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+  z-index: 101;
+}
+
+.hoverable:hover .optionContent {
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(0);
+}
+
+.optionLabel {
+  color: rgba(255, 255, 255, 0.9);
+  font-size: 16px;
+  font-weight: 600;
+}
+
+/* Dimension Inputs */
+.dimensionInputsGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+.dimensionInputWrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.inputWithUnit {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.inputWithUnit .dimensionInput {
+  padding-right: 35px;
+}
+
+.unitLabel {
+  position: absolute;
+  right: 10px;
+  color: rgba(255, 255, 255, 0.5);
+  font-size: 13px;
+  font-weight: 500;
+  pointer-events: none;
+}
+
+.dimensionInput {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(94, 200, 255, 0.3);
+  border-radius: 8px;
+  padding: 10px 8px;
+  color: #ffffff;
+  font-size: 14px;
+  outline: none;
+  transition: all 0.2s;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.dimensionInput:focus {
+  border-color: #5ec8ff;
+  background: rgba(94, 200, 255, 0.1);
+}
+
+.dimensionInput:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.lockToggle {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+
+.lockToggle input[type="checkbox"] {
+  width: 18px;
+  height: 18px;
+  cursor: pointer;
+}
+
+.lockToggle label {
+  color: rgba(255, 255, 255, 0.85);
+  font-size: 14px;
+  cursor: pointer;
+  user-select: none;
+}
+
+.aspectRatioInfo {
+  color: rgba(255, 255, 255, 0.6);
+  font-size: 13px;
+  margin-top: 4px;
+}
+
+.errorMessage {
+  background: rgba(255, 59, 48, 0.15);
+  border: 1px solid rgba(255, 59, 48, 0.4);
+  border-radius: 8px;
+  padding: 10px 12px;
+  color: #ff6b6b;
+  font-size: 13px;
+  margin-top: 8px;
+}
+
+.previewCaption {
+  color: rgba(255, 255, 255, 0.7);
+  font-size: 14px;
+  text-align: center;
+  margin-top: 12px;
+  font-style: italic;
+}
+
+/* Aspect Ratio Buttons */
+.aspectButtons {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 8px;
+}
+
+.aspectBtn {
+  background: rgba(255, 255, 255, 0.05);
+  border: 2px solid rgba(94, 200, 255, 0.3);
+  border-radius: 10px;
+  color: #ffffff;
+  padding: 12px 8px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.aspectBtn:hover {
+  border-color: rgba(94, 200, 255, 0.6);
+  background: rgba(255, 255, 255, 0.08);
+  transform: translateY(-2px);
+}
+
+.activeAspect {
+  border-color: #5ec8ff !important;
+  background: rgba(94, 200, 255, 0.15) !important;
+  box-shadow: 0 0 20px rgba(94, 200, 255, 0.3);
+}
+
+.customAspectInputs {
+  margin-top: 16px;
+
+  .customAspectInputs .dimensionInputsGrid {
+    gap: 8px;
+  }
+
+  .customAspectInputs .dimensionInput {
+    padding: 8px 6px;
+    font-size: 13px;
+  }
+  padding-top: 16px;
+  border-top: 1px solid rgba(94, 200, 255, 0.2);
+}
+
+/* Sliders */
+.slider {
+  width: 100%;
+  height: 6px;
+  border-radius: 3px;
+  background: rgba(255, 255, 255, 0.1);
+  outline: none;
+  -webkit-appearance: none;
+  appearance: none;
+}
+
+.slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #5ec8ff 0%, #4a9fd8 100%);
+  cursor: pointer;
+  box-shadow: 0 0 10px rgba(94, 200, 255, 0.5);
+  transition: all 0.2s ease;
+}
+
+.slider::-webkit-slider-thumb:hover {
+  transform: scale(1.2);
+  box-shadow: 0 0 15px rgba(94, 200, 255, 0.8);
+}
+
+.slider::-moz-range-thumb {
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #5ec8ff 0%, #4a9fd8 100%);
+  cursor: pointer;
+  border: none;
+  box-shadow: 0 0 10px rgba(94, 200, 255, 0.5);
+}
+
+/* Rotation Quick Buttons */
+.rotationQuickBtns {
+  display: flex;
+  gap: 8px;
+  margin-top: 4px;
+}
+
+.quickRotateBtn {
+  flex: 1;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(94, 200, 255, 0.3);
+  border-radius: 8px;
+  color: #ffffff;
+  padding: 8px 12px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.quickRotateBtn:hover {
+  border-color: rgba(94, 200, 255, 0.6);
+  background: rgba(255, 255, 255, 0.08);
+}
+
+/* Reset Button */
+.resetCropBtn {
+  background: rgba(255, 193, 7, 0.15);
+  border: 2px solid rgba(255, 193, 7, 0.5);
+  border-radius: 12px;
+  color: #ffc107;
+  padding: 12px 24px;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  width: 100%;
+}
+
+.resetCropBtn:hover {
+  background: rgba(255, 193, 7, 0.25);
+  border-color: rgba(255, 193, 7, 0.7);
+  transform: translateY(-2px);
+}
+
+/* Action Buttons */
+.cropActions {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding-top: 16px;
+  border-top: 1px solid rgba(94, 200, 255, 0.2);
+}
+
+.cancelBtn {
+  background: rgba(255, 82, 82, 0.15);
+  border: 2px solid rgba(255, 82, 82, 0.5);
+  border-radius: 12px;
+  color: #ff5252;
+  padding: 14px 24px;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.cancelBtn:hover {
+  background: rgba(255, 82, 82, 0.25);
+  border-color: rgba(255, 82, 82, 0.7);
+  transform: translateY(-2px);
+}
+
+.skipBtn {
+  background: rgba(255, 255, 255, 0.05);
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  border-radius: 12px;
+  color: #ffffff;
+  padding: 14px 24px;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.skipBtn:hover {
+  background: rgba(255, 255, 255, 0.1);
+  border-color: rgba(255, 255, 255, 0.5);
+  transform: translateY(-2px);
+}
+
+.applyCropBtn,
+.downloadBtn {
+  background: linear-gradient(135deg, #5ec8ff 0%, #4a9fd8 100%);
+  border: none;
+  border-radius: 12px;
+  color: #ffffff;
+  padding: 16px 24px;
+  font-size: 18px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 20px rgba(94, 200, 255, 0.3);
+}
+
+.applyCropBtn:hover,
+.downloadBtn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 30px rgba(94, 200, 255, 0.5);
+  background: linear-gradient(135deg, #6dd4ff 0%, #5aabdf 100%);
+}
+
+.applyCropBtn:disabled,
+.downloadBtn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+}
+
+.applyCropBtn:disabled:hover,
+.downloadBtn:disabled:hover {
+  transform: none;
+  box-shadow: none;
+  background: linear-gradient(135deg, #5ec8ff 0%, #4a9fd8 100%);
+}
+
+/* Format Buttons */
+.formatButtons {
+  display: flex;
+  gap: 8px;
+}
+
+.formatBtn {
+  flex: 1;
+  background: rgba(255, 255, 255, 0.05);
+  border: 2px solid rgba(94, 200, 255, 0.3);
+  border-radius: 10px;
+  color: #ffffff;
+  padding: 10px 16px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.formatBtn:hover {
+  border-color: rgba(94, 200, 255, 0.6);
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.activeFormat {
+  border-color: #5ec8ff !important;
+  background: rgba(94, 200, 255, 0.25) !important;
+  box-shadow: 0 0 25px rgba(94, 200, 255, 0.5),
+    inset 0 0 20px rgba(94, 200, 255, 0.2);
+  transform: translateY(-2px);
+  color: #ffffff !important;
+  font-weight: 700;
+}
+
+/* Resize Options Styles */
+.resizeToggle {
+  margin-bottom: 12px;
+}
+
+.toggleLabel {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: rgba(255, 255, 255, 0.9);
+  font-size: 14px;
+  cursor: pointer;
+}
+
+.toggleLabel input[type="checkbox"] {
+  width: 18px;
+  height: 18px;
+  cursor: pointer;
+}
+
+.resizeOptions {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-top: 10px;
+}
+
+.resizeMethodButtons {
+  display: flex;
+  gap: 8px;
+}
+
+.resizeMethodBtn {
+  flex: 1;
+  background: rgba(255, 255, 255, 0.05);
+  border: 2px solid rgba(94, 200, 255, 0.3);
+  border-radius: 10px;
+  color: #ffffff;
+  padding: 8px 12px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.resizeMethodBtn:hover {
+  border-color: rgba(94, 200, 255, 0.6);
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.activeResizeMethod {
+  border-color: #5ec8ff !important;
+  background: rgba(94, 200, 255, 0.25) !important;
+  box-shadow: 0 0 15px rgba(94, 200, 255, 0.4);
+  color: #ffffff !important;
+}
+
+.resizeSelect {
+  width: 100%;
+  background: rgba(255, 255, 255, 0.05);
+  border: 2px solid rgba(94, 200, 255, 0.3);
+  border-radius: 10px;
+  color: #ffffff;
+  padding: 10px;
+  font-size: 13px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.resizeSelect:focus {
+  outline: none;
+  border-color: #5ec8ff;
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.resizeSelect option {
+  background: #1a2942;
+  color: #ffffff;
+}
+
+.resizeCustomInputs {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+
+.resizeCustomInputs .dimensionInputWrapper label {
+  color: #ffffff;
+  font-size: 14px;
+}
+
+.resizePercentageWrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.resizePercentageWrapper label {
+  color: #ffffff;
+  font-size: 14px;
+}
+
+/* Instructions Box */
+.instructionsBox {
+  background: rgba(94, 200, 255, 0.1);
+  border: 1px solid rgba(94, 200, 255, 0.3);
+  border-radius: 12px;
+  padding: 16px;
+  margin-top: 8px;
+}
+
+.instructionTitle {
+  color: #5ec8ff;
+  font-size: 16px;
+  font-weight: 700;
+  margin: 0 0 12px 0;
+}
+
+.instructionsList {
+  color: rgba(255, 255, 255, 0.7);
+  font-size: 14px;
+  margin: 0;
+  padding-left: 20px;
+  line-height: 1.6;
+}
+
+.instructionsList li {
+  margin-bottom: 6px;
+}
+
+.instructionsList li:last-child {
+  margin-bottom: 0;
+}
+
+/* Responsive Design */
+@media (max-width: 1200px) {
+  .cropContainer {
+    flex-direction: column;
+  }
+
+  .cropPhotoArea {
+    flex: none;
+    height: 60vh;
+    min-height: 400px;
+  }
+
+  .cropOptionsPanel {
+    flex: none;
+    max-width: none;
+    border-left: none;
+    border-top: 1px solid rgba(94, 200, 255, 0.2);
+  }
+
+  .aspectButtons {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+@media (max-width: 768px) {
+  .cropPhotoArea {
+    padding: 12px;
+  }
+
+  .cropTitle {
+    font-size: 22px;
+  }
+
+  .cropFilename {
+    font-size: 14px;
+  }
+
+  .cropOptionsPanel {
+    padding: 20px 16px;
+  }
+
+  .optionsTitle {
+    font-size: 20px;
+  }
+
+  .aspectButtons {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .cropActions {
+    gap: 10px;
+  }
+
+  .applyCropBtn {
+    font-size: 16px;
+    padding: 14px 20px;
+  }
+}

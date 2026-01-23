@@ -1,6 +1,5 @@
 # Node modules (all locations)
 node_modules/
-db.js
 client/node_modules/
 server/node_modules/
 
@@ -13,6 +12,9 @@ yarn-error.log*
 .env
 server/.env
 client/.env
+
+# Database configuration
+server/controllers/database/db.js
 
 # Build outputs
 client/build/

@@ -11,10 +11,21 @@ function CompressionPage({
   onReset,
   formatFileSize 
 }) {
-  const handleLevelChange = (level) => {
-    console.log(`Compression level changed to: ${level}`);
-    setCompressionLevel(level);
+  const levels = [
+    { value: 0, name: "Very Low" },
+    { value: 1, name: "Low" },
+    { value: 2, name: "Medium" },
+    { value: 3, name: "Medium-High" },
+    { value: 4, name: "High" },
+    { value: 5, name: "Extreme" }
+  ];
+
+  const handleSliderChange = (e) => {
+    const value = parseInt(e.target.value);
+    setCompressionLevel(value);
   };
+
+  const currentLevel = levels.find(l => l.value === compressionLevel) || levels[0];
 
   return (
     <div className={`${styles.pageContainer} ${fadeIn ? styles.fadeIn : styles.fadeOut}`}>
@@ -23,8 +34,53 @@ function CompressionPage({
           ← Back to upload
         </button>
 
-        <h2 className={styles.compressionTitle}>Compression Settings</h2>
+        <h2 className={styles.compressionTitle}>Choose Compression Level</h2>
         
+        <div className={styles.currentLevelDisplay} style={{
+          textAlign: 'center',
+          fontSize: '20px',
+          fontWeight: '600',
+          color: '#5ec8ff',
+          marginBottom: '20px',
+          padding: '12px',
+          background: 'rgba(94, 200, 255, 0.1)',
+          borderRadius: '12px',
+          border: '2px solid rgba(94, 200, 255, 0.3)'
+        }}>
+          Selected: {currentLevel.name}
+        </div>
+        
+        <div className={styles.compressionOptions}>
+          <div className={styles.sliderContainer}>
+            <div className={styles.sliderTicks}>
+              {levels.map((level) => (
+                <div key={level.value} className={styles.tick}></div>
+              ))}
+            </div>
+            
+            <input
+              type="range"
+              min="0"
+              max="5"
+              step="1"
+              value={compressionLevel}
+              onChange={handleSliderChange}
+              className={styles.compressionSlider}
+            />
+            
+            <div className={styles.sliderLabels}>
+              {levels.map((level) => (
+                <span
+                  key={level.value}
+                  className={`${styles.sliderLabel} ${compressionLevel === level.value ? styles.activeLabel : ''}`}
+                >
+                  {level.name}
+                </span>
+              ))}
+            </div>
+          </div>
+        </div>
+
         <div className={styles.filesDisplay}>
           <div className={styles.filesHeader}>Selected Files:</div>
           <div className={styles.fileNames}>
@@ -33,33 +89,6 @@ function CompressionPage({
                 {file.name}
               </div>
             ))}
-          </div>
-        </div>
-
-        <div className={styles.compressionOptions}>
-          <div className={styles.compressionLabel}>Choose Compression Level</div>
-          <div className={styles.levelButtons}>
-            <button
-              className={`${styles.levelOption} ${compressionLevel === "low" ? styles.selected : ""}`}
-              onClick={() => handleLevelChange("low")}
-            >
-              <span className={styles.levelName}>LOW</span>
-              <span className={styles.levelDescription}>Better quality</span>
-            </button>
-            <button
-              className={`${styles.levelOption} ${compressionLevel === "medium" ? styles.selected : ""}`}
-              onClick={() => handleLevelChange("medium")}
-            >
-              <span className={styles.levelName}>MEDIUM</span>
-              <span className={styles.levelDescription}>Balanced</span>
-            </button>
-            <button
-              className={`${styles.levelOption} ${compressionLevel === "high" ? styles.selected : ""}`}
-              onClick={() => handleLevelChange("high")}
-            >
-              <span className={styles.levelName}>HIGH</span>
-              <span className={styles.levelDescription}>Smaller size</span>
-            </button>
           </div>
         </div>
 
