@@ -17,7 +17,7 @@ function DocumentTools() {
     },
     {
       id: 2,
-      name: "Merge PDF",
+      name: "Split and Merge PDF",
       description: "Combine multiple PDF files into one document",
       icon: "🔀",
       path: "/document-tools/merge-pdf"

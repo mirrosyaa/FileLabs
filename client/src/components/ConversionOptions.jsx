@@ -9,7 +9,7 @@ function ConversionOptions({ files, onConvert, isProcessing }) {
   const operations = [
     { id: "convert", label: "Convert Format", icon: "🔄", requiresFormat: true },
     { id: "compress", label: "Compress PDF", icon: "🗜️", requiresFormat: false },
-    { id: "merge", label: "Merge PDFs", icon: "📎", requiresFormat: false },
+    { id: "merge", label: "Split and Merge PDFs", icon: "📎", requiresFormat: false },
     { id: "split", label: "Split PDF", icon: "✂️", requiresFormat: false },
     { id: "extract", label: "Extract Images", icon: "🖼️", requiresFormat: false },
     { id: "ocr", label: "OCR (Scan to Text)", icon: "📝", requiresFormat: false },

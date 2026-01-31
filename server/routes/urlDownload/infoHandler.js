@@ -1,8 +1,9 @@
-
-const { getYouTubeInfo } = require("./youtube");
-const { getTikTokInfo } = require("./tiktok");
-const { getInstagramInfo } = require("./instagram");
-const { getFacebookInfo } = require("./facebook");
+const { 
+  getYouTubeInfo, 
+  getTikTokInfo, 
+  getInstagramInfo, 
+  getFacebookInfo 
+} = require("./platformHandlers");
 const { detectPlatform } = require("./utils");
 const twitterGetUrl = require("twitter-downloader");
 
