@@ -38,8 +38,8 @@ function FileTypeCards() {
       actions: [
         { name: "Convert", path: "/file-converter" },
         { name: "Trim", path: "/tools/audio/trim" },
-        { name: "Merge", path: "/tools/audio/merge" },
         { name: "Compress", path: "/tools/audio/compress" },
+        { name: "Download from URL", path: "/url-downloader" },
         { name: "Edit Metadata", path: "/tools/audio/metadata" },
         { name: "Normalize Volume", path: "/tools/audio/normalize" },
       ],
@@ -52,7 +52,7 @@ function FileTypeCards() {
         { name: "Convert", path: "/file-converter" },
         { name: "Compress", path: "/tools/video/compress" },
         { name: "Cut/Trim", path: "/tools/video/cut" },
-        { name: "Merge", path: "/tools/video/merge" },
+        { name: "Download from URL", path: "/url-downloader" },
         { name: "Change Resolution", path: "/tools/video/resolution" },
         { name: "Extract Audio", path: "/tools/video/extract-audio" },
         { name: "Auto Split", path: "/tools/video/auto-split" },
