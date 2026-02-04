@@ -18,6 +18,7 @@ import DocumentTools from "./pages/documentTools";
 import UrlDownloader from "./pages/urlDownloader";
 import ImageCrop from "./pages/imageCrop";
 import LoadingScreen from "./pages/loadingScreen";
+import PdfMergeSplit from "./pages/pdfMergeSplit";
 import Navbar from "./components/Layout/navbar";
 import SessionExpiredModal from "./modals/sessionExpiredModal";
 import { useAuth } from "./Authentication/authProvider";
@@ -133,6 +134,14 @@ function AppContent() {
             element={
               <RouteProtector>
                 <UrlDownloader />
+              </RouteProtector>
+            }
+          />
+          <Route
+            path="/tools/documents/merge-pdf"
+            element={
+              <RouteProtector>
+                <PdfMergeSplit />
               </RouteProtector>
             }
           />
