@@ -3,11 +3,12 @@ import Footer from "../components/Layout/footer";
 import UploadPage from "./pdfMergePages/UploadPage";
 import UploadingPage from "./pdfMergePages/UploadingPage";
 import ProcessingPage from "./pdfMergePages/ProcessingPage";
+import SplitOptionsPage from "./pdfMergePages/SplitOptionsPage";
 import DownloadPage from "./pdfMergePages/DownloadPage";
 import styles from "../CSS/Pages/fileConverter.module.css";
 
 function PdfMergeSplit() {
-  const [page, setPage] = useState(1); // 1 = upload, 2 = uploading, 3 = processing, 4 = complete
+  const [page, setPage] = useState(1); // 1 = upload, 2 = uploading, 3 = processing, 4 = split options, 5 = complete
   const [files, setFiles] = useState([]);
   const [selectedOperation, setSelectedOperation] = useState(""); // "merge" or "split"
   const [uploadProgress, setUploadProgress] = useState(0);
@@ -121,24 +122,33 @@ function PdfMergeSplit() {
       return;
     }
 
-    // Fade out processing page first
+    // If split is selected, go to split options page
+    if (selectedOperation === "split") {
+      setFadeIn(false);
+      setTimeout(() => {
+        setPage(4); // Split options page
+        setFadeIn(true);
+      }, 300);
+      return;
+    }
+
+    // For merge operation, proceed with processing
     setFadeIn(false);
 
     setTimeout(() => {
       setIsProcessing(true);
       setProcessingProgress(0);
       setError(null);
-      setFadeIn(true); // Fade in the loading screen
+      setFadeIn(true);
       const startTime = Date.now();
-      const minLoadingTime = 1000; // Minimum 1 second display time
+      const minLoadingTime = 1000;
 
-      // Simulate progress for better UX
       const progressInterval = setInterval(() => {
         setProcessingProgress((prev) => {
           const newProgress = prev >= 90 ? 90 : prev + 10;
           if (prev >= 90) {
             clearInterval(progressInterval);
-            return 90; // Stop at 90% until actual processing completes
+            return 90;
           }
           return newProgress;
         });
@@ -152,7 +162,6 @@ function PdfMergeSplit() {
 
       const performProcessing = async () => {
         try {
-          // TODO: Replace with actual API endpoint
           const response = await fetch("http://localhost:3001/api/pdf/process", {
             method: "POST",
             body: formData,
@@ -166,9 +175,7 @@ function PdfMergeSplit() {
           }
 
           const blob = await response.blob();
-          const contentDisposition = response.headers.get(
-            "content-disposition"
-          );
+          const contentDisposition = response.headers.get("content-disposition");
           let filename = selectedOperation === "merge" ? "merged.pdf" : "split.pdf";
 
           if (contentDisposition) {
@@ -187,16 +194,14 @@ function PdfMergeSplit() {
           clearInterval(progressInterval);
           setProcessingProgress(100);
 
-          // Ensure minimum loading time has elapsed
           const elapsedTime = Date.now() - startTime;
           const remainingTime = Math.max(0, minLoadingTime - elapsedTime);
 
-          // Wait for minimum time + 500ms at 100% before switching pages
           setTimeout(() => {
             setFadeIn(false);
             setTimeout(() => {
               setIsProcessing(false);
-              setPage(4);
+              setPage(5);
               setFadeIn(true);
             }, 300);
           }, remainingTime + 500);
@@ -213,13 +218,20 @@ function PdfMergeSplit() {
     }, 300);
   };
 
+  const handleBackToOperations = () => {
+    setFadeIn(false);
+    setTimeout(() => {
+      setPage(3);
+      setFadeIn(true);
+    }, 300);
+  };
+
   const handleDownload = async () => {
     if (!downloadUrl) return;
 
     setIsDownloading(true);
     setDownloadProgress(0);
 
-    // Simulate download progress for better UX
     const progressInterval = setInterval(() => {
       setDownloadProgress((prev) => {
         if (prev >= 100) {
@@ -231,7 +243,6 @@ function PdfMergeSplit() {
     }, 100);
 
     try {
-      // Small delay to show progress
       await new Promise((resolve) => setTimeout(resolve, 600));
 
       const a = document.createElement("a");
@@ -245,7 +256,6 @@ function PdfMergeSplit() {
       clearInterval(progressInterval);
       setDownloadProgress(100);
 
-      // Reset after download
       setTimeout(() => {
         setIsDownloading(false);
         setDownloadProgress(0);
@@ -314,8 +324,21 @@ function PdfMergeSplit() {
             />
           )}
 
-          {/* PAGE 4: Download */}
+          {/* PAGE 4: Split Options */}
           {page === 4 && (
+            <SplitOptionsPage
+              fadeIn={fadeIn}
+              files={files}
+              handleBack={handleBackToOperations}
+              setPage={setPage}
+              setDownloadUrl={setDownloadUrl}
+              setDownloadFilename={setDownloadFilename}
+              setFadeIn={setFadeIn}
+            />
+          )}
+
+          {/* PAGE 5: Download */}
+          {page === 5 && (
             <DownloadPage
               fadeIn={fadeIn}
               isDownloading={isDownloading}
