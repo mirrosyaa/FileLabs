@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { PDFDocument } from "pdf-lib";
 import Footer from "../components/Layout/footer";
 import UploadPage from "./pdfMergePages/UploadPage";
 import UploadingPage from "./pdfMergePages/UploadingPage";
@@ -10,6 +11,7 @@ import styles from "../CSS/Pages/fileConverter.module.css";
 function PdfMergeSplit() {
   const [page, setPage] = useState(1); // 1 = upload, 2 = uploading, 3 = processing, 4 = split options, 5 = complete
   const [files, setFiles] = useState([]);
+  const [filePageCounts, setFilePageCounts] = useState([]);
   const [selectedOperation, setSelectedOperation] = useState(""); // "merge" or "split"
   const [uploadProgress, setUploadProgress] = useState(0);
   const [isProcessing, setIsProcessing] = useState(false);
@@ -23,7 +25,7 @@ function PdfMergeSplit() {
   const [isDragging, setIsDragging] = useState(false);
   const [fadeIn, setFadeIn] = useState(true);
 
-  // Simulate upload progress
+  // Simulate upload progress and check PDF page counts
   useEffect(() => {
     if (page === 2) {
       setUploadProgress(0);
@@ -31,7 +33,34 @@ function PdfMergeSplit() {
         setUploadProgress((prev) => {
           if (prev >= 100) {
             clearInterval(interval);
-            setTimeout(() => {
+            setTimeout(async () => {
+              // Count pages in PDFs
+              const pageCounts = await Promise.all(
+                files.map(async (file) => {
+                  try {
+                    const arrayBuffer = await file.arrayBuffer();
+                    const pdfDoc = await PDFDocument.load(arrayBuffer);
+                    return pdfDoc.getPageCount();
+                  } catch (error) {
+                    console.error("Error counting pages:", error);
+                    return 0;
+                  }
+                })
+              );
+              setFilePageCounts(pageCounts);
+              
+              // Check if there's only 1 file with 1 page (error)
+              // Multiple files with 1 page each can be merged (allowed)
+              if (files.length === 1 && pageCounts[0] === 1) {
+                setError("PDF file must have more than one page for split operation");
+                setFadeIn(false);
+                setTimeout(() => {
+                  setPage(1);
+                  setFadeIn(true);
+                }, 300);
+                return;
+              }
+              
               setFadeIn(false);
               setTimeout(() => {
                 setPage(3);
@@ -45,7 +74,7 @@ function PdfMergeSplit() {
       }, 150);
       return () => clearInterval(interval);
     }
-  }, [page]);
+  }, [page, files]);
 
   const handleDragEnter = (e) => {
     e.preventDefault();
@@ -102,6 +131,22 @@ function PdfMergeSplit() {
 
   const handleRemoveFile = (indexToRemove) => {
     setFiles(prev => prev.filter((_, index) => index !== indexToRemove));
+    setFilePageCounts(prev => prev.filter((_, index) => index !== indexToRemove));
+  };
+
+  const handleReorderFiles = (fromIndex, toIndex) => {
+    setFiles(prev => {
+      const newFiles = [...prev];
+      const [movedFile] = newFiles.splice(fromIndex, 1);
+      newFiles.splice(toIndex, 0, movedFile);
+      return newFiles;
+    });
+    setFilePageCounts(prev => {
+      const newCounts = [...prev];
+      const [movedCount] = newCounts.splice(fromIndex, 1);
+      newCounts.splice(toIndex, 0, movedCount);
+      return newCounts;
+    });
   };
 
   const handleContinue = () => {
@@ -226,6 +271,16 @@ function PdfMergeSplit() {
     }, 300);
   };
 
+  const handleBackToUpload = () => {
+    setFadeIn(false);
+    setTimeout(() => {
+      setPage(1);
+      setSelectedOperation("");
+      setError(null);
+      setFadeIn(true);
+    }, 300);
+  };
+
   const handleDownload = async () => {
     if (!downloadUrl) return;
 
@@ -274,6 +329,7 @@ function PdfMergeSplit() {
     setTimeout(() => {
       setPage(1);
       setFiles([]);
+      setFilePageCounts([]);
       setSelectedOperation("");
       setDownloadUrl(null);
       setDownloadFilename("");
@@ -319,7 +375,8 @@ function PdfMergeSplit() {
               selectedOperation={selectedOperation}
               setSelectedOperation={setSelectedOperation}
               handleProcess={handleProcess}
-              handleReset={handleReset}
+              handleReset={handleBackToUpload}
+              onReorderFiles={handleReorderFiles}
               error={error}
             />
           )}

@@ -36,7 +36,7 @@ function UploadPage({
           onDragLeave={onDragLeave}
           onDrop={onDrop}
         >
-          <div className={compressorStyles.uploadIcon}>📄</div>
+          <div className={compressorStyles.uploadIcon}>📁</div>
           <p className={compressorStyles.uploadText}>Drag & drop PDF files here</p>
           <label className={compressorStyles.browseBtn}>
             Browse Files
@@ -57,15 +57,18 @@ function UploadPage({
           onDragLeave={onDragLeave}
           onDrop={onDrop}
         >
-          <div className={pdfStyles.uploadIcon}>📄</div>
+          <div className={pdfStyles.uploadIcon}>📁</div>
           <p className={pdfStyles.uploadText}>
             {files.length} file{files.length > 1 ? 's' : ''} added
           </p>
           
           <div className={pdfStyles.fileListContainer}>
             {files.map((file, index) => (
-              <div key={index} className={pdfStyles.fileItem}>
-                <div className={pdfStyles.fileIcon}>📄</div>
+              <div 
+                key={index} 
+                className={pdfStyles.fileItem}
+              >
+                <div className={pdfStyles.fileIcon}>📁</div>
                 <div className={pdfStyles.fileInfo}>
                   <div className={pdfStyles.fileName}>{file.name}</div>
                   <div className={pdfStyles.fileSize}>{formatFileSize(file.size)}</div>
