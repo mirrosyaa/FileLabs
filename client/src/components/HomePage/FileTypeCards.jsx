@@ -12,11 +12,11 @@ function FileTypeCards() {
       color: "#4a9fd8",
       actions: [
         { name: "Convert", path: "/file-converter" },
-        { name: "Compress PDF", path: "/tools/documents/compress-pdf" },
+        { name: "Compress PDF", path: "/compressor" },
         { name: "Split and Merge PDF", path: "/tools/documents/merge-pdf" },
         { name: "Download from URL", path: "/url-downloader" },
-        { name: "Auto Rename", path: "/tools/documents/auto-rename" },
-        { name: "Extract Images", path: "/tools/documents/extract-images" },
+        { name: "Add Metadata", path: "/tools/documents/metadata" },
+        { name: "Add Watermarks", path: "/tools/documents/watermark" },
       ],
     },
     {
@@ -25,7 +25,7 @@ function FileTypeCards() {
       color: "#e91e63",
       actions: [
         { name: "Convert", path: "/file-converter" },
-        { name: "Compress/Optimize", path: "/tools/images/compress" },
+        { name: "Compress/Optimize", path: "/compressor" },
         { name: "Image Editor", path: "/tools/images/crop" },
         { name: "Add Metadata", path: "/tools/images/metadata" },
         { name: "Add Watermarks", path: "/tools/images/watermark" },
@@ -38,10 +38,10 @@ function FileTypeCards() {
       actions: [
         { name: "Convert", path: "/file-converter" },
         { name: "Trim", path: "/tools/audio/trim" },
-        { name: "Compress", path: "/tools/audio/compress" },
+        { name: "Compress", path: "/compressor" },
         { name: "Download from URL", path: "/url-downloader" },
         { name: "Edit Metadata", path: "/tools/audio/metadata" },
-        { name: "Normalize Volume", path: "/tools/audio/normalize" },
+        { name: "Add Watermarks", path: "/tools/audio/watermark" },
       ],
     },
     {
@@ -50,12 +50,13 @@ function FileTypeCards() {
       color: "#ff9800",
       actions: [
         { name: "Convert", path: "/file-converter" },
-        { name: "Compress", path: "/tools/video/compress" },
+        { name: "Compress", path: "/compressor" },
         { name: "Cut/Trim", path: "/tools/video/cut" },
         { name: "Download from URL", path: "/url-downloader" },
         { name: "Change Resolution", path: "/tools/video/resolution" },
         { name: "Extract Audio", path: "/tools/video/extract-audio" },
-        { name: "Auto Split", path: "/tools/video/auto-split" },
+        { name: "Add Metadata", path: "/tools/video/metadata" },
+        { name: "Add Watermarks", path: "/tools/video/watermark" },
       ],
     },
   ];

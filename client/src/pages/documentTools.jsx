@@ -13,21 +13,21 @@ function DocumentTools() {
       name: "Compress PDF",
       description: "Reduce PDF file size while maintaining quality",
       icon: "📄",
-      path: "/document-tools/compress-pdf"
+      path: "/compressor"
     },
     {
       id: 2,
       name: "Split and Merge PDF",
       description: "Combine multiple PDF files into one document",
       icon: "🔀",
-      path: "/document-tools/merge-pdf"
+      path: "/tools/documents/merge-pdf"
     },
     {
       id: 3,
       name: "Download from URL",
       description: "Download files directly from web URLs",
       icon: "⬇️",
-      path: "/document-tools/download-url"
+      path: "/url-downloader"
     },
     {
       id: 4,
