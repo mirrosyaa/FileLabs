@@ -8,6 +8,7 @@ const resizeRoutes = require("./routes/resize");
 const cropRoutes = require("./routes/crop");
 const urlDownloadRoutes = require("./routes/urlDownload");
 const pdfProcessRoutes = require("./routes/pdfProcess");
+const watermarkRoutes = require("./routes/watermark");
 
 const app = express();
 const PORT = 3001;
@@ -28,6 +29,7 @@ app.use("/api/image/resize", resizeRoutes);
 app.use("/api/image/crop", cropRoutes);
 app.use("/api", urlDownloadRoutes);
 app.use("/api/pdf", pdfProcessRoutes);
+app.use("/api", watermarkRoutes);
 
 // Download from URL endpoint
 app.post("/api/download-url", async (req, res) => {

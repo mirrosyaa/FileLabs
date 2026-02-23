@@ -284,6 +284,7 @@ function SplitOptionsPage({
                   color: 'rgba(255, 255, 255, 0.6)', 
                   fontSize: '12px', 
                   marginTop: '8px',
+                  marginBottom: '0',
                   lineHeight: '1.4'
                 }}>
                   Example: "1-5, 7, 10-12"

@@ -3,7 +3,7 @@
   min-height: 100vh;
   padding: 2rem;
   padding-top: calc(100px + 2rem);
-  background-color: #f4f6f8;
+  background: linear-gradient(135deg, #0a1628 0%, #1a2942 100%);
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -21,12 +21,12 @@
 
 .dashboard-header h1 {
   font-size: 1.8rem;
-  color: #333;
+  color: #ffffff;
 }
 
 .dashboard-icon {
   font-size: 1.8rem;
-  color: #007bff;
+  color: #5ec8ff;
 }
 
 /* Search and add section */
@@ -58,22 +58,35 @@
 .search-box input {
   flex: 1;
   padding: 10px;
-  border: 1px solid #ccc;
+  border: 2px solid rgba(94, 200, 255, 0.3);
+  background: rgba(255, 255, 255, 0.08);
+  color: #ffffff;
   border-radius: 8px 0 0 8px;
   font-size: 1rem;
 }
 
+.search-box input::placeholder {
+  color: rgba(255, 255, 255, 0.5);
+}
+
+.search-box input:focus {
+  outline: none;
+  border-color: #5ec8ff;
+  background: rgba(255, 255, 255, 0.12);
+}
+
 .search-btn {
-  background-color: #e0e0e0;
+  background-color: rgba(94, 200, 255, 0.2);
   border: none;
   border-radius: 0 8px 8px 0;
   padding: 0 15px;
   cursor: pointer;
   font-size: 1.2rem;
+  color: #5ec8ff;
 }
 
 .search-btn:hover {
-  background-color: #ccc;
+  background-color: rgba(94, 200, 255, 0.3);
 }
 
 .filter-controls {
@@ -83,10 +96,10 @@
 }
 
 .filter-btn {
-  background-color: #f1f1f1;
-  color: #333;
+  background: rgba(255, 255, 255, 0.08);
+  color: #ffffff;
   padding: 10px 16px;
-  border: 2px solid transparent;
+  border: 2px solid rgba(94, 200, 255, 0.3);
   border-radius: 8px;
   cursor: pointer;
   font-size: 0.95rem;
@@ -95,39 +108,44 @@
 }
 
 .filter-btn:hover {
-  background-color: #e0e0e0;
-  border-color: #007bff;
+  background: rgba(255, 255, 255, 0.12);
+  border-color: #5ec8ff;
 }
 
 .filter-btn.active {
-  background-color: #007bff;
-  color: white;
-  border-color: #0056b3;
+  background: rgba(94, 200, 255, 0.2);
+  color: #5ec8ff;
+  border-color: #5ec8ff;
 }
 
 .add-btn {
-  background-color: #007bff;
-  color: white;
+  background-color: #5ec8ff;
+  color: #0a1628;
   padding: 10px 20px;
   border: none;
   border-radius: 8px;
   cursor: pointer;
   font-size: 1rem;
+  font-weight: 600;
   white-space: nowrap;
   flex-shrink: 0;
+  transition: all 0.3s ease;
 }
 
 .add-btn:hover {
-  background-color: #0056b3;
+  background-color: #4db8ef;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(94, 200, 255, 0.3);
 }
 
 /* Table */
 .table-container {
   width: 95%;
   overflow-x: auto;
-  background: white;
-  border-radius: 10px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 16px;
+  border: 1px solid rgba(94, 200, 255, 0.2);
+  backdrop-filter: blur(10px);
 }
 
 .user-table {
@@ -139,16 +157,17 @@
 .user-table th,
 .user-table td {
   padding: 12px 15px;
-  border-bottom: 1px solid #ddd;
+  border-bottom: 1px solid rgba(94, 200, 255, 0.1);
 }
 
 .user-table th {
-  background-color: #f1f1f1;
-  color: #333;
+  background: rgba(94, 200, 255, 0.1);
+  color: #5ec8ff;
+  font-weight: 600;
 }
 
 .user-table td {
-  color: #333;
+  color: #ffffff;
 }
 
 .user-table tbody tr {
@@ -157,7 +176,7 @@
 }
 
 .user-table tbody tr:hover {
-  background-color: #e3f2fd;
+  background: rgba(94, 200, 255, 0.08);
 }
 
 .user-type-badge {
@@ -169,31 +188,35 @@
 }
 
 .user-type-badge.admin {
-  background-color: #e3f2fd;
-  color: #1976d2;
+  background-color: rgba(94, 200, 255, 0.2);
+  color: #5ec8ff;
+  border: 1px solid rgba(94, 200, 255, 0.4);
 }
 
 .user-type-badge.user {
-  background-color: #f3e5f5;
-  color: #7b1fa2;
+  background-color: rgba(139, 92, 246, 0.2);
+  color: #a78bfa;
+  border: 1px solid rgba(139, 92, 246, 0.4);
 }
 
 .delete-btn {
-  background-color: #ff4d4d;
-  color: white;
-  border: none;
+  background-color: rgba(239, 68, 68, 0.2);
+  color: #ef4444;
+  border: 1px solid rgba(239, 68, 68, 0.4);
   padding: 6px 12px;
   border-radius: 6px;
   cursor: pointer;
+  transition: all 0.3s ease;
 }
 
 .delete-btn:hover {
-  background-color: #d93636;
+  background-color: rgba(239, 68, 68, 0.3);
+  transform: translateY(-2px);
 }
 
 .no-users {
   text-align: center;
-  color: gray;
+  color: rgba(255, 255, 255, 0.5);
   font-style: italic;
   padding: 20px;
 }

@@ -724,6 +724,121 @@
   box-shadow: 0 6px 20px rgba(255, 255, 255, 0.1);
 }
 
+/* Watermark Settings */
+.watermarkSettings {
+  width: 100%;
+  max-width: 600px;
+  margin: 30px auto;
+}
+
+.settingGroup {
+  margin-bottom: 30px;
+}
+
+.settingLabel {
+  display: block;
+  color: rgba(255, 255, 255, 0.8);
+  font-size: 16px;
+  font-weight: 600;
+  margin-bottom: 12px;
+}
+
+.watermarkInput {
+  width: 100%;
+  padding: 14px 18px;
+  background: rgba(255, 255, 255, 0.08);
+  border: 2px solid rgba(94, 200, 255, 0.3);
+  border-radius: 12px;
+  color: #ffffff;
+  font-size: 16px;
+  transition: all 0.3s ease;
+  box-sizing: border-box;
+}
+
+.watermarkInput::placeholder {
+  color: rgba(255, 255, 255, 0.4);
+}
+
+.watermarkInput:focus {
+  outline: none;
+  border-color: #5ec8ff;
+  background: rgba(255, 255, 255, 0.12);
+  box-shadow: 0 0 0 3px rgba(94, 200, 255, 0.15);
+}
+
+.positionGrid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+}
+
+.positionButton {
+  background: rgba(255, 255, 255, 0.08);
+  border: 2px solid rgba(94, 200, 255, 0.3);
+  border-radius: 10px;
+  color: rgba(255, 255, 255, 0.7);
+  padding: 12px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.positionButton:hover {
+  background: rgba(255, 255, 255, 0.12);
+  border-color: rgba(94, 200, 255, 0.5);
+  color: #ffffff;
+}
+
+.positionButton.selected {
+  background: rgba(94, 200, 255, 0.2);
+  border-color: #5ec8ff;
+  color: #5ec8ff;
+}
+
+.opacitySlider {
+  width: 100%;
+  height: 8px;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 10px;
+  outline: none;
+  -webkit-appearance: none;
+  cursor: pointer;
+}
+
+.opacitySlider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 24px;
+  height: 24px;
+  background: #5ec8ff;
+  border-radius: 50%;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 8px rgba(94, 200, 255, 0.4);
+}
+
+.opacitySlider::-webkit-slider-thumb:hover {
+  transform: scale(1.2);
+  box-shadow: 0 4px 12px rgba(94, 200, 255, 0.6);
+}
+
+.opacitySlider::-moz-range-thumb {
+  width: 24px;
+  height: 24px;
+  background: #5ec8ff;
+  border: none;
+  border-radius: 50%;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 8px rgba(94, 200, 255, 0.4);
+}
+
+.opacitySlider::-moz-range-thumb:hover {
+  transform: scale(1.2);
+  box-shadow: 0 4px 12px rgba(94, 200, 255, 0.6);
+}
+
 /* Responsive design */
 @media (max-width: 768px) {
   .compressorMain {

@@ -19,6 +19,7 @@ import UrlDownloader from "./pages/urlDownloader";
 import ImageCrop from "./pages/imageCrop";
 import LoadingScreen from "./pages/loadingScreen";
 import PdfMergeSplit from "./pages/pdfMergeSplit";
+import Watermark from "./pages/watermark";
 import Navbar from "./components/Layout/navbar";
 import SessionExpiredModal from "./modals/sessionExpiredModal";
 import { useAuth } from "./Authentication/authProvider";
@@ -142,6 +143,14 @@ function AppContent() {
             element={
               <RouteProtector>
                 <PdfMergeSplit />
+              </RouteProtector>
+            }
+          />
+          <Route
+            path="/tools/watermark"
+            element={
+              <RouteProtector>
+                <Watermark />
               </RouteProtector>
             }
           />

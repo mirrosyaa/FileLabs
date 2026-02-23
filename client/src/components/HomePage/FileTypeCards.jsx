@@ -16,7 +16,7 @@ function FileTypeCards() {
         { name: "Split and Merge PDF", path: "/tools/documents/merge-pdf" },
         { name: "Download from URL", path: "/url-downloader" },
         { name: "Add Metadata", path: "/tools/documents/metadata" },
-        { name: "Add Watermarks", path: "/tools/documents/watermark" },
+        { name: "Add Watermarks", path: "/tools/watermark" },
       ],
     },
     {
@@ -28,7 +28,7 @@ function FileTypeCards() {
         { name: "Compress/Optimize", path: "/compressor" },
         { name: "Image Editor", path: "/tools/images/crop" },
         { name: "Add Metadata", path: "/tools/images/metadata" },
-        { name: "Add Watermarks", path: "/tools/images/watermark" },
+        { name: "Add Watermarks", path: "/tools/watermark" },
       ],
     },
     {
@@ -41,7 +41,7 @@ function FileTypeCards() {
         { name: "Compress", path: "/compressor" },
         { name: "Download from URL", path: "/url-downloader" },
         { name: "Edit Metadata", path: "/tools/audio/metadata" },
-        { name: "Add Watermarks", path: "/tools/audio/watermark" },
+        { name: "Add Watermarks", path: "/tools/watermark" },
       ],
     },
     {
@@ -56,7 +56,7 @@ function FileTypeCards() {
         { name: "Change Resolution", path: "/tools/video/resolution" },
         { name: "Extract Audio", path: "/tools/video/extract-audio" },
         { name: "Add Metadata", path: "/tools/video/metadata" },
-        { name: "Add Watermarks", path: "/tools/video/watermark" },
+        { name: "Add Watermarks", path: "/tools/watermark" },
       ],
     },
   ];

@@ -5,7 +5,8 @@
   left: 0;
   right: 0;
   bottom: 0;
-  background-color: rgba(0, 0, 0, 0.6);
+  background-color: rgba(0, 0, 0, 0.85);
+  backdrop-filter: blur(8px);
   display: flex;
   justify-content: center;
   align-items: center;
@@ -40,13 +41,15 @@
 
 /* Modal Content Box */
 .modal-content {
-  background-color: white;
-  border-radius: 12px;
+  position: relative;
+  background: linear-gradient(135deg, rgba(26, 41, 66, 0.98) 0%, rgba(10, 22, 40, 0.98) 100%);
+  border: 1px solid rgba(94, 200, 255, 0.3);
+  border-radius: 16px;
   width: 90%;
   max-width: 600px;
   max-height: 80vh;
   overflow: hidden;
-  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5), 0 0 40px rgba(94, 200, 255, 0.1);
   animation: slideIn 0.3s ease;
   display: flex;
   flex-direction: column;
@@ -84,10 +87,10 @@
   position: absolute;
   top: 15px;
   right: 15px;
-  background: #dc3545;
-  border: none;
+  background: rgba(239, 68, 68, 0.2);
+  border: 1px solid rgba(239, 68, 68, 0.4);
   font-size: 24px;
-  color: white;
+  color: #ef4444;
   cursor: pointer;
   width: 36px;
   height: 36px;
@@ -100,7 +103,7 @@
 }
 
 .close-btn:hover {
-  background: #c82333;
+  background: rgba(239, 68, 68, 0.3);
   transform: scale(1.1);
 }
 
@@ -109,9 +112,9 @@
   margin: 0;
   padding: 20px 25px;
   font-size: 24px;
-  color: #333;
-  border-bottom: 2px solid #007bff;
-  background-color: #f9f9f9;
+  color: #ffffff;
+  border-bottom: 2px solid rgba(94, 200, 255, 0.5);
+  background: rgba(94, 200, 255, 0.1);
 }
 
 /* Settings Form */
@@ -129,7 +132,7 @@
 .form-section h3 {
   margin: 0 0 20px 0;
   font-size: 18px;
-  color: #444;
+  color: #5ec8ff;
   padding-bottom: 8px;
 }
 
@@ -146,7 +149,7 @@
   display: block;
   margin-bottom: 8px;
   font-weight: 500;
-  color: #555;
+  color: rgba(255, 255, 255, 0.8);
   font-size: 14px;
 }
 
@@ -156,11 +159,19 @@
 .form-group select {
   width: 100%;
   padding: 10px 12px;
-  border: 1px solid #ddd;
-  border-radius: 6px;
+  border: 2px solid rgba(94, 200, 255, 0.3);
+  background: rgba(255, 255, 255, 0.08);
+  color: #ffffff;
+  border-radius: 8px;
   font-size: 14px;
-  transition: border-color 0.2s ease;
+  transition: all 0.2s ease;
   box-sizing: border-box;
+}
+
+.form-group input[type="text"]::placeholder,
+.form-group input[type="email"]::placeholder,
+.form-group input[type="password"]::placeholder {
+  color: rgba(255, 255, 255, 0.4);
 }
 
 .form-group input[type="text"]:focus,
@@ -168,41 +179,45 @@
 .form-group input[type="password"]:focus,
 .form-group select:focus {
   outline: none;
-  border-color: #007bff;
-  box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.1);
+  border-color: #5ec8ff;
+  background: rgba(255, 255, 255, 0.12);
+  box-shadow: 0 0 0 3px rgba(94, 200, 255, 0.15);
 }
 
 .form-group select {
   cursor: pointer;
-  background-color: white;
+  background: rgba(255, 255, 255, 0.08);
 }
 
 /* Disabled inputs */
 .form-group input:disabled,
 .form-group select:disabled {
-  background-color: #f5f5f5;
+  background: rgba(255, 255, 255, 0.03);
   cursor: not-allowed;
-  opacity: 0.6;
+  opacity: 0.5;
+  color: rgba(255, 255, 255, 0.4);
 }
 
 /* Error and Success Messages */
 .error-message-modal {
-  background-color: #fee;
-  color: #c33;
+  background: rgba(239, 68, 68, 0.15);
+  color: #ef4444;
   padding: 10px 12px;
-  border-radius: 6px;
-  border-left: 4px solid #c33;
+  border-radius: 8px;
+  border: 1px solid rgba(239, 68, 68, 0.4);
+  border-left: 4px solid #ef4444;
   margin: 15px 0;
   font-size: 14px;
   font-weight: 500;
 }
 
 .success-message-modal {
-  background-color: #efe;
-  color: #2a7;
+  background: rgba(34, 197, 94, 0.15);
+  color: #22c55e;
   padding: 10px 12px;
-  border-radius: 6px;
-  border-left: 4px solid #2a7;
+  border-radius: 8px;
+  border: 1px solid rgba(34, 197, 94, 0.4);
+  border-left: 4px solid #22c55e;
   margin: 15px 0;
   font-size: 14px;
   font-weight: 500;
@@ -212,39 +227,45 @@
 .save-btn {
   width: 100%;
   padding: 12px 20px;
-  background-color: #007bff;
-  color: white;
+  background-color: #5ec8ff;
+  color: #0a1628;
   border: none;
-  border-radius: 6px;
+  border-radius: 8px;
   font-size: 14px;
-  font-weight: 500;
+  font-weight: 600;
   cursor: pointer;
-  transition: background-color 0.3s ease;
+  transition: all 0.3s ease;
   margin-top: 15px;
 }
 
 .save-btn:hover {
-  background-color: #0056b3;
+  background-color: #4db8ef;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(94, 200, 255, 0.3);
 }
 
 .save-btn:active {
-  background-color: #004494;
+  transform: translateY(0);
 }
 
 .save-btn:disabled {
-  background-color: #6c757d;
+  background: rgba(255, 255, 255, 0.1);
+  color: rgba(255, 255, 255, 0.4);
   cursor: not-allowed;
   opacity: 0.6;
+  transform: none;
 }
 
 /* Success State - Green Button */
 .save-btn.success {
-  background-color: #28a745;
+  background-color: #22c55e;
+  color: #ffffff;
   cursor: default;
 }
 
 .save-btn.success:hover {
-  background-color: #28a745;
+  background-color: #22c55e;
+  transform: none;
 }
 
 /* Responsive Design */

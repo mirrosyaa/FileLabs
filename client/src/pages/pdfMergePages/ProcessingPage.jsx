@@ -47,6 +47,8 @@ function ProcessingPage({
 
   // Disable split if there are multiple files
   const canSplit = files.length === 1;
+  // Disable merge if there is only one file
+  const canMerge = files.length > 1;
 
   return (
     <div
@@ -85,11 +87,16 @@ function ProcessingPage({
                 className={`${styles.formatOption} ${
                   selectedOperation === "merge" ? styles.selectedFormat : ""
                 }`}
-                onClick={() => setSelectedOperation("merge")}
+                onClick={() => canMerge && setSelectedOperation("merge")}
+                disabled={!canMerge}
+                style={{
+                  opacity: canMerge ? 1 : 0.5,
+                  cursor: canMerge ? 'pointer' : 'not-allowed'
+                }}
               >
                 <span className={styles.formatName}>Merge PDFs</span>
                 <span className={styles.formatDescription}>
-                  Combine multiple PDFs into one
+                  {canMerge ? "Combine multiple PDFs into one" : "Need at least 2 PDFs to merge"}
                 </span>
               </button>
               
