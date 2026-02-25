@@ -14,6 +14,9 @@ function Watermark() {
   const [uploadProgress, setUploadProgress] = useState(0);
   const [processingProgress, setProcessingProgress] = useState(0); // eslint-disable-line no-unused-vars
   const [fadeIn, setFadeIn] = useState(true);
+  const [isDownloading, setIsDownloading] = useState(false);
+  const [hasDownloaded, setHasDownloaded] = useState(false);
+  const [downloadProgress, setDownloadProgress] = useState(0);
   
   // Watermark settings
   const [watermarkType, setWatermarkType] = useState("text"); // "text" or "image"
@@ -21,8 +24,6 @@ function Watermark() {
   const [watermarkImage, setWatermarkImage] = useState(null);
   const [watermarkImageUrl, setWatermarkImageUrl] = useState(null);
   const [anchorPosition, setAnchorPosition] = useState("bottom-right");
-  const [offsetX, setOffsetX] = useState(24);
-  const [offsetY, setOffsetY] = useState(24);
   const [watermarkOpacity, setWatermarkOpacity] = useState(0.8);
   const [watermarkColor, setWatermarkColor] = useState("#ffffff");
   const [fontFamily, setFontFamily] = useState("Arial");
@@ -132,8 +133,6 @@ function Watermark() {
     }
     
     formData.append("anchorPosition", anchorPosition);
-    formData.append("offsetX", offsetX);
-    formData.append("offsetY", offsetY);
     formData.append("opacity", watermarkOpacity);
     formData.append("rotation", rotation);
     
@@ -171,14 +170,39 @@ function Watermark() {
   };
 
   const handleDownload = () => {
-    if (processedFileUrl) {
-      const link = document.createElement("a");
-      link.href = processedFileUrl;
-      link.download = `watermarked_${files[0].name}`;
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
-    }
+    if (hasDownloaded) return; // Prevent double downloads
+    
+    setFadeIn(false);
+    setTimeout(() => {
+      setFadeIn(true);
+      setIsDownloading(true);
+      setDownloadProgress(0);
+      
+      // Simulate download progress
+      const progressInterval = setInterval(() => {
+        setDownloadProgress((prev) => {
+          if (prev >= 100) {
+            clearInterval(progressInterval);
+            
+            // Start actual download
+            const link = document.createElement("a");
+            link.href = processedFileUrl;
+            link.download = `watermarked_${files[0].name}`;
+            link.style.display = 'none';
+            document.body.appendChild(link);
+            link.click();
+            setTimeout(() => {
+              document.body.removeChild(link);
+            }, 100);
+            
+            setIsDownloading(false);
+            setHasDownloaded(true);
+            return 100;
+          }
+          return prev + 10;
+        });
+      }, 100);
+    }, 300);
   };
 
   const handleReset = () => {
@@ -188,8 +212,6 @@ function Watermark() {
     setWatermarkImage(null);
     setWatermarkImageUrl(null);
     setAnchorPosition("bottom-right");
-    setOffsetX(24);
-    setOffsetY(24);
     setWatermarkOpacity(0.8);
     setWatermarkColor("#ffffff");
     setFontFamily("Arial");
@@ -204,6 +226,9 @@ function Watermark() {
     setUploadProgress(0);
     setProcessingProgress(0);
     setProcessedFileUrl(null);
+    setIsDownloading(false);
+    setHasDownloaded(false);
+    setDownloadProgress(0);
     setError("");
     previewUrls.forEach(url => URL.revokeObjectURL(url));
     setPreviewUrls([]);
@@ -238,10 +263,6 @@ function Watermark() {
               setWatermarkImageUrl={setWatermarkImageUrl}
               anchorPosition={anchorPosition}
               setAnchorPosition={setAnchorPosition}
-              offsetX={offsetX}
-              setOffsetX={setOffsetX}
-              offsetY={offsetY}
-              setOffsetY={setOffsetY}
               watermarkOpacity={watermarkOpacity}
               setWatermarkOpacity={setWatermarkOpacity}
               watermarkColor={watermarkColor}
@@ -275,6 +296,9 @@ function Watermark() {
           {currentPage === "download" && (
             <DownloadPage
               fadeIn={fadeIn}
+              isDownloading={isDownloading}
+              hasDownloaded={hasDownloaded}
+              downloadProgress={downloadProgress}
               onDownload={handleDownload}
               onReset={handleReset}
             />

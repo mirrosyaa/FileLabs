@@ -27,49 +27,110 @@ const upload = multer({ storage });
 router.post("/watermark/add", upload.array("files"), async (req, res) => {
   try {
     const files = req.files;
-    const { watermarkText, position, opacity } = req.body;
+    const { 
+      watermarkType, 
+      watermarkText, 
+      anchorPosition, 
+      opacity,
+      fontFamily,
+      fontSize,
+      color,
+      strokeEnabled,
+      strokeColor,
+      strokeWidth,
+      rotation,
+      pdfPages,
+      pdfPageRange,
+      tiledMode
+    } = req.body;
+
+    console.log("Received watermark request:", {
+      filesCount: files?.length,
+      watermarkType,
+      watermarkText,
+      anchorPosition,
+      opacity
+    });
 
     if (!files || files.length === 0) {
       return res.status(400).json({ message: "No files uploaded" });
     }
 
-    if (!watermarkText) {
+    if (watermarkType === "text" && !watermarkText) {
       return res.status(400).json({ message: "Watermark text is required" });
     }
 
-    const file = files[0]; // Process first file for now
+    if (watermarkType === "image" && !req.files.find(f => f.fieldname === "watermarkImage")) {
+      return res.status(400).json({ message: "Watermark image is required" });
+    }
+
+    const file = files[0]; // Process first file
     const fileExt = path.extname(file.originalname).toLowerCase();
     const outputPath = path.join(
       file.destination,
       `watermarked-${file.filename}`
     );
 
+    console.log("Processing file:", {
+      originalName: file.originalname,
+      extension: fileExt,
+      outputPath
+    });
+
     // Determine file type and process accordingly
-    const imageExtensions = [".jpg", ".jpeg", ".png", ".webp", ".bmp"];
-    const videoExtensions = [".mp4", ".avi", ".mov", ".mkv", ".webm"];
+    const imageExtensions = [".jpg", ".jpeg", ".png", ".webp", ".bmp", ".gif", ".tiff"];
+    const videoExtensions = [".mp4", ".avi", ".mov", ".mkv", ".webm", ".m4v", ".flv", ".wmv"];
+    const pdfExtensions = [".pdf"];
 
     if (imageExtensions.includes(fileExt)) {
       // Process image with sharp
-      await addWatermarkToImage(file.path, outputPath, watermarkText, position, opacity);
+      await addWatermarkToImage(file.path, outputPath, {
+        text: watermarkText,
+        position: anchorPosition || "bottom-right",
+        opacity: parseFloat(opacity) || 0.8,
+        fontFamily: fontFamily || "Arial",
+        fontSize: parseInt(fontSize) || 4,
+        color: color || "#ffffff",
+        strokeEnabled: strokeEnabled === "true",
+        strokeColor: strokeColor || "#000000",
+        strokeWidth: parseInt(strokeWidth) || 2,
+        rotation: parseFloat(rotation) || 0
+      });
     } else if (videoExtensions.includes(fileExt)) {
       // Process video with ffmpeg
-      await addWatermarkToVideo(file.path, outputPath, watermarkText, position, opacity);
-    } else {
-      // For audio files, return error as watermarks don't apply
+      await addWatermarkToVideo(file.path, outputPath, {
+        text: watermarkText,
+        position: anchorPosition || "bottom-right",
+        opacity: parseFloat(opacity) || 0.8,
+        fontFamily: fontFamily || "Arial",
+        fontSize: parseInt(fontSize) || 24
+      });
+    } else if (pdfExtensions.includes(fileExt)) {
+      // TODO: Implement PDF watermarking
       return res.status(400).json({ 
-        message: "Audio files cannot have visual watermarks. Only images and videos are supported." 
+        message: "PDF watermarking is not yet implemented." 
+      });
+    } else {
+      return res.status(400).json({ 
+        message: "Unsupported file type. Only images and videos are supported." 
       });
     }
+
+    console.log("Watermark processing complete, sending file...");
 
     // Send the watermarked file
     res.download(outputPath, `watermarked-${file.originalname}`, (err) => {
       // Cleanup
-      fs.unlinkSync(file.path);
+      if (fs.existsSync(file.path)) {
+        fs.unlinkSync(file.path);
+      }
       if (fs.existsSync(outputPath)) {
         fs.unlinkSync(outputPath);
       }
       if (err) {
         console.error("Error sending file:", err);
+      } else {
+        console.log("File sent successfully");
       }
     });
   } catch (error) {
@@ -79,19 +140,24 @@ router.post("/watermark/add", upload.array("files"), async (req, res) => {
 });
 
 // Helper function to add watermark to images
-async function addWatermarkToImage(inputPath, outputPath, text, position, opacity) {
+async function addWatermarkToImage(inputPath, outputPath, options) {
+  const { text, position, opacity, fontFamily, fontSize, color, strokeEnabled, strokeColor, strokeWidth, rotation } = options;
+  
   const image = sharp(inputPath);
   const metadata = await image.metadata();
   
-  // Create SVG watermark
-  const fontSize = Math.round(metadata.width / 25);
+  // Calculate font size based on percentage of shorter side
+  const shorterSide = Math.min(metadata.width, metadata.height);
+  const calculatedFontSize = Math.round((shorterSide * fontSize) / 100);
   const padding = 20;
-  const watermarkOpacity = parseFloat(opacity) || 0.5;
+  const watermarkOpacity = parseFloat(opacity);
+  
+  // Estimate text dimensions
+  const textWidth = text.length * (calculatedFontSize * 0.6);
+  const textHeight = calculatedFontSize;
   
   // Calculate position
   let x, y;
-  const textWidth = text.length * (fontSize * 0.6);
-  const textHeight = fontSize;
   
   switch (position) {
     case "top-left":
@@ -106,8 +172,16 @@ async function addWatermarkToImage(inputPath, outputPath, text, position, opacit
       x = metadata.width - textWidth - padding;
       y = padding + textHeight;
       break;
+    case "middle-left":
+      x = padding;
+      y = metadata.height / 2;
+      break;
     case "center":
       x = (metadata.width - textWidth) / 2;
+      y = metadata.height / 2;
+      break;
+    case "middle-right":
+      x = metadata.width - textWidth - padding;
       y = metadata.height / 2;
       break;
     case "bottom-left":
@@ -127,22 +201,37 @@ async function addWatermarkToImage(inputPath, outputPath, text, position, opacit
       y = metadata.height - padding;
   }
   
-  const svgWatermark = Buffer.from(`
-    <svg width="${metadata.width}" height="${metadata.height}">
-      <text 
-        x="${x}" 
-        y="${y}" 
-        font-size="${fontSize}" 
-        fill="white" 
-        fill-opacity="${watermarkOpacity}"
-        font-family="Arial, sans-serif"
-        font-weight="bold"
-        stroke="black"
-        stroke-width="1"
-        stroke-opacity="${watermarkOpacity * 0.5}"
-      >${text}</text>
-    </svg>
-  `);
+  // Build SVG watermark
+  let svgContent = `<svg width="${metadata.width}" height="${metadata.height}">`;
+  
+  if (rotation) {
+    svgContent += `<g transform="rotate(${rotation} ${x} ${y})">`;
+  }
+  
+  svgContent += `<text 
+    x="${x}" 
+    y="${y}" 
+    font-size="${calculatedFontSize}" 
+    fill="${color}" 
+    fill-opacity="${watermarkOpacity}"
+    font-family="${fontFamily}, Arial, sans-serif"
+    font-weight="bold"`;
+  
+  if (strokeEnabled) {
+    svgContent += ` stroke="${strokeColor}"
+    stroke-width="${strokeWidth}"
+    stroke-opacity="${watermarkOpacity * 0.8}"`;
+  }
+  
+  svgContent += `>${text}</text>`;
+  
+  if (rotation) {
+    svgContent += `</g>`;
+  }
+  
+  svgContent += `</svg>`;
+  
+  const svgWatermark = Buffer.from(svgContent);
   
   await image
     .composite([{ input: svgWatermark, top: 0, left: 0 }])
@@ -150,7 +239,9 @@ async function addWatermarkToImage(inputPath, outputPath, text, position, opacit
 }
 
 // Helper function to add watermark to videos
-async function addWatermarkToVideo(inputPath, outputPath, text, position, opacity) {
+async function addWatermarkToVideo(inputPath, outputPath, options) {
+  const { text, position, opacity, fontFamily, fontSize } = options;
+  
   return new Promise((resolve, reject) => {
     // Map position to ffmpeg drawtext position
     let xPosition, yPosition;
@@ -168,8 +259,16 @@ async function addWatermarkToVideo(inputPath, outputPath, text, position, opacit
         xPosition = "w-text_w-10";
         yPosition = "10";
         break;
+      case "middle-left":
+        xPosition = "10";
+        yPosition = "(h-text_h)/2";
+        break;
       case "center":
         xPosition = "(w-text_w)/2";
+        yPosition = "(h-text_h)/2";
+        break;
+      case "middle-right":
+        xPosition = "w-text_w-10";
         yPosition = "(h-text_h)/2";
         break;
       case "bottom-left":
@@ -189,15 +288,22 @@ async function addWatermarkToVideo(inputPath, outputPath, text, position, opacit
         yPosition = "h-text_h-10";
     }
     
-    const watermarkOpacity = parseFloat(opacity) || 0.5;
+    const watermarkOpacity = parseFloat(opacity);
+    const escapedText = text.replace(/'/g, "\\'").replace(/:/g, "\\:");
     
     ffmpeg(inputPath)
       .outputOptions([
         `-vf`,
-        `drawtext=text='${text}':fontcolor=white@${watermarkOpacity}:fontsize=24:box=1:boxcolor=black@${watermarkOpacity * 0.5}:boxborderw=5:x=${xPosition}:y=${yPosition}`
+        `drawtext=text='${escapedText}':fontcolor=white@${watermarkOpacity}:fontsize=${fontSize}:fontfile=/System/Library/Fonts/Supplemental/Arial.ttf:box=1:boxcolor=black@${watermarkOpacity * 0.5}:boxborderw=5:x=${xPosition}:y=${yPosition}`
       ])
-      .on("end", () => resolve())
-      .on("error", (err) => reject(err))
+      .on("end", () => {
+        console.log("Video watermark processing complete");
+        resolve();
+      })
+      .on("error", (err) => {
+        console.error("Video watermark error:", err);
+        reject(err);
+      })
       .save(outputPath);
   });
 }

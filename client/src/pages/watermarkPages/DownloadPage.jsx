@@ -1,23 +1,74 @@
 import React from "react";
-import styles from "../../CSS/Pages/fileConverter.module.css";
+import styles from "../../CSS/Pages/compressor.module.css";
 
-function DownloadPage({ fadeIn, onDownload, onReset }) {
+function DownloadPage({ 
+  fadeIn,
+  isDownloading, 
+  hasDownloaded, 
+  downloadProgress, 
+  onDownload, 
+  onReset 
+}) {
   return (
     <div className={`${styles.pageContainer} ${fadeIn ? styles.fadeIn : styles.fadeOut}`}>
-      <div className={styles.downloadContainer}>
-        <div className={styles.successIcon}>✓</div>
-        <h2 className={styles.downloadTitle}>Watermark Added Successfully!</h2>
-        <p className={styles.downloadMessage}>
-          Your file has been watermarked and is ready to download.
-        </p>
+      {/* Download Loading Overlay */}
+      {isDownloading && (
+        <div className={`${styles.uploadingContainer} ${fadeIn ? styles.fadeIn : styles.fadeOut}`}>
+          <div className={styles.spinner}></div>
+          <p className={styles.uploadingText}>Downloading file...</p>
+          <div className={styles.progressBar}>
+            <div
+              className={styles.progressFill}
+              style={{ width: `${downloadProgress}%` }}
+            ></div>
+          </div>
+          <p className={styles.progressText}>{downloadProgress}%</p>
+        </div>
+      )}
 
-        <button className={styles.downloadButton} onClick={onDownload}>
-          Download File
-        </button>
-        <button className={styles.backToHomeButton} onClick={onReset}>
-          Add Watermark to Another File
-        </button>
-      </div>
+      {!isDownloading && (
+        <div className={styles.successContainer}>
+          <div className={styles.successIconWrapper}>
+            <div className={styles.successIconCircle}>
+              <div className={styles.successIcon}>✓</div>
+            </div>
+          </div>
+          {!hasDownloaded ? (
+            <>
+              <h2 className={styles.successTitle}>Watermark Added Successfully!</h2>
+              <p className={styles.successMessage}>
+                Your file has been watermarked and is ready to download
+              </p>
+            </>
+          ) : (
+            <h2 className={styles.successTitle}>File Downloaded Successfully!</h2>
+          )}
+
+          {!hasDownloaded && (
+            <button
+              className={styles.downloadButton}
+              onClick={onDownload}
+              disabled={isDownloading}
+            >
+              {isDownloading ? (
+                <>
+                  <span className={styles.buttonSpinner}></span>
+                  Downloading...
+                </>
+              ) : (
+                <>
+                  <span className={styles.downloadIcon}>⬇</span>
+                  Download File
+                </>
+              )}
+            </button>
+          )}
+          
+          <button className={styles.newConversionBtn} onClick={onReset}>
+            Add Watermark to Another File
+          </button>
+        </div>
+      )}
     </div>
   );
 }

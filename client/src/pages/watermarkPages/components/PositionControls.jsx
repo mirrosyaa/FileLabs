@@ -3,22 +3,18 @@ import styles from "../../../CSS/Pages/fileConverter.module.css";
 
 function PositionControls({ 
   anchorPosition, 
-  setAnchorPosition, 
-  offsetX, 
-  setOffsetX, 
-  offsetY, 
-  setOffsetY 
+  setAnchorPosition
 }) {
   const anchorPositions = [
-    { value: "top-left", label: "TL", icon: "↖" },
-    { value: "top-center", label: "TC", icon: "↑" },
-    { value: "top-right", label: "TR", icon: "↗" },
-    { value: "middle-left", label: "ML", icon: "←" },
-    { value: "center", label: "C", icon: "⊙" },
-    { value: "middle-right", label: "MR", icon: "→" },
-    { value: "bottom-left", label: "BL", icon: "↙" },
-    { value: "bottom-center", label: "BC", icon: "↓" },
-    { value: "bottom-right", label: "BR", icon: "↘" }
+    { value: "top-left", label: "Top Left" },
+    { value: "top-center", label: "Top Center" },
+    { value: "top-right", label: "Top Right" },
+    { value: "middle-left", label: "Middle Left" },
+    { value: "center", label: "Center" },
+    { value: "middle-right", label: "Middle Right" },
+    { value: "bottom-left", label: "Bottom Left" },
+    { value: "bottom-center", label: "Bottom Center" },
+    { value: "bottom-right", label: "Bottom Right" }
   ];
 
   return (
@@ -41,60 +37,17 @@ function PositionControls({
             className={`${styles.formatOption} ${anchorPosition === pos.value ? styles.selectedFormat : ""}`}
             onClick={() => setAnchorPosition(pos.value)}
             style={{
-              padding: '16px 8px',
+              padding: '12px 8px',
               display: 'flex',
-              flexDirection: 'column',
               alignItems: 'center',
-              gap: '4px',
-              fontSize: '11px',
-              fontWeight: '600'
+              justifyContent: 'center',
+              fontSize: '13px',
+              fontWeight: '500'
             }}
           >
-            <span style={{ fontSize: '20px' }}>{pos.icon}</span>
-            <span>{pos.label}</span>
+            {pos.label}
           </button>
         ))}
-      </div>
-
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
-        <div>
-          <label style={{ fontSize: '13px', color: 'rgba(255, 255, 255, 0.7)', display: 'block', marginBottom: '6px' }}>
-            Offset X: {offsetX}px
-          </label>
-          <input
-            type="number"
-            value={offsetX}
-            onChange={(e) => setOffsetX(parseInt(e.target.value) || 0)}
-            style={{
-              width: '100%',
-              padding: '8px',
-              background: 'rgba(255, 255, 255, 0.08)',
-              border: '2px solid rgba(94, 200, 255, 0.3)',
-              borderRadius: '6px',
-              color: '#ffffff',
-              fontSize: '14px'
-            }}
-          />
-        </div>
-        <div>
-          <label style={{ fontSize: '13px', color: 'rgba(255, 255, 255, 0.7)', display: 'block', marginBottom: '6px' }}>
-            Offset Y: {offsetY}px
-          </label>
-          <input
-            type="number"
-            value={offsetY}
-            onChange={(e) => setOffsetY(parseInt(e.target.value) || 0)}
-            style={{
-              width: '100%',
-              padding: '8px',
-              background: 'rgba(255, 255, 255, 0.08)',
-              border: '2px solid rgba(94, 200, 255, 0.3)',
-              borderRadius: '6px',
-              color: '#ffffff',
-              fontSize: '14px'
-            }}
-          />
-        </div>
       </div>
     </div>
   );

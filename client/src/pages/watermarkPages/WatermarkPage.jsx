@@ -8,7 +8,7 @@ import PreviewContainer from "./components/PreviewContainer";
 
 pdfjsLib.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjsLib.version}/pdf.worker.min.js`;
 
-function WatermarkPage({ fadeIn, files, watermarkType, setWatermarkType, watermarkText, setWatermarkText, watermarkImage, setWatermarkImage, watermarkImageUrl, setWatermarkImageUrl, anchorPosition, setAnchorPosition, offsetX, setOffsetX, offsetY, setOffsetY, watermarkOpacity, setWatermarkOpacity, watermarkColor, setWatermarkColor, fontFamily, setFontFamily, fontSize, setFontSize, rotation, setRotation, strokeEnabled, setStrokeEnabled, strokeColor, setStrokeColor, strokeWidth, setStrokeWidth, pdfPages, setPdfPages, pdfPageRange, setPdfPageRange, tiledMode, setTiledMode, onProcess, error, previewUrls }) {
+function WatermarkPage({ fadeIn, files, watermarkType, setWatermarkType, watermarkText, setWatermarkText, watermarkImage, setWatermarkImage, watermarkImageUrl, setWatermarkImageUrl, anchorPosition, setAnchorPosition, watermarkOpacity, setWatermarkOpacity, watermarkColor, setWatermarkColor, fontFamily, setFontFamily, fontSize, setFontSize, rotation, setRotation, strokeEnabled, setStrokeEnabled, strokeColor, setStrokeColor, strokeWidth, setStrokeWidth, pdfPages, setPdfPages, pdfPageRange, setPdfPageRange, tiledMode, setTiledMode, onProcess, error, previewUrls }) {
   const [previewIndex, setPreviewIndex] = useState(0);
   const [imageDimensions, setImageDimensions] = useState({ width: 0, height: 0 });
   const [watermarkPosition, setWatermarkPosition] = useState({ x: 50, y: 50 });
@@ -161,9 +161,7 @@ function WatermarkPage({ fadeIn, files, watermarkType, setWatermarkType, waterma
     const usingAnchor = Math.abs(watermarkPosition.x - anchorDefault.x) < 1 && Math.abs(watermarkPosition.y - anchorDefault.y) < 1;
     
     if (usingAnchor) {
-      const finalX = anchorPosition.includes('left') ? `${offsetX}px` : anchorPosition.includes('right') ? `calc(100% - ${offsetX}px)` : '50%';
-      const finalY = anchorPosition.includes('top') ? `${offsetY}px` : anchorPosition.includes('bottom') ? `calc(100% - ${offsetY}px)` : '50%';
-      return { ...baseStyle, left: finalX, top: finalY };
+      return { ...baseStyle, left: `${anchorDefault.x}%`, top: `${anchorDefault.y}%` };
     }
     return { ...baseStyle, left: `${watermarkPosition.x}%`, top: `${watermarkPosition.y}%` };
   };
@@ -187,9 +185,7 @@ function WatermarkPage({ fadeIn, files, watermarkType, setWatermarkType, waterma
     const usingAnchor = Math.abs(watermarkPosition.x - anchorDefault.x) < 1 && Math.abs(watermarkPosition.y - anchorDefault.y) < 1;
     
     if (usingAnchor) {
-      const finalX = anchorPosition.includes('left') ? `${offsetX}px` : anchorPosition.includes('right') ? `calc(100% - ${offsetX}px)` : '50%';
-      const finalY = anchorPosition.includes('top') ? `${offsetY}px` : anchorPosition.includes('bottom') ? `calc(100% - ${offsetY}px)` : '50%';
-      return { ...baseStyle, left: finalX, top: finalY };
+      return { ...baseStyle, left: `${anchorDefault.x}%`, top: `${anchorDefault.y}%` };
     }
     return { ...baseStyle, left: `${watermarkPosition.x}%`, top: `${watermarkPosition.y}%` };
   };
@@ -230,7 +226,7 @@ function WatermarkPage({ fadeIn, files, watermarkType, setWatermarkType, waterma
             )}
 
             {/* Position */}
-            <PositionControls anchorPosition={anchorPosition} setAnchorPosition={setAnchorPosition} offsetX={offsetX} setOffsetX={setOffsetX} offsetY={offsetY} setOffsetY={setOffsetY} />
+            <PositionControls anchorPosition={anchorPosition} setAnchorPosition={setAnchorPosition} />
 
             {/* Appearance */}
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px', marginBottom: '20px' }}>

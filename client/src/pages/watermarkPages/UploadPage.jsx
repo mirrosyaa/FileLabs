@@ -32,7 +32,7 @@ function UploadPage({ fadeIn, onFilesSelected, error }) {
 
   return (
     <div className={`${styles.pageContainer} ${fadeIn ? styles.fadeIn : styles.fadeOut}`}>
-      <h1 className={styles.mainTitle}>💧 Add Watermark</h1>
+      <h1 className={styles.mainTitle}>Add Watermark</h1>
       <div
         className={`${compressorStyles.uploadBox} ${isDragging ? compressorStyles.dragging : ""}`}
         onDragOver={handleDragOver}
