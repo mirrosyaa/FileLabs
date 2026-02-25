@@ -5,6 +5,7 @@ const path = require("path");
 const fs = require("fs");
 const sharp = require("sharp");
 const ffmpeg = require("fluent-ffmpeg");
+const { PDFDocument, rgb, StandardFonts, degrees } = require("pdf-lib");
 
 // Configure multer for file uploads
 const storage = multer.diskStorage({
@@ -30,7 +31,9 @@ router.post("/watermark/add", upload.array("files"), async (req, res) => {
     const { 
       watermarkType, 
       watermarkText, 
-      anchorPosition, 
+      anchorPosition,
+      customPositionX,
+      customPositionY,
       opacity,
       fontFamily,
       fontSize,
@@ -49,6 +52,8 @@ router.post("/watermark/add", upload.array("files"), async (req, res) => {
       watermarkType,
       watermarkText,
       anchorPosition,
+      customPositionX,
+      customPositionY,
       opacity
     });
 
@@ -87,6 +92,8 @@ router.post("/watermark/add", upload.array("files"), async (req, res) => {
       await addWatermarkToImage(file.path, outputPath, {
         text: watermarkText,
         position: anchorPosition || "bottom-right",
+        customPositionX: parseFloat(customPositionX),
+        customPositionY: parseFloat(customPositionY),
         opacity: parseFloat(opacity) || 0.8,
         fontFamily: fontFamily || "Arial",
         fontSize: parseInt(fontSize) || 4,
@@ -106,13 +113,23 @@ router.post("/watermark/add", upload.array("files"), async (req, res) => {
         fontSize: parseInt(fontSize) || 24
       });
     } else if (pdfExtensions.includes(fileExt)) {
-      // TODO: Implement PDF watermarking
-      return res.status(400).json({ 
-        message: "PDF watermarking is not yet implemented." 
+      // Process PDF with pdf-lib
+      await addWatermarkToPDF(file.path, outputPath, {
+        text: watermarkText,
+        position: anchorPosition || "bottom-right",
+        customPositionX: parseFloat(customPositionX),
+        customPositionY: parseFloat(customPositionY),
+        opacity: parseFloat(opacity) || 0.8,
+        fontSize: parseInt(fontSize) || 24,
+        color: color || "#ffffff",
+        rotation: parseFloat(rotation) || 0,
+        pages: pdfPages || "all",
+        pageRange: pdfPageRange,
+        tiledMode: tiledMode === "true"
       });
     } else {
       return res.status(400).json({ 
-        message: "Unsupported file type. Only images and videos are supported." 
+        message: "Unsupported file type. Only images, videos, and PDFs are supported." 
       });
     }
 
@@ -141,7 +158,7 @@ router.post("/watermark/add", upload.array("files"), async (req, res) => {
 
 // Helper function to add watermark to images
 async function addWatermarkToImage(inputPath, outputPath, options) {
-  const { text, position, opacity, fontFamily, fontSize, color, strokeEnabled, strokeColor, strokeWidth, rotation } = options;
+  const { text, position, customPositionX, customPositionY, opacity, fontFamily, fontSize, color, strokeEnabled, strokeColor, strokeWidth, rotation } = options;
   
   const image = sharp(inputPath);
   const metadata = await image.metadata();
@@ -159,46 +176,54 @@ async function addWatermarkToImage(inputPath, outputPath, options) {
   // Calculate position
   let x, y;
   
-  switch (position) {
-    case "top-left":
-      x = padding;
-      y = padding + textHeight;
-      break;
-    case "top-center":
-      x = (metadata.width - textWidth) / 2;
-      y = padding + textHeight;
-      break;
-    case "top-right":
-      x = metadata.width - textWidth - padding;
-      y = padding + textHeight;
-      break;
-    case "middle-left":
-      x = padding;
-      y = metadata.height / 2;
-      break;
-    case "center":
-      x = (metadata.width - textWidth) / 2;
-      y = metadata.height / 2;
-      break;
-    case "middle-right":
-      x = metadata.width - textWidth - padding;
-      y = metadata.height / 2;
-      break;
-    case "bottom-left":
-      x = padding;
-      y = metadata.height - padding;
-      break;
-    case "bottom-center":
-      x = (metadata.width - textWidth) / 2;
-      y = metadata.height - padding;
-      break;
-    case "bottom-right":
-      x = metadata.width - textWidth - padding;
-      y = metadata.height - padding;
-      break;
-    default:
-      x = metadata.width - textWidth - padding;
-      y = metadata.height - padding;
+  // Use custom position if provided, otherwise use anchor position
+  if (customPositionX !== undefined && customPositionY !== undefined && !isNaN(customPositionX) && !isNaN(customPositionY)) {
+    // Convert percentage to pixels (custom position from drag)
+    x = (metadata.width * customPositionX) / 100;
+    y = (metadata.height * customPositionY) / 100;
+  } else {
+    // Use anchor position presets
+    switch (position) {
+      case "top-left":
+        x = padding;
+        y = padding + textHeight;
+        break;
+      case "top-center":
+        x = (metadata.width - textWidth) / 2;
+        y = padding + textHeight;
+        break;
+      case "top-right":
+        x = metadata.width - textWidth - padding;
+        y = padding + textHeight;
+        break;
+      case "middle-left":
+        x = padding;
+        y = metadata.height / 2;
+        break;
+      case "center":
+        x = (metadata.width - textWidth) / 2;
+        y = metadata.height / 2;
+        break;
+      case "middle-right":
+        x = metadata.width - textWidth - padding;
+        y = metadata.height / 2;
+        break;
+      case "bottom-left":
+        x = padding;
+        y = metadata.height - padding;
+        break;
+      case "bottom-center":
+        x = (metadata.width - textWidth) / 2;
+        y = metadata.height - padding;
+        break;
+      case "bottom-right":
+        x = metadata.width - textWidth - padding;
+        y = metadata.height - padding;
+        break;
+      default:
+        x = metadata.width - textWidth - padding;
+        y = metadata.height - padding;
+    }
   }
   
   // Build SVG watermark
@@ -306,6 +331,154 @@ async function addWatermarkToVideo(inputPath, outputPath, options) {
       })
       .save(outputPath);
   });
+}
+
+// Helper function to add watermark to PDFs
+async function addWatermarkToPDF(inputPath, outputPath, options) {
+  const { text, position, customPositionX, customPositionY, opacity, fontSize, color, rotation, pages, pageRange, tiledMode } = options;
+  
+  const existingPdfBytes = fs.readFileSync(inputPath);
+  const pdfDoc = await PDFDocument.load(existingPdfBytes);
+  const totalPages = pdfDoc.getPageCount();
+  
+  // Parse color (hex to RGB)
+  const hexColor = color || "#ffffff";
+  const r = parseInt(hexColor.substring(1, 3), 16) / 255;
+  const g = parseInt(hexColor.substring(3, 5), 16) / 255;
+  const b = parseInt(hexColor.substring(5, 7), 16) / 255;
+  const textColor = rgb(r, g, b);
+  
+  // Embed font
+  const font = await pdfDoc.embedFont(StandardFonts.HelveticaBold);
+  
+  // Determine which pages to watermark
+  let pagesToWatermark = [];
+  if (pages === "all") {
+    pagesToWatermark = Array.from({ length: totalPages }, (_, i) => i);
+  } else if (pages === "first") {
+    pagesToWatermark = [0];
+  } else if (pages === "range" && pageRange) {
+    // Parse range like "1-3,5,7-9"
+    const ranges = pageRange.split(",");
+    ranges.forEach(range => {
+      range = range.trim();
+      if (range.includes("-")) {
+        const [start, end] = range.split("-").map(n => parseInt(n.trim()) - 1);
+        for (let i = start; i <= end && i < totalPages; i++) {
+          if (i >= 0 && !pagesToWatermark.includes(i)) {
+            pagesToWatermark.push(i);
+          }
+        }
+      } else {
+        const pageNum = parseInt(range) - 1;
+        if (pageNum >= 0 && pageNum < totalPages && !pagesToWatermark.includes(pageNum)) {
+          pagesToWatermark.push(pageNum);
+        }
+      }
+    });
+  }
+  
+  // Add watermark to selected pages
+  for (const pageIndex of pagesToWatermark) {
+    const page = pdfDoc.getPages()[pageIndex];
+    const { width, height } = page.getSize();
+    
+    // Calculate font size based on percentage of shorter side (same as images)
+    const shorterSide = Math.min(width, height);
+    const calculatedFontSize = Math.round((shorterSide * fontSize) / 100);
+    
+    const textWidth = font.widthOfTextAtSize(text, calculatedFontSize);
+    const textHeight = calculatedFontSize;
+    const padding = 20;
+    
+    let x, y;
+    
+    // Use custom position if provided, otherwise use anchor position
+    if (customPositionX !== undefined && customPositionY !== undefined && !isNaN(customPositionX) && !isNaN(customPositionY)) {
+      // Convert percentage to points (custom position from drag)
+      x = (width * customPositionX) / 100;
+      y = height - (height * customPositionY) / 100; // PDF coordinates are bottom-up
+    } else {
+      // Use anchor position presets
+      switch (position) {
+        case "top-left":
+          x = padding;
+          y = height - padding - textHeight;
+          break;
+        case "top-center":
+          x = (width - textWidth) / 2;
+          y = height - padding - textHeight;
+          break;
+        case "top-right":
+          x = width - textWidth - padding;
+          y = height - padding - textHeight;
+          break;
+        case "middle-left":
+          x = padding;
+          y = (height - textHeight) / 2;
+          break;
+        case "center":
+          x = (width - textWidth) / 2;
+          y = (height - textHeight) / 2;
+          break;
+        case "middle-right":
+          x = width - textWidth - padding;
+          y = (height - textHeight) / 2;
+          break;
+        case "bottom-left":
+          x = padding;
+          y = padding;
+          break;
+        case "bottom-center":
+          x = (width - textWidth) / 2;
+          y = padding;
+          break;
+        case "bottom-right":
+          x = width - textWidth - padding;
+          y = padding;
+          break;
+        default:
+          x = width - textWidth - padding;
+          y = padding;
+      }
+    }
+    
+    if (tiledMode) {
+      // Add tiled watermark pattern across the page
+      const tileSpacingX = textWidth * 2;
+      const tileSpacingY = textHeight * 4;
+      const rotationAngle = rotation || -45;
+      
+      for (let tileY = -textHeight; tileY < height + textHeight; tileY += tileSpacingY) {
+        for (let tileX = -textWidth; tileX < width + textWidth; tileX += tileSpacingX) {
+          page.drawText(text, {
+            x: tileX,
+            y: tileY,
+            size: calculatedFontSize,
+            font: font,
+            color: textColor,
+            opacity: opacity * 0.3, // Lower opacity for tiled mode
+            rotate: degrees(rotationAngle)
+          });
+        }
+      }
+    } else {
+      // Add single watermark
+      page.drawText(text, {
+        x: x,
+        y: y,
+        size: calculatedFontSize,
+        font: font,
+        color: textColor,
+        opacity: opacity,
+        rotate: degrees(rotation || 0)
+      });
+    }
+  }
+  
+  // Save the modified PDF
+  const pdfBytes = await pdfDoc.save();
+  fs.writeFileSync(outputPath, pdfBytes);
 }
 
 module.exports = router;

@@ -8,17 +8,15 @@ import PreviewContainer from "./components/PreviewContainer";
 
 pdfjsLib.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjsLib.version}/pdf.worker.min.js`;
 
-function WatermarkPage({ fadeIn, files, watermarkType, setWatermarkType, watermarkText, setWatermarkText, watermarkImage, setWatermarkImage, watermarkImageUrl, setWatermarkImageUrl, anchorPosition, setAnchorPosition, watermarkOpacity, setWatermarkOpacity, watermarkColor, setWatermarkColor, fontFamily, setFontFamily, fontSize, setFontSize, rotation, setRotation, strokeEnabled, setStrokeEnabled, strokeColor, setStrokeColor, strokeWidth, setStrokeWidth, pdfPages, setPdfPages, pdfPageRange, setPdfPageRange, tiledMode, setTiledMode, onProcess, error, previewUrls }) {
+function WatermarkPage({ fadeIn, files, watermarkType, setWatermarkType, watermarkText, setWatermarkText, watermarkImage, setWatermarkImage, watermarkImageUrl, setWatermarkImageUrl, anchorPosition, setAnchorPosition, watermarkPosition, setWatermarkPosition, watermarkOpacity, setWatermarkOpacity, watermarkColor, setWatermarkColor, fontFamily, setFontFamily, fontSize, setFontSize, rotation, setRotation, strokeEnabled, setStrokeEnabled, strokeColor, setStrokeColor, strokeWidth, setStrokeWidth, pdfPages, setPdfPages, pdfPageRange, setPdfPageRange, tiledMode, setTiledMode, onProcess, error, previewUrls }) {
   const [previewIndex, setPreviewIndex] = useState(0);
   const [imageDimensions, setImageDimensions] = useState({ width: 0, height: 0 });
-  const [watermarkPosition, setWatermarkPosition] = useState({ x: 50, y: 50 });
   const [isDragging, setIsDragging] = useState(false);
   const [pdfDoc, setPdfDoc] = useState(null);
   const [currentPdfPage, setCurrentPdfPage] = useState(1);
   const [totalPdfPages, setTotalPdfPages] = useState(0);
   const [pdfRendering, setPdfRendering] = useState(false);
-  const [zoomLevel, setZoomLevel] = useState(100);
-  const [viewMode, setViewMode] = useState("fit-width");
+  const [pdfZoom, setPdfZoom] = useState(1.0);
   
   const imageRef = useRef(null);
   const previewContainerRef = useRef(null);
@@ -63,11 +61,9 @@ function WatermarkPage({ fadeIn, files, watermarkType, setWatermarkType, waterma
       const context = canvas.getContext('2d');
       const viewport = page.getViewport({ scale: 1.0 });
       const containerWidth = previewContainerRef.current.offsetWidth - 40;
-      const containerHeight = previewContainerRef.current.offsetHeight - 100;
       
-      let scale = viewMode === "fit-width" ? containerWidth / viewport.width :
-                  viewMode === "fit-height" ? containerHeight / viewport.height : 1.0;
-      scale *= (zoomLevel / 100);
+      const baseScale = containerWidth / viewport.width;
+      const scale = baseScale * pdfZoom;
       
       const scaledViewport = page.getViewport({ scale });
       canvas.width = scaledViewport.width;
@@ -80,7 +76,7 @@ function WatermarkPage({ fadeIn, files, watermarkType, setWatermarkType, waterma
     } finally {
       setPdfRendering(false);
     }
-  }, [pdfDoc, viewMode, zoomLevel]);
+  }, [pdfDoc, pdfZoom]);
 
   useEffect(() => {
     if (currentFile && isPDF) loadPDF(currentFile);
@@ -89,7 +85,7 @@ function WatermarkPage({ fadeIn, files, watermarkType, setWatermarkType, waterma
 
   useEffect(() => {
     if (pdfDoc && currentPdfPage) renderPDFPage(currentPdfPage);
-  }, [pdfDoc, currentPdfPage, renderPDFPage]);
+  }, [pdfDoc, currentPdfPage, pdfZoom, renderPDFPage]);
 
   useEffect(() => {
     return () => { if (watermarkImageUrl) URL.revokeObjectURL(watermarkImageUrl); };
@@ -98,7 +94,7 @@ function WatermarkPage({ fadeIn, files, watermarkType, setWatermarkType, waterma
   useEffect(() => {
     const positions = { "top-left": { x: 10, y: 10 }, "top-center": { x: 50, y: 10 }, "top-right": { x: 90, y: 10 }, "middle-left": { x: 10, y: 50 }, "center": { x: 50, y: 50 }, "middle-right": { x: 90, y: 50 }, "bottom-left": { x: 10, y: 90 }, "bottom-center": { x: 50, y: 90 }, "bottom-right": { x: 90, y: 90 } };
     setWatermarkPosition(positions[anchorPosition] || { x: 90, y: 90 });
-  }, [anchorPosition]);
+  }, [anchorPosition, setWatermarkPosition]);
 
   const handleImageLoad = () => {
     if (imageRef.current) {
@@ -123,7 +119,7 @@ function WatermarkPage({ fadeIn, files, watermarkType, setWatermarkType, waterma
       const y = ((e.clientY - rect.top) / rect.height) * 100;
       setWatermarkPosition({ x: Math.max(0, Math.min(100, x)), y: Math.max(0, Math.min(100, y)) });
     }
-  }, [isDragging]);
+  }, [isDragging, setWatermarkPosition]);
 
   useEffect(() => {
     if (isDragging) {
@@ -241,7 +237,7 @@ function WatermarkPage({ fadeIn, files, watermarkType, setWatermarkType, waterma
             </div>
 
             {/* PDF Controls */}
-            {hasPDF && <PDFControls pdfPages={pdfPages} setPdfPages={setPdfPages} pdfPageRange={pdfPageRange} setPdfPageRange={setPdfPageRange} tiledMode={tiledMode} setTiledMode={setTiledMode} currentPdfPage={currentPdfPage} setCurrentPdfPage={setCurrentPdfPage} totalPdfPages={totalPdfPages} />}
+            {hasPDF && <PDFControls pdfPages={pdfPages} setPdfPages={setPdfPages} pdfPageRange={pdfPageRange} setPdfPageRange={setPdfPageRange} tiledMode={tiledMode} setTiledMode={setTiledMode} currentPdfPage={currentPdfPage} setCurrentPdfPage={setCurrentPdfPage} totalPdfPages={totalPdfPages} pdfZoom={pdfZoom} setPdfZoom={setPdfZoom} isPDF={isPDF} />}
 
             {/* File Queue */}
             {files.length > 1 && (
@@ -266,7 +262,7 @@ function WatermarkPage({ fadeIn, files, watermarkType, setWatermarkType, waterma
         </div>
 
         {/* Preview Panel */}
-        <PreviewContainer previewContainerRef={previewContainerRef} assetFrameRef={assetFrameRef} zoomLevel={zoomLevel} setZoomLevel={setZoomLevel} viewMode={viewMode} setViewMode={setViewMode}>
+        <PreviewContainer previewContainerRef={previewContainerRef} assetFrameRef={assetFrameRef}>
           {isPDF ? (
             <>
               <canvas ref={canvasRef} style={{ display: 'block', maxWidth: '100%', borderRadius: '8px', boxShadow: '0 4px 12px rgba(0,0,0,0.3)' }} />

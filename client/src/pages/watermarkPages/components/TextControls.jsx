@@ -43,9 +43,9 @@ function TextControls({
         />
       </div>
 
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px', marginBottom: '20px' }}>
+      <div style={{ display: 'grid', gridTemplateColumns: '2fr 1fr 1fr', gap: '12px', marginBottom: '20px' }}>
         <div>
-          <label className={styles.formatLabel} style={{ fontSize: '14px', marginBottom: '8px', display: 'block' }}>Font</label>
+          <label className={styles.formatLabel} style={{ fontSize: '14px', marginBottom: '8px', display: 'block' }}>Font Family</label>
           <select
             value={fontFamily}
             onChange={(e) => setFontFamily(e.target.value)}
@@ -56,13 +56,32 @@ function TextControls({
               border: '2px solid rgba(94, 200, 255, 0.3)',
               borderRadius: '8px',
               color: '#ffffff',
-              fontSize: '14px'
+              fontSize: '14px',
+              cursor: 'pointer'
             }}
           >
             {fontFamilies.map(font => (
               <option key={font} value={font} style={{ background: '#1a2942' }}>{font}</option>
             ))}
           </select>
+        </div>
+
+        <div>
+          <label className={styles.formatLabel} style={{ fontSize: '14px', marginBottom: '8px', display: 'block' }}>Size</label>
+          <div style={{ 
+            display: 'flex', 
+            alignItems: 'center', 
+            gap: '8px',
+            padding: '10px 12px',
+            background: 'rgba(255, 255, 255, 0.08)',
+            border: '2px solid rgba(94, 200, 255, 0.3)',
+            borderRadius: '8px',
+            color: '#ffffff',
+            fontSize: '14px',
+            fontWeight: '600'
+          }}>
+            {fontSize}%
+          </div>
         </div>
 
         <div>
@@ -85,7 +104,7 @@ function TextControls({
 
       <div style={{ marginBottom: '20px' }}>
         <label className={styles.formatLabel} style={{ fontSize: '14px', marginBottom: '8px', display: 'block' }}>
-          Size: {fontSize}% of image
+          Font Size
         </label>
         <input
           type="range"

@@ -24,6 +24,7 @@ function Watermark() {
   const [watermarkImage, setWatermarkImage] = useState(null);
   const [watermarkImageUrl, setWatermarkImageUrl] = useState(null);
   const [anchorPosition, setAnchorPosition] = useState("bottom-right");
+  const [watermarkPosition, setWatermarkPosition] = useState({ x: 90, y: 90 });
   const [watermarkOpacity, setWatermarkOpacity] = useState(0.8);
   const [watermarkColor, setWatermarkColor] = useState("#ffffff");
   const [fontFamily, setFontFamily] = useState("Arial");
@@ -133,6 +134,8 @@ function Watermark() {
     }
     
     formData.append("anchorPosition", anchorPosition);
+    formData.append("customPositionX", watermarkPosition.x);
+    formData.append("customPositionY", watermarkPosition.y);
     formData.append("opacity", watermarkOpacity);
     formData.append("rotation", rotation);
     
@@ -212,6 +215,7 @@ function Watermark() {
     setWatermarkImage(null);
     setWatermarkImageUrl(null);
     setAnchorPosition("bottom-right");
+    setWatermarkPosition({ x: 90, y: 90 });
     setWatermarkOpacity(0.8);
     setWatermarkColor("#ffffff");
     setFontFamily("Arial");
@@ -263,6 +267,8 @@ function Watermark() {
               setWatermarkImageUrl={setWatermarkImageUrl}
               anchorPosition={anchorPosition}
               setAnchorPosition={setAnchorPosition}
+              watermarkPosition={watermarkPosition}
+              setWatermarkPosition={setWatermarkPosition}
               watermarkOpacity={watermarkOpacity}
               setWatermarkOpacity={setWatermarkOpacity}
               watermarkColor={watermarkColor}

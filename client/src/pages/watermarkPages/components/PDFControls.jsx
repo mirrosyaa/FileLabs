@@ -19,21 +19,55 @@ function PDFControls({
           <label style={{ fontSize: '13px', color: 'rgba(255, 255, 255, 0.8)', display: 'block', marginBottom: '8px' }}>
             Preview Page: {currentPdfPage} / {totalPdfPages}
           </label>
-          <input
-            type="range"
-            min="1"
-            max={totalPdfPages}
-            value={currentPdfPage}
-            onChange={(e) => setCurrentPdfPage(parseInt(e.target.value))}
-            style={{
-              width: '100%',
-              height: '6px',
-              background: 'rgba(255, 255, 255, 0.2)',
-              borderRadius: '10px',
-              outline: 'none',
-              cursor: 'pointer'
-            }}
-          />
+          <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
+            <button
+              onClick={() => setCurrentPdfPage(Math.max(1, currentPdfPage - 1))}
+              disabled={currentPdfPage === 1}
+              style={{
+                padding: '8px 16px',
+                background: currentPdfPage === 1 ? 'rgba(255, 255, 255, 0.05)' : 'rgba(94, 200, 255, 0.2)',
+                border: '2px solid rgba(94, 200, 255, 0.4)',
+                borderRadius: '6px',
+                color: currentPdfPage === 1 ? 'rgba(255, 255, 255, 0.3)' : '#ffffff',
+                cursor: currentPdfPage === 1 ? 'not-allowed' : 'pointer',
+                fontSize: '16px',
+                fontWeight: 'bold'
+              }}
+            >
+              ←
+            </button>
+            <input
+              type="range"
+              min="1"
+              max={totalPdfPages}
+              value={currentPdfPage}
+              onChange={(e) => setCurrentPdfPage(parseInt(e.target.value))}
+              style={{
+                flex: 1,
+                height: '6px',
+                background: 'rgba(255, 255, 255, 0.2)',
+                borderRadius: '10px',
+                outline: 'none',
+                cursor: 'pointer'
+              }}
+            />
+            <button
+              onClick={() => setCurrentPdfPage(Math.min(totalPdfPages, currentPdfPage + 1))}
+              disabled={currentPdfPage === totalPdfPages}
+              style={{
+                padding: '8px 16px',
+                background: currentPdfPage === totalPdfPages ? 'rgba(255, 255, 255, 0.05)' : 'rgba(94, 200, 255, 0.2)',
+                border: '2px solid rgba(94, 200, 255, 0.4)',
+                borderRadius: '6px',
+                color: currentPdfPage === totalPdfPages ? 'rgba(255, 255, 255, 0.3)' : '#ffffff',
+                cursor: currentPdfPage === totalPdfPages ? 'not-allowed' : 'pointer',
+                fontSize: '16px',
+                fontWeight: 'bold'
+              }}
+            >
+              →
+            </button>
+          </div>
         </div>
       )}
 
