@@ -117,7 +117,8 @@ function WatermarkPage({ fadeIn, files, watermarkType, setWatermarkType, waterma
       const rect = assetFrameRef.current.getBoundingClientRect();
       const x = ((e.clientX - rect.left) / rect.width) * 100;
       const y = ((e.clientY - rect.top) / rect.height) * 100;
-      setWatermarkPosition({ x: Math.max(0, Math.min(100, x)), y: Math.max(0, Math.min(100, y)) });
+      // Constrain to 5-95% to keep watermark visible and within bounds
+      setWatermarkPosition({ x: Math.max(5, Math.min(95, x)), y: Math.max(5, Math.min(95, y)) });
     }
   }, [isDragging, setWatermarkPosition]);
 
@@ -187,11 +188,11 @@ function WatermarkPage({ fadeIn, files, watermarkType, setWatermarkType, waterma
   };
 
   return (
-    <div className={`${styles.pageContainer} ${fadeIn ? styles.fadeIn : styles.fadeOut}`}>
-      <div style={{ display: 'flex', gap: '30px', alignItems: 'flex-start', width: '100%', maxWidth: '1600px', margin: '0 auto' }}>
+    <div className={`${styles.pageContainer} ${fadeIn ? styles.fadeIn : styles.fadeOut}`} style={{ height: 'calc(100vh - 200px)', overflow: 'hidden', boxSizing: 'border-box', paddingBottom: '20px' }}>
+      <div style={{ display: 'flex', gap: '30px', alignItems: 'stretch', width: '100%', maxWidth: '1600px', margin: '0 auto', height: '100%', boxSizing: 'border-box', overflow: 'hidden' }}>
         
         {/* Settings Panel */}
-        <div style={{ flex: '0 0 420px', maxHeight: 'calc(100vh - 150px)', overflowY: 'auto' }}>
+        <div style={{ flex: '0 0 420px', height: '100%', overflowY: 'auto', overflowX: 'hidden', boxSizing: 'border-box' }}>
           <div className={styles.conversionBox}>
             <h2 className={styles.conversionTitle}>Watermark Settings</h2>
 
@@ -265,7 +266,7 @@ function WatermarkPage({ fadeIn, files, watermarkType, setWatermarkType, waterma
         <PreviewContainer previewContainerRef={previewContainerRef} assetFrameRef={assetFrameRef}>
           {isPDF ? (
             <>
-              <canvas ref={canvasRef} style={{ display: 'block', maxWidth: '100%', borderRadius: '8px', boxShadow: '0 4px 12px rgba(0,0,0,0.3)' }} />
+              <canvas ref={canvasRef} style={{ display: 'block', maxWidth: '100%', maxHeight: 'calc(100vh - 280px)', borderRadius: '8px', border: '2px solid rgba(94, 200, 255, 0.4)', boxShadow: '0 4px 12px rgba(0,0,0,0.3)' }} />
               {!pdfRendering && (watermarkType === "text" ? watermarkText : watermarkImageUrl) && (
                 <div style={watermarkType === "text" ? getWatermarkStyle() : getWatermarkImageStyle()} onMouseDown={handleMouseDown}>
                   {watermarkType === "text" ? watermarkText : <img src={watermarkImageUrl} alt="Watermark" style={{ display: 'block', maxWidth: '200px' }} />}
@@ -274,7 +275,7 @@ function WatermarkPage({ fadeIn, files, watermarkType, setWatermarkType, waterma
             </>
           ) : isVideo ? (
             <>
-              <video ref={imageRef} src={previewUrls[previewIndex]} style={{ maxWidth: '100%', maxHeight: '600px', display: 'block', borderRadius: '8px' }} controls onLoadedMetadata={handleImageLoad} />
+              <video ref={imageRef} src={previewUrls[previewIndex]} style={{ display: 'block', maxWidth: '100%', maxHeight: 'calc(100vh - 280px)', width: 'auto', height: 'auto', objectFit: 'contain', borderRadius: '8px', border: '2px solid rgba(94, 200, 255, 0.4)', boxShadow: '0 4px 12px rgba(0,0,0,0.3)' }} controls onLoadedMetadata={handleImageLoad} />
               {(watermarkType === "text" ? watermarkText : watermarkImageUrl) && (
                 <div style={watermarkType === "text" ? getWatermarkStyle() : getWatermarkImageStyle()} onMouseDown={handleMouseDown}>
                   {watermarkType === "text" ? watermarkText : <img src={watermarkImageUrl} alt="Watermark" style={{ display: 'block', maxWidth: '200px' }} />}
@@ -283,7 +284,7 @@ function WatermarkPage({ fadeIn, files, watermarkType, setWatermarkType, waterma
             </>
           ) : previewUrls[previewIndex] ? (
             <>
-              <img ref={imageRef} src={previewUrls[previewIndex]} alt="Preview" style={{ maxWidth: '100%', maxHeight: '600px', display: 'block', borderRadius: '8px' }} onLoad={handleImageLoad} />
+              <img ref={imageRef} src={previewUrls[previewIndex]} alt="Preview" style={{ display: 'block', maxWidth: '100%', maxHeight: 'calc(100vh - 280px)', width: 'auto', height: 'auto', objectFit: 'contain', borderRadius: '8px', border: '2px solid rgba(94, 200, 255, 0.4)', boxShadow: '0 4px 12px rgba(0,0,0,0.3)' }} onLoad={handleImageLoad} />
               {(watermarkType === "text" ? watermarkText : watermarkImageUrl) && (
                 <div style={watermarkType === "text" ? getWatermarkStyle() : getWatermarkImageStyle()} onMouseDown={handleMouseDown}>
                   {watermarkType === "text" ? watermarkText : <img src={watermarkImageUrl} alt="Watermark" style={{ display: 'block', maxWidth: '200px' }} />}

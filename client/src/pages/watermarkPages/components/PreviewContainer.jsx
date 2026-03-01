@@ -6,18 +6,26 @@ function PreviewContainer({
   children
 }) {
   return (
-    <div style={{ flex: 1, minWidth: '500px' }}>
+    <div style={{ flex: 1, minWidth: '500px', height: '100%', display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
       <div style={{
         background: 'rgba(255, 255, 255, 0.05)',
         borderRadius: '16px',
-        padding: '20px',
-        border: '2px solid rgba(94, 200, 255, 0.3)'
+        padding: '16px',
+        border: '2px solid rgba(94, 200, 255, 0.3)',
+        height: '100%',
+        display: 'flex',
+        flexDirection: 'column',
+        overflow: 'hidden',
+        boxSizing: 'border-box'
       }}>
         <h3 style={{
           color: '#5ec8ff',
           fontSize: '18px',
           fontWeight: '600',
-          marginBottom: '16px'
+          marginBottom: '12px',
+          flexShrink: 0,
+          margin: 0,
+          paddingBottom: '12px'
         }}>
           Preview
         </h3>
@@ -26,19 +34,18 @@ function PreviewContainer({
           ref={previewContainerRef}
           style={{
             display: 'flex',
-            justifyContent: 'flex-start',
-            alignItems: 'flex-start',
-            minHeight: '500px',
-            maxHeight: '70vh',
-            overflowY: 'auto',
-            overflowX: 'auto',
-            background: 'url("data:image/svg+xml,%3Csvg width=\'20\' height=\'20\' xmlns=\'http://www.w3.org/2000/svg\'%3E%3Crect width=\'10\' height=\'10\' fill=\'%23333\'/%3E%3Crect x=\'10\' y=\'10\' width=\'10\' height=\'10\' fill=\'%23333\'/%3E%3Crect x=\'10\' width=\'10\' height=\'10\' fill=\'%23444\'/%3E%3Crect y=\'10\' width=\'10\' height=\'10\' fill=\'%23444\'/%3E%3C/svg%3E")',
+            justifyContent: 'center',
+            alignItems: 'center',
+            flex: 1,
+            overflow: 'hidden',
+            background: 'transparent',
             borderRadius: '12px',
-            padding: '20px',
-            position: 'relative'
+            padding: '0',
+            position: 'relative',
+            minHeight: 0
           }}
         >
-          <div ref={assetFrameRef} style={{ position: 'relative', display: 'inline-block' }}>
+          <div ref={assetFrameRef} style={{ position: 'relative', display: 'flex', maxWidth: '100%', maxHeight: 'calc(100% - 40px)' }}>
             {children}
           </div>
         </div>

@@ -12,7 +12,7 @@ function Watermark() {
   const [currentPage, setCurrentPage] = useState("upload");
   const [files, setFiles] = useState([]);
   const [uploadProgress, setUploadProgress] = useState(0);
-  const [processingProgress, setProcessingProgress] = useState(0); // eslint-disable-line no-unused-vars
+  const [processingProgress, setProcessingProgress] = useState(0);
   const [fadeIn, setFadeIn] = useState(true);
   const [isDownloading, setIsDownloading] = useState(false);
   const [hasDownloaded, setHasDownloaded] = useState(false);
@@ -113,6 +113,20 @@ function Watermark() {
     }
 
     changePage("processing");
+    
+    // Start progress at 5% immediately
+    setProcessingProgress(5);
+
+    // Simulate processing progress since server doesn't send updates
+    const progressInterval = setInterval(() => {
+      setProcessingProgress((prev) => {
+        if (prev >= 90) {
+          // Stop at 90% and wait for actual response
+          return prev;
+        }
+        return prev + 5;
+      });
+    }, 300);
 
     const formData = new FormData();
     files.forEach((file) => {
@@ -152,20 +166,21 @@ function Watermark() {
         formData,
         {
           headers: { "Content-Type": "multipart/form-data" },
-          onUploadProgress: (progressEvent) => {
-            const progress = Math.round(
-              (progressEvent.loaded * 100) / progressEvent.total
-            );
-            setProcessingProgress(progress);
-          },
           responseType: "blob",
         }
       );
 
+      clearInterval(progressInterval);
+      setProcessingProgress(100);
+
       const url = window.URL.createObjectURL(new Blob([response.data]));
       setProcessedFileUrl(url);
-      changePage("download");
+      
+      setTimeout(() => {
+        changePage("download");
+      }, 500);
     } catch (err) {
+      clearInterval(progressInterval);
       console.error("Error adding watermark:", err);
       setError(err.response?.data?.message || "Failed to add watermark");
       changePage("watermark");
@@ -175,37 +190,33 @@ function Watermark() {
   const handleDownload = () => {
     if (hasDownloaded) return; // Prevent double downloads
     
-    setFadeIn(false);
-    setTimeout(() => {
-      setFadeIn(true);
-      setIsDownloading(true);
-      setDownloadProgress(0);
-      
-      // Simulate download progress
-      const progressInterval = setInterval(() => {
-        setDownloadProgress((prev) => {
-          if (prev >= 100) {
-            clearInterval(progressInterval);
-            
-            // Start actual download
-            const link = document.createElement("a");
-            link.href = processedFileUrl;
-            link.download = `watermarked_${files[0].name}`;
-            link.style.display = 'none';
-            document.body.appendChild(link);
-            link.click();
-            setTimeout(() => {
-              document.body.removeChild(link);
-            }, 100);
-            
-            setIsDownloading(false);
-            setHasDownloaded(true);
-            return 100;
-          }
-          return prev + 10;
-        });
-      }, 100);
-    }, 300);
+    setIsDownloading(true);
+    setDownloadProgress(0);
+    
+    // Simulate download progress
+    const progressInterval = setInterval(() => {
+      setDownloadProgress((prev) => {
+        if (prev >= 100) {
+          clearInterval(progressInterval);
+          
+          // Start actual download
+          const link = document.createElement("a");
+          link.href = processedFileUrl;
+          link.download = `watermarked_${files[0].name}`;
+          link.style.display = 'none';
+          document.body.appendChild(link);
+          link.click();
+          setTimeout(() => {
+            document.body.removeChild(link);
+          }, 100);
+          
+          setIsDownloading(false);
+          setHasDownloaded(true);
+          return 100;
+        }
+        return prev + 10;
+      });
+    }, 100);
   };
 
   const handleReset = () => {
@@ -297,7 +308,7 @@ function Watermark() {
             />
           )}
           {currentPage === "processing" && (
-            <ProcessingPage fadeIn={fadeIn} />
+            <ProcessingPage fadeIn={fadeIn} processingProgress={processingProgress} />
           )}
           {currentPage === "download" && (
             <DownloadPage

@@ -96,7 +96,7 @@ router.post("/watermark/add", upload.array("files"), async (req, res) => {
         customPositionY: parseFloat(customPositionY),
         opacity: parseFloat(opacity) || 0.8,
         fontFamily: fontFamily || "Arial",
-        fontSize: parseInt(fontSize) || 4,
+        fontSize: parseFloat(fontSize) || 4,
         color: color || "#ffffff",
         strokeEnabled: strokeEnabled === "true",
         strokeColor: strokeColor || "#000000",
@@ -108,9 +108,16 @@ router.post("/watermark/add", upload.array("files"), async (req, res) => {
       await addWatermarkToVideo(file.path, outputPath, {
         text: watermarkText,
         position: anchorPosition || "bottom-right",
+        customPositionX: parseFloat(customPositionX),
+        customPositionY: parseFloat(customPositionY),
         opacity: parseFloat(opacity) || 0.8,
         fontFamily: fontFamily || "Arial",
-        fontSize: parseInt(fontSize) || 24
+        fontSize: parseFloat(fontSize) || 4,
+        color: color || "#ffffff",
+        strokeEnabled: strokeEnabled === "true",
+        strokeColor: strokeColor || "#000000",
+        strokeWidth: parseInt(strokeWidth) || 2,
+        rotation: parseFloat(rotation) || 0
       });
     } else if (pdfExtensions.includes(fileExt)) {
       // Process PDF with pdf-lib
@@ -120,7 +127,7 @@ router.post("/watermark/add", upload.array("files"), async (req, res) => {
         customPositionX: parseFloat(customPositionX),
         customPositionY: parseFloat(customPositionY),
         opacity: parseFloat(opacity) || 0.8,
-        fontSize: parseInt(fontSize) || 24,
+        fontSize: parseFloat(fontSize) || 4,
         color: color || "#ffffff",
         rotation: parseFloat(rotation) || 0,
         pages: pdfPages || "all",
@@ -135,20 +142,23 @@ router.post("/watermark/add", upload.array("files"), async (req, res) => {
 
     console.log("Watermark processing complete, sending file...");
 
-    // Send the watermarked file
-    res.download(outputPath, `watermarked-${file.originalname}`, (err) => {
-      // Cleanup
-      if (fs.existsSync(file.path)) {
-        fs.unlinkSync(file.path);
-      }
-      if (fs.existsSync(outputPath)) {
-        fs.unlinkSync(outputPath);
-      }
-      if (err) {
-        console.error("Error sending file:", err);
-      } else {
-        console.log("File sent successfully");
-      }
+    // Send the watermarked file as blob (without attachment to prevent auto-download)
+    res.setHeader('Content-Type', 'application/octet-stream');
+    
+    const fileStream = fs.createReadStream(outputPath);
+    fileStream.pipe(res);
+    
+    fileStream.on('end', () => {
+      // Cleanup after sending
+      setTimeout(() => {
+        if (fs.existsSync(file.path)) {
+          fs.unlinkSync(file.path);
+        }
+        if (fs.existsSync(outputPath)) {
+          fs.unlinkSync(outputPath);
+        }
+        console.log("File sent successfully and cleanup completed");
+      }, 1000);
     });
   } catch (error) {
     console.error("Error adding watermark:", error);
@@ -179,50 +189,55 @@ async function addWatermarkToImage(inputPath, outputPath, options) {
   // Use custom position if provided, otherwise use anchor position
   if (customPositionX !== undefined && customPositionY !== undefined && !isNaN(customPositionX) && !isNaN(customPositionY)) {
     // Convert percentage to pixels (custom position from drag)
+    // The preview uses transform: translate(-50%, -50%), so the position IS the center point
     x = (metadata.width * customPositionX) / 100;
     y = (metadata.height * customPositionY) / 100;
+    
+    // Ensure watermark stays within bounds (with text already centered via text-anchor)
+    x = Math.max(textWidth/2 + padding, Math.min(metadata.width - textWidth/2 - padding, x));
+    y = Math.max(textHeight/2 + padding, Math.min(metadata.height - textHeight/2 - padding, y));
   } else {
-    // Use anchor position presets
+    // Use anchor position presets - all positions are now center points
     switch (position) {
       case "top-left":
-        x = padding;
-        y = padding + textHeight;
+        x = padding + textWidth/2;
+        y = padding + textHeight/2;
         break;
       case "top-center":
-        x = (metadata.width - textWidth) / 2;
-        y = padding + textHeight;
+        x = metadata.width / 2;
+        y = padding + textHeight/2;
         break;
       case "top-right":
-        x = metadata.width - textWidth - padding;
-        y = padding + textHeight;
+        x = metadata.width - textWidth/2 - padding;
+        y = padding + textHeight/2;
         break;
       case "middle-left":
-        x = padding;
+        x = padding + textWidth/2;
         y = metadata.height / 2;
         break;
       case "center":
-        x = (metadata.width - textWidth) / 2;
+        x = metadata.width / 2;
         y = metadata.height / 2;
         break;
       case "middle-right":
-        x = metadata.width - textWidth - padding;
+        x = metadata.width - textWidth/2 - padding;
         y = metadata.height / 2;
         break;
       case "bottom-left":
-        x = padding;
-        y = metadata.height - padding;
+        x = padding + textWidth/2;
+        y = metadata.height - textHeight/2 - padding;
         break;
       case "bottom-center":
-        x = (metadata.width - textWidth) / 2;
-        y = metadata.height - padding;
+        x = metadata.width / 2;
+        y = metadata.height - textHeight/2 - padding;
         break;
       case "bottom-right":
-        x = metadata.width - textWidth - padding;
-        y = metadata.height - padding;
+        x = metadata.width - textWidth/2 - padding;
+        y = metadata.height - textHeight/2 - padding;
         break;
       default:
-        x = metadata.width - textWidth - padding;
-        y = metadata.height - padding;
+        x = metadata.width - textWidth/2 - padding;
+        y = metadata.height - textHeight/2 - padding;
     }
   }
   
@@ -236,6 +251,8 @@ async function addWatermarkToImage(inputPath, outputPath, options) {
   svgContent += `<text 
     x="${x}" 
     y="${y}" 
+    text-anchor="middle"
+    dominant-baseline="middle"
     font-size="${calculatedFontSize}" 
     fill="${color}" 
     fill-opacity="${watermarkOpacity}"
@@ -265,71 +282,127 @@ async function addWatermarkToImage(inputPath, outputPath, options) {
 
 // Helper function to add watermark to videos
 async function addWatermarkToVideo(inputPath, outputPath, options) {
-  const { text, position, opacity, fontFamily, fontSize } = options;
+  const { text, position, customPositionX, customPositionY, opacity, fontFamily, fontSize, color, strokeEnabled, strokeColor, strokeWidth, rotation } = options;
   
   return new Promise((resolve, reject) => {
-    // Map position to ffmpeg drawtext position
-    let xPosition, yPosition;
-    
-    switch (position) {
-      case "top-left":
-        xPosition = "10";
-        yPosition = "10";
-        break;
-      case "top-center":
-        xPosition = "(w-text_w)/2";
-        yPosition = "10";
-        break;
-      case "top-right":
-        xPosition = "w-text_w-10";
-        yPosition = "10";
-        break;
-      case "middle-left":
-        xPosition = "10";
-        yPosition = "(h-text_h)/2";
-        break;
-      case "center":
-        xPosition = "(w-text_w)/2";
-        yPosition = "(h-text_h)/2";
-        break;
-      case "middle-right":
-        xPosition = "w-text_w-10";
-        yPosition = "(h-text_h)/2";
-        break;
-      case "bottom-left":
-        xPosition = "10";
-        yPosition = "h-text_h-10";
-        break;
-      case "bottom-center":
-        xPosition = "(w-text_w)/2";
-        yPosition = "h-text_h-10";
-        break;
-      case "bottom-right":
-        xPosition = "w-text_w-10";
-        yPosition = "h-text_h-10";
-        break;
-      default:
-        xPosition = "w-text_w-10";
-        yPosition = "h-text_h-10";
-    }
-    
-    const watermarkOpacity = parseFloat(opacity);
-    const escapedText = text.replace(/'/g, "\\'").replace(/:/g, "\\:");
-    
-    ffmpeg(inputPath)
-      .outputOptions([
-        `-vf`,
-        `drawtext=text='${escapedText}':fontcolor=white@${watermarkOpacity}:fontsize=${fontSize}:fontfile=/System/Library/Fonts/Supplemental/Arial.ttf:box=1:boxcolor=black@${watermarkOpacity * 0.5}:boxborderw=5:x=${xPosition}:y=${yPosition}`
-      ])
-      .on("end", () => {
-        console.log("Video watermark processing complete");
-        resolve();
-      })
-      .on("error", (err) => {
-        console.error("Video watermark error:", err);
+    // First, get video dimensions to calculate font size
+    ffmpeg.ffprobe(inputPath, (err, metadata) => {
+      if (err) {
         reject(err);
-      })
-      .save(outputPath);
+        return;
+      }
+
+      const videoStream = metadata.streams.find(s => s.codec_type === 'video');
+      if (!videoStream) {
+        reject(new Error('No video stream found'));
+        return;
+      }
+
+      const videoWidth = videoStream.width;
+      const videoHeight = videoStream.height;
+      const shorterSide = Math.min(videoWidth, videoHeight);
+      
+      // Calculate font size as percentage of shorter side (same as images)
+      const calculatedFontSize = Math.round((shorterSide * fontSize) / 100);
+
+      let xPosition, yPosition;
+      
+      // Use custom position if provided, otherwise use anchor position
+      if (customPositionX !== undefined && customPositionY !== undefined && !isNaN(customPositionX) && !isNaN(customPositionY)) {
+        // Convert percentage to pixels and center the text
+        // Note: FFmpeg drawtext doesn't have a built-in way to center at exact position,
+        // so we approximate by subtracting half the estimated text width/height
+        const estimatedTextWidth = text.length * (calculatedFontSize * 0.6);
+        const estimatedTextHeight = calculatedFontSize;
+        
+        const centerX = (videoWidth * customPositionX) / 100;
+        const centerY = (videoHeight * customPositionY) / 100;
+        
+        xPosition = Math.max(10, Math.min(videoWidth - estimatedTextWidth - 10, centerX - estimatedTextWidth / 2));
+        yPosition = Math.max(10, Math.min(videoHeight - estimatedTextHeight - 10, centerY - estimatedTextHeight / 2));
+      } else {
+        // Map position to ffmpeg drawtext position
+        switch (position) {
+          case "top-left":
+            xPosition = "10";
+            yPosition = "10";
+            break;
+          case "top-center":
+            xPosition = "(w-text_w)/2";
+            yPosition = "10";
+            break;
+          case "top-right":
+            xPosition = "w-text_w-10";
+            yPosition = "10";
+            break;
+          case "middle-left":
+            xPosition = "10";
+            yPosition = "(h-text_h)/2";
+            break;
+          case "center":
+            xPosition = "(w-text_w)/2";
+            yPosition = "(h-text_h)/2";
+            break;
+          case "middle-right":
+            xPosition = "w-text_w-10";
+            yPosition = "(h-text_h)/2";
+            break;
+          case "bottom-left":
+            xPosition = "10";
+            yPosition = "h-text_h-10";
+            break;
+          case "bottom-center":
+            xPosition = "(w-text_w)/2";
+            yPosition = "h-text_h-10";
+            break;
+          case "bottom-right":
+            xPosition = "w-text_w-10";
+            yPosition = "h-text_h-10";
+            break;
+          default:
+            xPosition = "w-text_w-10";
+            yPosition = "h-text_h-10";
+        }
+      }
+      
+      const watermarkOpacity = parseFloat(opacity);
+      const escapedText = text.replace(/'/g, "\\'").replace(/:/g, "\\:");
+      
+      // Convert hex color to RGB for ffmpeg
+      const hexColor = color || "#ffffff";
+      const r = parseInt(hexColor.substring(1, 3), 16);
+      const g = parseInt(hexColor.substring(3, 5), 16);
+      const b = parseInt(hexColor.substring(5, 7), 16);
+      const fontColor = `0x${hexColor.substring(1)}`;
+      
+      // Build drawtext filter
+      let drawTextFilter = `drawtext=text='${escapedText}':fontcolor=${fontColor}@${watermarkOpacity}:fontsize=${calculatedFontSize}:fontfile=/System/Library/Fonts/Supplemental/Arial.ttf`;
+      
+      // Add stroke (border) if enabled
+      if (strokeEnabled) {
+        const hexStroke = strokeColor || "#000000";
+        const strokeColorHex = `0x${hexStroke.substring(1)}`;
+        drawTextFilter += `:borderw=${strokeWidth}:bordercolor=${strokeColorHex}@${watermarkOpacity * 0.8}`;
+      }
+      
+      // Add position
+      drawTextFilter += `:x=${xPosition}:y=${yPosition}`;
+      
+      ffmpeg(inputPath)
+        .outputOptions([
+          `-vf`,
+          drawTextFilter
+        ])
+        .on("end", () => {
+          console.log("Video watermark processing complete");
+          resolve();
+        })
+        .on("error", (err) => {
+          console.error("Video watermark error:", err);
+          reject(err);
+        })
+        .save(outputPath);
+    });
   });
 }
 
@@ -396,8 +469,13 @@ async function addWatermarkToPDF(inputPath, outputPath, options) {
     // Use custom position if provided, otherwise use anchor position
     if (customPositionX !== undefined && customPositionY !== undefined && !isNaN(customPositionX) && !isNaN(customPositionY)) {
       // Convert percentage to points (custom position from drag)
-      x = (width * customPositionX) / 100;
-      y = height - (height * customPositionY) / 100; // PDF coordinates are bottom-up
+      // The preview uses transform: translate(-50%, -50%), so we need to center the text here too
+      x = (width * customPositionX) / 100 - (textWidth / 2);
+      y = height - (height * customPositionY) / 100 - (textHeight / 2); // PDF coordinates are bottom-up
+      
+      // Ensure watermark stays within bounds
+      x = Math.max(padding, Math.min(width - textWidth - padding, x));
+      y = Math.max(padding, Math.min(height - padding - textHeight, y));
     } else {
       // Use anchor position presets
       switch (position) {
