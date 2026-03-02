@@ -20,6 +20,7 @@ import ImageCrop from "./pages/imageCrop";
 import LoadingScreen from "./pages/loadingScreen";
 import PdfMergeSplit from "./pages/pdfMergeSplit";
 import Watermark from "./pages/watermark";
+import VideoResolution from "./pages/videoResolution";
 import Navbar from "./components/Layout/navbar";
 import SessionExpiredModal from "./modals/sessionExpiredModal";
 import { useAuth } from "./Authentication/authProvider";
@@ -151,6 +152,14 @@ function AppContent() {
             element={
               <RouteProtector>
                 <Watermark />
+              </RouteProtector>
+            }
+          />
+          <Route
+            path="/tools/video/resolution"
+            element={
+              <RouteProtector>
+                <VideoResolution />
               </RouteProtector>
             }
           />
