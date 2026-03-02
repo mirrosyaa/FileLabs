@@ -3,7 +3,8 @@ import React from "react";
 function PreviewContainer({ 
   previewContainerRef,
   assetFrameRef,
-  children
+  children,
+  currentFileName
 }) {
   return (
     <div style={{ flex: 1, minWidth: '500px', height: '100%', display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
@@ -42,12 +43,19 @@ function PreviewContainer({
             borderRadius: '12px',
             padding: '0',
             position: 'relative',
-            minHeight: 0
+            minHeight: 0,
+            flexDirection: 'column',
+            gap: '12px'
           }}
         >
-          <div ref={assetFrameRef} style={{ position: 'relative', display: 'flex', maxWidth: '100%', maxHeight: 'calc(100% - 40px)' }}>
+          <div ref={assetFrameRef} style={{ position: 'relative', display: 'flex', maxWidth: '100%', maxHeight: 'calc(100% - 40px)', justifyContent: 'center', alignItems: 'center' }}>
             {children}
           </div>
+          {currentFileName && (
+            <p style={{ color: 'rgba(255, 255, 255, 0.6)', fontSize: '14px', textAlign: 'center', margin: 0, flexShrink: 0 }}>
+              {currentFileName}
+            </p>
+          )}
         </div>
       </div>
     </div>

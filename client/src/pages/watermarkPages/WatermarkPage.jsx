@@ -11,6 +11,7 @@ pdfjsLib.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.j
 function WatermarkPage({ fadeIn, files, watermarkType, setWatermarkType, watermarkText, setWatermarkText, watermarkImage, setWatermarkImage, watermarkImageUrl, setWatermarkImageUrl, anchorPosition, setAnchorPosition, watermarkPosition, setWatermarkPosition, watermarkOpacity, setWatermarkOpacity, watermarkColor, setWatermarkColor, fontFamily, setFontFamily, fontSize, setFontSize, rotation, setRotation, strokeEnabled, setStrokeEnabled, strokeColor, setStrokeColor, strokeWidth, setStrokeWidth, pdfPages, setPdfPages, pdfPageRange, setPdfPageRange, tiledMode, setTiledMode, onProcess, error, previewUrls }) {
   const [previewIndex, setPreviewIndex] = useState(0);
   const [imageDimensions, setImageDimensions] = useState({ width: 0, height: 0 });
+  const [actualDimensions, setActualDimensions] = useState({ width: 0, height: 0 }); // Natural/actual dimensions
   const [isDragging, setIsDragging] = useState(false);
   const [pdfDoc, setPdfDoc] = useState(null);
   const [currentPdfPage, setCurrentPdfPage] = useState(1);
@@ -62,6 +63,9 @@ function WatermarkPage({ fadeIn, files, watermarkType, setWatermarkType, waterma
       const viewport = page.getViewport({ scale: 1.0 });
       const containerWidth = previewContainerRef.current.offsetWidth - 40;
       
+      // Store actual PDF dimensions at scale 1.0
+      setActualDimensions({ width: viewport.width, height: viewport.height });
+      
       const baseScale = containerWidth / viewport.width;
       const scale = baseScale * pdfZoom;
       
@@ -98,10 +102,13 @@ function WatermarkPage({ fadeIn, files, watermarkType, setWatermarkType, waterma
 
   const handleImageLoad = () => {
     if (imageRef.current) {
-      setImageDimensions({
-        width: imageRef.current.naturalWidth || imageRef.current.videoWidth,
-        height: imageRef.current.naturalHeight || imageRef.current.videoHeight
-      });
+      const actualWidth = imageRef.current.naturalWidth || imageRef.current.videoWidth;
+      const actualHeight = imageRef.current.naturalHeight || imageRef.current.videoHeight;
+      const displayedWidth = imageRef.current.width || imageRef.current.offsetWidth;
+      const displayedHeight = imageRef.current.height || imageRef.current.offsetHeight;
+      
+      setActualDimensions({ width: actualWidth, height: actualHeight });
+      setImageDimensions({ width: displayedWidth, height: displayedHeight });
     }
   };
 
@@ -114,13 +121,33 @@ function WatermarkPage({ fadeIn, files, watermarkType, setWatermarkType, waterma
 
   const handleMouseMove = useCallback((e) => {
     if (isDragging && previewContainerRef.current && assetFrameRef.current) {
-      const rect = assetFrameRef.current.getBoundingClientRect();
-      const x = ((e.clientX - rect.left) / rect.width) * 100;
-      const y = ((e.clientY - rect.top) / rect.height) * 100;
-      // Constrain to 5-95% to keep watermark visible and within bounds
-      setWatermarkPosition({ x: Math.max(5, Math.min(95, x)), y: Math.max(5, Math.min(95, y)) });
+      const assetRect = assetFrameRef.current.getBoundingClientRect();
+      
+      // Get the actual image/video/canvas element bounds
+      let mediaElement = null;
+      if (isPDF && canvasRef.current) {
+        mediaElement = canvasRef.current;
+      } else if (isVideo && imageRef.current) {
+        mediaElement = imageRef.current;
+      } else if (imageRef.current) {
+        mediaElement = imageRef.current;
+      }
+      
+      if (mediaElement) {
+        const mediaRect = mediaElement.getBoundingClientRect();
+        
+        // Calculate position relative to the actual media element, not the container
+        const x = ((e.clientX - mediaRect.left) / mediaRect.width) * 100;
+        const y = ((e.clientY - mediaRect.top) / mediaRect.height) * 100;
+        
+        // Constrain to 5-95% to keep watermark visible and within the actual image bounds
+        setWatermarkPosition({ 
+          x: Math.max(5, Math.min(95, x)), 
+          y: Math.max(5, Math.min(95, y)) 
+        });
+      }
     }
-  }, [isDragging, setWatermarkPosition]);
+  }, [isDragging, setWatermarkPosition, isPDF, isVideo]);
 
   useEffect(() => {
     if (isDragging) {
@@ -135,12 +162,23 @@ function WatermarkPage({ fadeIn, files, watermarkType, setWatermarkType, waterma
 
   const getWatermarkStyle = () => {
     if (!imageDimensions.width || !imageDimensions.height) return {};
-    const actualFontSize = (fontSize / 100) * Math.min(imageDimensions.width, imageDimensions.height);
+    if (!actualDimensions.width || !actualDimensions.height) return {};
+    
+    // Calculate font size based on ACTUAL dimensions (same as server)
+    const actualShorterSide = Math.min(actualDimensions.width, actualDimensions.height);
+    const actualFontSize = (fontSize / 100) * actualShorterSide;
+    
+    // Scale font size for display based on the ratio between displayed and actual dimensions
+    const displayScale = Math.min(
+      imageDimensions.width / actualDimensions.width,
+      imageDimensions.height / actualDimensions.height
+    );
+    const displayedFontSize = actualFontSize * displayScale;
     
     const baseStyle = {
       position: 'absolute',
       color: watermarkColor,
-      fontSize: `${actualFontSize}px`,
+      fontSize: `${displayedFontSize}px`,
       fontFamily: fontFamily,
       fontWeight: 'bold',
       opacity: watermarkOpacity,
@@ -165,11 +203,19 @@ function WatermarkPage({ fadeIn, files, watermarkType, setWatermarkType, waterma
 
   const getWatermarkImageStyle = () => {
     if (!imageDimensions.width || !imageDimensions.height) return {};
+    if (!actualDimensions.width || !actualDimensions.height) return {};
+    
+    // Calculate scale ratio for display
+    const displayScale = Math.min(
+      imageDimensions.width / actualDimensions.width,
+      imageDimensions.height / actualDimensions.height
+    );
+    
     const baseStyle = {
       position: 'absolute',
       opacity: watermarkOpacity,
       pointerEvents: 'auto',
-      transform: `translate(-50%, -50%) rotate(${rotation}deg)`,
+      transform: `translate(-50%, -50%) rotate(${rotation}deg) scale(${displayScale})`,
       transformOrigin: 'center',
       zIndex: 10,
       maxWidth: '30%',
@@ -263,10 +309,10 @@ function WatermarkPage({ fadeIn, files, watermarkType, setWatermarkType, waterma
         </div>
 
         {/* Preview Panel */}
-        <PreviewContainer previewContainerRef={previewContainerRef} assetFrameRef={assetFrameRef}>
+        <PreviewContainer previewContainerRef={previewContainerRef} assetFrameRef={assetFrameRef} currentFileName={currentFile?.name}>
           {isPDF ? (
             <>
-              <canvas ref={canvasRef} style={{ display: 'block', maxWidth: '100%', maxHeight: 'calc(100vh - 280px)', borderRadius: '8px', border: '2px solid rgba(94, 200, 255, 0.4)', boxShadow: '0 4px 12px rgba(0,0,0,0.3)' }} />
+              <canvas ref={canvasRef} style={{ display: 'block', maxWidth: '100%', maxHeight: '100%', borderRadius: '8px', border: '2px solid rgba(94, 200, 255, 0.4)', boxShadow: '0 4px 12px rgba(0,0,0,0.3)', margin: 'auto' }} />
               {!pdfRendering && (watermarkType === "text" ? watermarkText : watermarkImageUrl) && (
                 <div style={watermarkType === "text" ? getWatermarkStyle() : getWatermarkImageStyle()} onMouseDown={handleMouseDown}>
                   {watermarkType === "text" ? watermarkText : <img src={watermarkImageUrl} alt="Watermark" style={{ display: 'block', maxWidth: '200px' }} />}
@@ -275,7 +321,7 @@ function WatermarkPage({ fadeIn, files, watermarkType, setWatermarkType, waterma
             </>
           ) : isVideo ? (
             <>
-              <video ref={imageRef} src={previewUrls[previewIndex]} style={{ display: 'block', maxWidth: '100%', maxHeight: 'calc(100vh - 280px)', width: 'auto', height: 'auto', objectFit: 'contain', borderRadius: '8px', border: '2px solid rgba(94, 200, 255, 0.4)', boxShadow: '0 4px 12px rgba(0,0,0,0.3)' }} controls onLoadedMetadata={handleImageLoad} />
+              <video ref={imageRef} src={previewUrls[previewIndex]} style={{ display: 'block', maxWidth: '100%', maxHeight: '100%', width: 'auto', height: 'auto', objectFit: 'contain', borderRadius: '8px', border: '2px solid rgba(94, 200, 255, 0.4)', boxShadow: '0 4px 12px rgba(0,0,0,0.3)', margin: 'auto' }} controls onLoadedMetadata={handleImageLoad} />
               {(watermarkType === "text" ? watermarkText : watermarkImageUrl) && (
                 <div style={watermarkType === "text" ? getWatermarkStyle() : getWatermarkImageStyle()} onMouseDown={handleMouseDown}>
                   {watermarkType === "text" ? watermarkText : <img src={watermarkImageUrl} alt="Watermark" style={{ display: 'block', maxWidth: '200px' }} />}
@@ -284,7 +330,7 @@ function WatermarkPage({ fadeIn, files, watermarkType, setWatermarkType, waterma
             </>
           ) : previewUrls[previewIndex] ? (
             <>
-              <img ref={imageRef} src={previewUrls[previewIndex]} alt="Preview" style={{ display: 'block', maxWidth: '100%', maxHeight: 'calc(100vh - 280px)', width: 'auto', height: 'auto', objectFit: 'contain', borderRadius: '8px', border: '2px solid rgba(94, 200, 255, 0.4)', boxShadow: '0 4px 12px rgba(0,0,0,0.3)' }} onLoad={handleImageLoad} />
+              <img ref={imageRef} src={previewUrls[previewIndex]} alt="Preview" style={{ display: 'block', maxWidth: '100%', maxHeight: '100%', width: 'auto', height: 'auto', objectFit: 'contain', borderRadius: '8px', border: '2px solid rgba(94, 200, 255, 0.4)', boxShadow: '0 4px 12px rgba(0,0,0,0.3)', margin: 'auto' }} onLoad={handleImageLoad} />
               {(watermarkType === "text" ? watermarkText : watermarkImageUrl) && (
                 <div style={watermarkType === "text" ? getWatermarkStyle() : getWatermarkImageStyle()} onMouseDown={handleMouseDown}>
                   {watermarkType === "text" ? watermarkText : <img src={watermarkImageUrl} alt="Watermark" style={{ display: 'block', maxWidth: '200px' }} />}
@@ -294,7 +340,6 @@ function WatermarkPage({ fadeIn, files, watermarkType, setWatermarkType, waterma
           ) : (
             <div style={{ color: 'rgba(255, 255, 255, 0.5)', fontSize: '16px' }}>No preview</div>
           )}
-          <p style={{ color: 'rgba(255, 255, 255, 0.6)', fontSize: '14px', marginTop: '12px', textAlign: 'center' }}>{currentFile?.name}</p>
         </PreviewContainer>
       </div>
     </div>

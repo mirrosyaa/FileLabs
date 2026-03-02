@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import axios from "axios";
 import Footer from "../components/Layout/footer";
 import styles from "../CSS/Pages/fileConverter.module.css";
@@ -17,6 +17,7 @@ function Watermark() {
   const [isDownloading, setIsDownloading] = useState(false);
   const [hasDownloaded, setHasDownloaded] = useState(false);
   const [downloadProgress, setDownloadProgress] = useState(0);
+  const downloadTriggeredRef = useRef(false);
   
   // Watermark settings
   const [watermarkType, setWatermarkType] = useState("text"); // "text" or "image"
@@ -188,35 +189,45 @@ function Watermark() {
   };
 
   const handleDownload = () => {
-    if (hasDownloaded) return; // Prevent double downloads
+    console.log("handleDownload called, hasDownloaded:", hasDownloaded, "downloadTriggered:", downloadTriggeredRef.current);
+    if (hasDownloaded || downloadTriggeredRef.current) {
+      console.log("Download already triggered, returning");
+      return; // Prevent double downloads
+    }
     
+    downloadTriggeredRef.current = true;
     setIsDownloading(true);
-    setDownloadProgress(0);
     
-    // Simulate download progress
+    // Simulate download progress with simple counter
+    let progress = 0;
     const progressInterval = setInterval(() => {
-      setDownloadProgress((prev) => {
-        if (prev >= 100) {
-          clearInterval(progressInterval);
-          
-          // Start actual download
-          const link = document.createElement("a");
-          link.href = processedFileUrl;
-          link.download = `watermarked_${files[0].name}`;
-          link.style.display = 'none';
-          document.body.appendChild(link);
-          link.click();
-          setTimeout(() => {
-            document.body.removeChild(link);
-          }, 100);
-          
-          setIsDownloading(false);
-          setHasDownloaded(true);
-          return 100;
-        }
-        return prev + 10;
-      });
+      progress += 10;
+      setDownloadProgress(progress);
+      
+      if (progress >= 100) {
+        clearInterval(progressInterval);
+      }
     }, 100);
+    
+    // Trigger actual download after progress completes (1 second)
+    setTimeout(() => {
+      console.log("Executing download after timeout");
+      const link = document.createElement("a");
+      link.href = processedFileUrl;
+      link.download = `watermarked_${files[0].name}`;
+      link.style.display = 'none';
+      document.body.appendChild(link);
+      link.click();
+      console.log("Download link clicked");
+      
+      // Cleanup
+      setTimeout(() => {
+        document.body.removeChild(link);
+        setIsDownloading(false);
+        setHasDownloaded(true);
+        console.log("Download complete, hasDownloaded set to true");
+      }, 100);
+    }, 1100); // Wait for progress to complete (100ms * 10 + buffer)
   };
 
   const handleReset = () => {
@@ -244,6 +255,7 @@ function Watermark() {
     setIsDownloading(false);
     setHasDownloaded(false);
     setDownloadProgress(0);
+    downloadTriggeredRef.current = false;
     setError("");
     previewUrls.forEach(url => URL.revokeObjectURL(url));
     setPreviewUrls([]);

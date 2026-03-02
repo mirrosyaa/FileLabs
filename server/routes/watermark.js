@@ -193,9 +193,14 @@ async function addWatermarkToImage(inputPath, outputPath, options) {
     x = (metadata.width * customPositionX) / 100;
     y = (metadata.height * customPositionY) / 100;
     
-    // Ensure watermark stays within bounds (with text already centered via text-anchor)
-    x = Math.max(textWidth/2 + padding, Math.min(metadata.width - textWidth/2 - padding, x));
-    y = Math.max(textHeight/2 + padding, Math.min(metadata.height - textHeight/2 - padding, y));
+    // Constrain to image bounds (text is already centered via text-anchor="middle")
+    const minX = Math.max(textWidth/2 + padding, textWidth/2);
+    const maxX = Math.min(metadata.width - textWidth/2 - padding, metadata.width - textWidth/2);
+    const minY = Math.max(textHeight/2 + padding, textHeight/2);
+    const maxY = Math.min(metadata.height - textHeight/2 - padding, metadata.height - textHeight/2);
+    
+    x = Math.max(minX, Math.min(maxX, x));
+    y = Math.max(minY, Math.min(maxY, y));
   } else {
     // Use anchor position presets - all positions are now center points
     switch (position) {
@@ -309,17 +314,22 @@ async function addWatermarkToVideo(inputPath, outputPath, options) {
       
       // Use custom position if provided, otherwise use anchor position
       if (customPositionX !== undefined && customPositionY !== undefined && !isNaN(customPositionX) && !isNaN(customPositionY)) {
-        // Convert percentage to pixels and center the text
-        // Note: FFmpeg drawtext doesn't have a built-in way to center at exact position,
-        // so we approximate by subtracting half the estimated text width/height
+        // Convert percentage to pixels
+        // FFmpeg drawtext uses top-left corner positioning, but our preview centers the text
+        // So we need to convert from center-based percentage to top-left pixel coordinates
         const estimatedTextWidth = text.length * (calculatedFontSize * 0.6);
         const estimatedTextHeight = calculatedFontSize;
         
         const centerX = (videoWidth * customPositionX) / 100;
         const centerY = (videoHeight * customPositionY) / 100;
         
-        xPosition = Math.max(10, Math.min(videoWidth - estimatedTextWidth - 10, centerX - estimatedTextWidth / 2));
-        yPosition = Math.max(10, Math.min(videoHeight - estimatedTextHeight - 10, centerY - estimatedTextHeight / 2));
+        // Convert center position to top-left position (ffmpeg drawtext uses top-left)
+        xPosition = centerX - estimatedTextWidth / 2;
+        yPosition = centerY - estimatedTextHeight / 2;
+        
+        // Constrain to video bounds
+        xPosition = Math.max(10, Math.min(videoWidth - estimatedTextWidth - 10, xPosition));
+        yPosition = Math.max(10, Math.min(videoHeight - estimatedTextHeight - 10, yPosition));
       } else {
         // Map position to ffmpeg drawtext position
         switch (position) {
@@ -469,11 +479,15 @@ async function addWatermarkToPDF(inputPath, outputPath, options) {
     // Use custom position if provided, otherwise use anchor position
     if (customPositionX !== undefined && customPositionY !== undefined && !isNaN(customPositionX) && !isNaN(customPositionY)) {
       // Convert percentage to points (custom position from drag)
-      // The preview uses transform: translate(-50%, -50%), so we need to center the text here too
-      x = (width * customPositionX) / 100 - (textWidth / 2);
-      y = height - (height * customPositionY) / 100 - (textHeight / 2); // PDF coordinates are bottom-up
+      // The preview uses transform: translate(-50%, -50%), so the position IS the center point
+      const centerX = (width * customPositionX) / 100;
+      const centerY = height - (height * customPositionY) / 100; // PDF coordinates are bottom-up
       
-      // Ensure watermark stays within bounds
+      // Convert center position to top-left position for PDF text drawing
+      x = centerX - (textWidth / 2);
+      y = centerY - (textHeight / 2);
+      
+      // Constrain to PDF bounds
       x = Math.max(padding, Math.min(width - textWidth - padding, x));
       y = Math.max(padding, Math.min(height - padding - textHeight, y));
     } else {
