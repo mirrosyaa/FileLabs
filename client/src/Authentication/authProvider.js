@@ -53,7 +53,8 @@ const AuthProvider = ({ children }) => {
       // Cleanup interceptor on unmount
       axios.interceptors.response.eject(interceptor);
     };
-  }, []);
+  });
+  
 
   useEffect(() => {
     if (token) {

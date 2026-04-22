@@ -1,6 +1,5 @@
 import React, { useState, useRef, useEffect } from "react";
 import axios from "axios";
-import { useNavigate } from "react-router-dom";
 import styles from "../CSS/Pages/adminDashboard.module.css";
 import AdminHeader from "../components/Admin/AdminHeader";
 import SearchBar from "../components/SearchBar";
@@ -13,7 +12,6 @@ function AdminDashboard() {
   const [isAddUserModalOpen, setIsAddUserModalOpen] = useState(false);
   const [currentAdminId, setCurrentAdminId] = useState(null);
   const usersTableRef = useRef();
-  const navigate = useNavigate();
 
   // Fetch current admin's user ID
   useEffect(() => {
